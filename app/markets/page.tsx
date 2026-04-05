@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   AreaChart,
@@ -41,7 +41,12 @@ import {
   TrendingUp,
   Loader2,
 } from "lucide-react";
-import { sparkGen, Market, markets as allMarkets, CATEGORIES, PLATFORMS } from "@/lib/mockData";
+import { useMarkets } from "@/hooks/useData";
+import { CATEGORIES, PLATFORMS } from "@/lib/mockData";
+import type { Market } from "@/lib/mockData";
+import { useDataSource } from "@/components/layout/DataSourceContext";
+import { LastUpdated } from "@/components/layout/LastUpdated";
+import { MarketsBrowseSkeleton } from "@/components/ui/skeleton-loaders";
 
 const categories = CATEGORIES;
 const platforms = PLATFORMS;
@@ -59,7 +64,7 @@ type ViewMode = "grid" | "table";
 // ─── SPARKLINE ────────────────────────────────────────────────────────
 function MiniSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
-    <div className="h-6 w-16">
+    <div className="h-8 w-16">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} dot={false} />
@@ -169,6 +174,9 @@ function MarketCard({ m }: { m: Market }) {
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────
 export default function MarketsBrowsePage() {
+  const { markets: allMarkets, source, refreshing, lastFetched, error, retry } = useMarkets();
+  const { setSource } = useDataSource();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sortBy, setSortBy] = useState<SortKey>("volume");
@@ -177,6 +185,10 @@ export default function MarketsBrowsePage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [visibleCount, setVisibleCount] = useState(12);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => { const t = setTimeout(() => setPageLoading(false), 1200); return () => clearTimeout(t); }, []);
+  useEffect(() => { setSource(source); }, [source, setSource]);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -215,12 +227,15 @@ export default function MarketsBrowsePage() {
     return sortDir === "desc" ? <ChevronDown className="size-3 text-[#57D7BA]" /> : <ChevronUp className="size-3 text-[#57D7BA]" />;
   };
 
+  if (pageLoading) return <MarketsBrowseSkeleton />;
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
       {/* ─── HERO SEARCH ────────────────────────────────────── */}
       <div className="text-center py-4">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Browse Prediction Markets</h1>
-        <p className="text-sm text-[#8892b0] mb-5">{allMarkets.length} active markets across all platforms</p>
+        <p className="text-sm text-[#8892b0] mb-2">{allMarkets.length} active markets across all platforms</p>
+        <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
         <div className="max-w-2xl mx-auto relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-[#8892b0]" />
           <input
@@ -399,7 +414,7 @@ export default function MarketsBrowsePage() {
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          <Link href="/api" className="hover:text-[#57D7BA] transition-colors">API</Link>
+          <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
         </div>
       </footer>
     </div>

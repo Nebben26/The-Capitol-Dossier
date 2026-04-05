@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import {
-  whales as traders,
-  TIME_FILTERS as timeFilters,
-  CATEGORIES as categories,
-  type Whale,
-} from "@/lib/mockData";
+import { useLeaderboard } from "@/hooks/useData";
+import { TIME_FILTERS as timeFilters, CATEGORIES as categories } from "@/lib/mockData";
+import type { Whale } from "@/lib/mockData";
 import {
   ResponsiveContainer,
   LineChart,
@@ -62,6 +59,8 @@ import {
   Brain,
   Flame,
 } from "lucide-react";
+import { LastUpdated } from "@/components/layout/LastUpdated";
+import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 
 
 type SortKey = "rank" | "pnl" | "winRate" | "accuracy" | "volume" | "activeMarkets" | "brier";
@@ -70,7 +69,7 @@ type SortDir = "asc" | "desc";
 // ─── SPARKLINE ────────────────────────────────────────────────────────
 function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
-    <div className="h-6 w-20">
+    <div className="h-8 w-20">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data}>
           <defs>
@@ -183,12 +182,16 @@ function TraderCard({ t, followed, onFollow }: { t: Whale; followed: boolean; on
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────
 export default function LeaderboardPage() {
+  const { whales: traders } = useLeaderboard();
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<typeof timeFilters[number]>("All Time");
   const [category, setCategory] = useState("All");
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -233,6 +236,8 @@ export default function LeaderboardPage() {
     return sortDir === "desc" ? <ChevronDown className="size-3 text-[#57D7BA]" /> : <ChevronUp className="size-3 text-[#57D7BA]" />;
   };
 
+  if (loading) return <LeaderboardSkeleton />;
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
             {/* ─── PAGE TITLE ──────────────────────────────────────── */}
@@ -240,15 +245,12 @@ export default function LeaderboardPage() {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
                   <Trophy className="size-7 text-[#f59e0b]" />
-                  Leaderboard
+                  Who's Making Money
                 </h1>
                 <p className="text-sm text-[#8892b0] mt-1">Top Prediction Market Traders — ranked by performance</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#222638] border border-[#2a2f45] text-[10px] text-[#8892b0]">
-                  <Clock className="size-3" />
-                  Updated 2m ago
-                </span>
+                <LastUpdated />
                 <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-semibold">
                   <Users className="size-3" />
                   2,847 tracked
@@ -327,7 +329,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* ─── DESKTOP TABLE ────────────────────────────────────── */}
-            <Card className="bg-[#222638] border-[#2a2f45] hidden md:block">
+            <Card className="bg-[#222638] border-[#2a2f45] hidden lg:block">
               <CardContent className="px-0 py-0">
                 <Table>
                   <TableHeader>
@@ -337,25 +339,25 @@ export default function LeaderboardPage() {
                       </TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium">TRADER</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("pnl")}>
-                        <span className="flex items-center gap-0.5">TOTAL P&L <SortIcon col="pnl" /></span>
+                        <span className="flex items-center gap-0.5">P&L <SortIcon col="pnl" /></span>
                       </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">P&L TREND</TableHead>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium hidden xl:table-cell">P&L TREND</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("winRate")}>
-                        <span className="flex items-center gap-0.5">WIN RATE <SortIcon col="winRate" /></span>
+                        <span className="flex items-center gap-0.5">WIN% <SortIcon col="winRate" /></span>
                       </TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("accuracy")}>
-                        <span className="flex items-center gap-0.5">ACCURACY <SortIcon col="accuracy" /></span>
+                        <span className="flex items-center gap-0.5">ACC% <SortIcon col="accuracy" /></span>
                       </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("brier")}>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell" onClick={() => handleSort("brier")}>
                         <span className="flex items-center gap-0.5">BRIER <SortIcon col="brier" /></span>
                       </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("volume")}>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell" onClick={() => handleSort("volume")}>
                         <span className="flex items-center gap-0.5">VOLUME <SortIcon col="volume" /></span>
                       </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("activeMarkets")}>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell" onClick={() => handleSort("activeMarkets")}>
                         <span className="flex items-center gap-0.5">MARKETS <SortIcon col="activeMarkets" /></span>
                       </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">BEST CAT</TableHead>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium">BEST</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4 text-right">ACTION</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -368,7 +370,7 @@ export default function LeaderboardPage() {
                               <RankBadge rank={t.rank} />
                             </TableCell>
                             <TableCell className="py-3">
-                              <Link href={`/whales/${t.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors">
+                              <Link href={`/whales/${t.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors max-w-[140px]">
                                 <div className="size-7 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0">
                                   <span className="text-[9px] font-bold text-[#0f1119]">{t.name[0]}</span>
                                 </div>
@@ -400,7 +402,7 @@ export default function LeaderboardPage() {
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 hidden xl:table-cell">
                               <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
                             </TableCell>
                             <TableCell className="py-3">
@@ -414,15 +416,15 @@ export default function LeaderboardPage() {
                                 <span className="font-mono text-xs font-semibold text-[#57D7BA]">{t.accuracy}%</span>
                               </div>
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 hidden xl:table-cell">
                               <span className={`font-mono text-xs font-semibold ${t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]"}`}>
                                 {t.brier.toFixed(2)}
                               </span>
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 hidden xl:table-cell">
                               <span className="font-mono text-xs text-[#8892b0]">{t.totalVolume}</span>
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 hidden xl:table-cell">
                               <span className="font-mono text-xs text-[#8892b0]">{t.activeMarkets}</span>
                             </TableCell>
                             <TableCell className="py-3">
@@ -474,7 +476,7 @@ export default function LeaderboardPage() {
             </Card>
 
             {/* ─── MOBILE CARDS ─────────────────────────────────────── */}
-            <div className="md:hidden space-y-3">
+            <div className="lg:hidden space-y-3">
               {sorted.map((t) => (
                 <TraderCard key={t.id} t={t} followed={followedIds.has(t.id)} onFollow={() => toggleFollow(t.id)} />
               ))}
@@ -486,7 +488,7 @@ export default function LeaderboardPage() {
               <div className="flex items-center gap-3">
                 <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
                 <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-                <Link href="/api" className="hover:text-[#57D7BA] transition-colors">API</Link>
+                <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
               </div>
             </footer>
     </div>

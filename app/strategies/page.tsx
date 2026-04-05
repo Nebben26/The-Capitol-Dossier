@@ -58,14 +58,9 @@ import {
   LineChart as LineChartIcon,
 } from "lucide-react";
 
-import {
-  sparkGen,
-  Strategy,
-  strategies,
-  STRAT_CATEGORIES,
-  backtestEquity,
-  backtestTrades,
-} from "@/lib/mockData";
+import { useStrategies, useBacktestData, STRAT_CATEGORIES } from "@/hooks/useData";
+import type { Strategy } from "@/lib/mockData";
+import { LastUpdated } from "@/components/layout/LastUpdated";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function StratSparkline({ data, color }: { data: { d: number; v: number }[]; color: string }) {
@@ -89,6 +84,8 @@ function StratSparkline({ data, color }: { data: { d: number; v: number }[]; col
 
 // ─── MAIN ─────────────────────────────────────────────────────────────
 export default function StrategiesPage() {
+  const { strategies } = useStrategies();
+  const { backtestEquity, backtestTrades } = useBacktestData();
   const [searchQuery, setSearchQuery] = useState("");
   const [stratCategory, setStratCategory] = useState("All");
   const [backtestRun, setBacktestRun] = useState(false);
@@ -124,7 +121,7 @@ export default function StrategiesPage() {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
                   <Zap className="size-7 text-[#f59e0b]" />
-                  Strategies & Backtester
+                  Strategies That Actually Work
                 </h1>
                 <p className="text-sm text-[#8892b0] mt-1">Curated alpha strategies + build and backtest your own</p>
               </div>
@@ -132,9 +129,7 @@ export default function StrategiesPage() {
                 <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-[10px] font-bold">
                   <Sparkles className="size-3" />Premium
                 </span>
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#222638] border border-[#2a2f45] text-[10px] text-[#8892b0]">
-                  <Clock className="size-3" />Updated 5m ago
-                </span>
+                <LastUpdated />
               </div>
             </div>
 
@@ -511,7 +506,7 @@ export default function StrategiesPage() {
               <div className="flex items-center gap-3">
                 <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
                 <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-                <Link href="/api" className="hover:text-[#57D7BA] transition-colors">API</Link>
+                <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
               </div>
             </footer>
     </div>

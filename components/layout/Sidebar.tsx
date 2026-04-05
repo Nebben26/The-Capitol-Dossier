@@ -12,6 +12,8 @@ import {
   Target,
   Shield,
   X,
+  GitCompareArrows,
+  Crosshair,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,9 +21,11 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Markets", icon: Target, href: "/markets" },
+  { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Whales", icon: Users, href: "/whales" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
   { label: "Strategies", icon: Zap, href: "/strategies" },
+  { label: "Calibration", icon: Crosshair, href: "/calibration" },
   { label: "Alerts", icon: Bell, href: "/alerts" },
 ];
 

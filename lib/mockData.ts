@@ -377,7 +377,31 @@ export const resolutionHistory: ResolutionRecord[] = [
   { q: "US recession by Dec 2020?", resolved: "YES", finalPrice: 91, accuracy: "Correct — COVID recession", date: "Jan 2021" },
 ];
 
-// ─── WHALE-PROFILE SUPPLEMENTARY DATA ───────────────────────────���─────
+// ─── RECENTLY RESOLVED MARKETS ────────────────────────────────────────
+export interface ResolvedMarket {
+  id: string;
+  question: string;
+  marketId: string;
+  resolved: "YES" | "NO";
+  finalPrice: number;
+  marketPrice: number;
+  correct: boolean;
+  traders: number;
+  volume: string;
+  category: string;
+  resolvedDate: string;
+}
+
+export const recentlyResolved: ResolvedMarket[] = [
+  { id: "rm1", question: "Will the Fed raise rates in Q1 2026?", marketId: "fed-hike-q1", resolved: "NO", finalPrice: 3, marketPrice: 18, correct: true, traders: 8420, volume: "$6.2M", category: "Economics", resolvedDate: "Mar 31, 2026" },
+  { id: "rm2", question: "Will UK call a snap election before April 2026?", marketId: "uk-snap", resolved: "NO", finalPrice: 5, marketPrice: 22, correct: true, traders: 3100, volume: "$1.8M", category: "Elections", resolvedDate: "Mar 28, 2026" },
+  { id: "rm3", question: "Will Bitcoin hit $200K by March 2026?", marketId: "btc-200k-mar", resolved: "NO", finalPrice: 2, marketPrice: 8, correct: true, traders: 14200, volume: "$18.4M", category: "Crypto", resolvedDate: "Mar 31, 2026" },
+  { id: "rm4", question: "Will TikTok be banned in the US by March 2026?", marketId: "tiktok-ban", resolved: "YES", finalPrice: 94, marketPrice: 62, correct: false, traders: 28400, volume: "$42.1M", category: "Tech", resolvedDate: "Mar 15, 2026" },
+  { id: "rm5", question: "Will inflation drop below 2.5% by Feb 2026?", marketId: "inflation-2-5", resolved: "NO", finalPrice: 8, marketPrice: 45, correct: false, traders: 6800, volume: "$4.9M", category: "Economics", resolvedDate: "Feb 28, 2026" },
+  { id: "rm6", question: "Will Starship achieve orbit by Q1 2026?", marketId: "starship-orbit", resolved: "YES", finalPrice: 92, marketPrice: 78, correct: true, traders: 9200, volume: "$7.3M", category: "Tech", resolvedDate: "Mar 22, 2026" },
+];
+
+// ─── WHALE-PROFILE SUPPLEMENTARY DATA ────────────────────────────���─────
 export const pnlHistory = [
   { month: "Apr", pnl: 120 }, { month: "May", pnl: 340 }, { month: "Jun", pnl: 280 },
   { month: "Jul", pnl: 510 }, { month: "Aug", pnl: 390 }, { month: "Sep", pnl: 720 },
@@ -506,6 +530,35 @@ export const breakingMarkets = [
   { id: "ufc-309", title: "Jones wins UFC 309?", price: 61, vol: "3.2M", time: "22m ago", hot: false },
   { id: "pandemic-2026", title: "WHO declares new pandemic 2026?", price: 6, vol: "11.8M", time: "34m ago", hot: true },
   { id: "dem-nominee", title: "Harris is 2028 Dem nominee?", price: 44, vol: "7.9M", time: "41m ago", hot: false },
+];
+
+// ─── DISAGREES (cross-platform spreads) ───────────────────────────────
+export interface Disagreement {
+  id: string;
+  question: string;
+  marketId: string;
+  polyPrice: number;
+  kalshiPrice: number;
+  spread: number;
+  polyVol: string;
+  kalshiVol: string;
+  category: string;
+  resolution: string;
+  daysLeft: number;
+  direction: "poly-higher" | "kalshi-higher";
+}
+
+export const disagreements: Disagreement[] = [
+  { id: "d1", question: "Will there be a US recession by Dec 2026?", marketId: "recession-2026", polyPrice: 68, kalshiPrice: 55, spread: 13, polyVol: "$24.1M", kalshiVol: "$8.3M", category: "Economics", resolution: "Dec 31, 2026", daysLeft: 271, direction: "poly-higher" },
+  { id: "d2", question: "Will Trump win the 2028 presidential election?", marketId: "trump-2028", polyPrice: 31, kalshiPrice: 19, spread: 12, polyVol: "$45.2M", kalshiVol: "$12.1M", category: "Elections", resolution: "Nov 5, 2028", daysLeft: 950, direction: "poly-higher" },
+  { id: "d3", question: "Will Bitcoin trade above $150K by end of 2026?", marketId: "btc-150k", polyPrice: 23, kalshiPrice: 34, spread: 11, polyVol: "$32.8M", kalshiVol: "$9.4M", category: "Crypto", resolution: "Dec 31, 2026", daysLeft: 271, direction: "kalshi-higher" },
+  { id: "d4", question: "Will the EU impose retaliatory tariffs by Q3 2026?", marketId: "eu-tariff", polyPrice: 54, kalshiPrice: 42, spread: 12, polyVol: "$6.1M", kalshiVol: "$3.8M", category: "Geopolitics", resolution: "Sep 30, 2026", daysLeft: 179, direction: "poly-higher" },
+  { id: "d5", question: "Will AGI be announced by a major lab by 2027?", marketId: "ai-agi", polyPrice: 15, kalshiPrice: 5, spread: 10, polyVol: "$12.4M", kalshiVol: "$2.1M", category: "Tech", resolution: "Dec 31, 2027", daysLeft: 636, direction: "poly-higher" },
+  { id: "d6", question: "Will OpenAI hit $10B annual revenue by mid-2026?", marketId: "openai-revenue", polyPrice: 55, kalshiPrice: 41, spread: 14, polyVol: "$5.6M", kalshiVol: "$2.8M", category: "Tech", resolution: "Jul 1, 2026", daysLeft: 88, direction: "poly-higher" },
+  { id: "d7", question: "Will Harris be the 2028 Democratic nominee?", marketId: "dem-nominee", polyPrice: 44, kalshiPrice: 32, spread: 12, polyVol: "$7.9M", kalshiVol: "$4.2M", category: "Elections", resolution: "Aug 30, 2028", daysLeft: 879, direction: "poly-higher" },
+  { id: "d8", question: "Will oil prices exceed $100/barrel in 2026?", marketId: "oil-100", polyPrice: 33, kalshiPrice: 22, spread: 11, polyVol: "$7.1M", kalshiVol: "$3.4M", category: "Economics", resolution: "Dec 31, 2026", daysLeft: 271, direction: "poly-higher" },
+  { id: "d9", question: "Will Solana's market cap flip Ethereum in 2026?", marketId: "sol-flip-eth", polyPrice: 11, kalshiPrice: 22, spread: 11, polyVol: "$8.9M", kalshiVol: "$5.1M", category: "Crypto", resolution: "Dec 31, 2026", daysLeft: 271, direction: "kalshi-higher" },
+  { id: "d10", question: "Will the Senate flip in 2026 midterms?", marketId: "senate-flip", polyPrice: 38, kalshiPrice: 27, spread: 11, polyVol: "$14.2M", kalshiVol: "$6.8M", category: "Elections", resolution: "Nov 3, 2026", daysLeft: 213, direction: "poly-higher" },
 ];
 
 // Homepage whale activity (top 5 recent whale moves)

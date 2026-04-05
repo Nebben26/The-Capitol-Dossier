@@ -139,7 +139,7 @@ export default function PricingPage() {
       </div>
 
       {/* ─── PLAN CARDS ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto pt-4 overflow-visible">
         {/* Free */}
         <Card className="bg-[#222638] border-[#2a2f45] relative">
           <CardHeader className="pb-4">
@@ -178,7 +178,7 @@ export default function PricingPage() {
         </Card>
 
         {/* Pro */}
-        <Card className="bg-[#222638] border-[#57D7BA]/30 relative ring-1 ring-[#57D7BA]/20 shadow-xl shadow-[#57D7BA]/5">
+        <Card className="bg-[#222638] border-[#57D7BA]/30 relative overflow-visible ring-1 ring-[#57D7BA]/20 shadow-xl shadow-[#57D7BA]/5">
           {/* Badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#57D7BA] text-[#0f1119] text-[10px] font-bold flex items-center gap-1 shadow-lg shadow-[#57D7BA]/30">
             <Crown className="size-3" />
@@ -357,7 +357,7 @@ export default function PricingPage() {
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          <Link href="/api" className="hover:text-[#57D7BA] transition-colors">API</Link>
+          <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
         </div>
       </footer>
 
