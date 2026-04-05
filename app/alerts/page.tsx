@@ -1,0 +1,440 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  LineChart,
+  Line,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Target,
+  ChevronUp,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Wallet,
+  Eye,
+  UserPlus,
+  AlertTriangle,
+  Timer,
+  Flame,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Volume2,
+  Radio,
+  ChevronRight,
+} from "lucide-react";
+import {
+  sparkGen,
+  WhaleAlert,
+  PriceMover,
+  ResolutionItem,
+  initialWhaleAlerts,
+  incomingAlerts,
+  priceMovers,
+  resolutionNearing,
+} from "@/lib/mockData";
+
+// ─── SORT ─────────────────────────────────────────────────────────────
+type PmSort = "change5m" | "change15m" | "change1h" | "price";
+type SortDir = "asc" | "desc";
+
+// ─── MINI SPARKLINE ───────────────────────────────────────────────────
+function MoverSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
+  return (
+    <div className="h-6 w-16">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ─── COUNTDOWN ────────────────────────────────────────────────────────
+function Countdown({ days, hours }: { days: number; hours: number }) {
+  const urgency = days <= 7 ? "text-[#ef4444]" : days <= 30 ? "text-[#f59e0b]" : "text-[#8892b0]";
+  const bg = days <= 7 ? "bg-[#ef4444]/10" : days <= 30 ? "bg-[#f59e0b]/10" : "bg-[#2a2f45]";
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${urgency} ${bg}`}>
+      <Timer className="size-2.5" />
+      {days}d {hours % 24}h
+    </span>
+  );
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────
+export default function AlertsPage() {
+  const [alerts, setAlerts] = useState(initialWhaleAlerts);
+  const [alertCount, setAlertCount] = useState(2847);
+  const [pmSort, setPmSort] = useState<PmSort>("change1h");
+  const [pmDir, setPmDir] = useState<SortDir>("desc");
+  const [followedWhales, setFollowedWhales] = useState<Set<string>>(new Set());
+  const [newAlertIdx, setNewAlertIdx] = useState(0);
+
+  // Simulated live incoming alerts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNewAlertIdx((prev) => {
+        const nextIdx = prev % incomingAlerts.length;
+        const newAlert: WhaleAlert = {
+          ...incomingAlerts[nextIdx],
+          id: `wa-live-${Date.now()}`,
+          isNew: true,
+        };
+        setAlerts((a) => [newAlert, ...a.map((x) => ({ ...x, isNew: false })).slice(0, 14)]);
+        setAlertCount((c) => c + 1);
+        return prev + 1;
+      });
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const toggleFollow = (id: string) => {
+    setFollowedWhales((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handlePmSort = (key: PmSort) => {
+    if (pmSort === key) setPmDir(pmDir === "asc" ? "desc" : "asc");
+    else { setPmSort(key); setPmDir("desc"); }
+  };
+
+  const sortedMovers = [...priceMovers].sort((a, b) => {
+    const av = a[pmSort];
+    const bv = b[pmSort];
+    return pmDir === "desc" ? Math.abs(bv) - Math.abs(av) : Math.abs(av) - Math.abs(bv);
+  });
+
+  const sortedResolutions = [...resolutionNearing].sort((a, b) => a.daysLeft - b.daysLeft);
+
+  const PmSortIcon = ({ col }: { col: PmSort }) => {
+    if (pmSort !== col) return <ChevronDown className="size-3 opacity-30" />;
+    return pmDir === "desc" ? <ChevronDown className="size-3 text-[#57D7BA]" /> : <ChevronUp className="size-3 text-[#57D7BA]" />;
+  };
+
+  return (
+    <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+            {/* Title */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
+                  <Radio className="size-7 text-[#ef4444]" />
+                  Live Alerts
+                </h1>
+                <p className="text-sm text-[#8892b0] mt-1">Real-time whale movements, price spikes & resolution countdowns</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-[10px] font-bold animate-pulse">
+                  <span className="size-1.5 rounded-full bg-[#ef4444]" />LIVE
+                </span>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#222638] border border-[#2a2f45] text-[10px] text-[#8892b0] font-mono">
+                  {alertCount.toLocaleString()} alerts today
+                </span>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Whale Alerts", val: "142", icon: Wallet, color: "#8b5cf6", sub: "Last 24h" },
+                { label: "Price Spikes", val: "38", icon: TrendingUp, color: "#22c55e", sub: ">5% in 1h" },
+                { label: "Vol Spikes", val: "24", icon: Volume2, color: "#f59e0b", sub: ">3x avg" },
+                { label: "Resolving Soon", val: "8", icon: Timer, color: "#ef4444", sub: "Within 30d" },
+              ].map((s) => (
+                <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
+                  <CardContent className="p-3 flex items-center gap-3">
+                    <div className="size-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${s.color}15` }}>
+                      <s.icon className="size-4" style={{ color: s.color }} />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold font-mono">{s.val}</div>
+                      <div className="text-[10px] text-[#8892b0]">{s.label}</div>
+                      <div className="text-[9px] text-[#8892b0]/60">{s.sub}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* ─── TABS ──────────────────────────────────────────── */}
+            <Tabs defaultValue="whales">
+              <div className="border-b border-[#2a2f45] -mx-4 px-4 overflow-x-auto scrollbar-none">
+                <TabsList variant="line" className="bg-transparent gap-0">
+                  <TabsTrigger value="whales" className="px-4 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0]">
+                    <Wallet className="size-3.5" />Whale Alerts
+                  </TabsTrigger>
+                  <TabsTrigger value="movers" className="px-4 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0]">
+                    <TrendingUp className="size-3.5" />Price Movers
+                  </TabsTrigger>
+                  <TabsTrigger value="resolution" className="px-4 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0]">
+                    <Calendar className="size-3.5" />Resolution Nearing
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* ═══ WHALE ALERTS TAB ═════════════════════════════════ */}
+              <TabsContent value="whales" className="pt-5 space-y-2">
+                {alerts.map((a) => (
+                  <div
+                    key={a.id}
+                    className={`rounded-lg border transition-all duration-500 ${
+                      a.isNew
+                        ? "bg-[#57D7BA]/5 border-[#57D7BA]/20 shadow-lg shadow-[#57D7BA]/5 animate-in slide-in-from-top-2 fade-in-0 duration-500"
+                        : "bg-[#222638] border-[#2a2f45] hover:border-[#57D7BA]/10"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 p-3 sm:p-4">
+                      {/* Pulse dot */}
+                      <div className="shrink-0">
+                        {a.isNew ? (
+                          <span className="relative flex size-3">
+                            <span className="absolute inline-flex size-full rounded-full bg-[#57D7BA] opacity-75 animate-ping" />
+                            <span className="relative inline-flex size-3 rounded-full bg-[#57D7BA]" />
+                          </span>
+                        ) : (
+                          <span className="size-3 rounded-full bg-[#2a2f45]" />
+                        )}
+                      </div>
+
+                      {/* Avatar */}
+                      <div className="size-8 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0 relative">
+                        <span className="text-[9px] font-bold text-[#0f1119]">#{a.rank}</span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                          <Link href={`/whales/${a.walletId}`} className="text-xs font-semibold hover:text-[#57D7BA] transition-colors">
+                            {a.wallet}
+                          </Link>
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            a.side === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"
+                          }`}>
+                            {a.side === "YES" ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
+                            {a.side} {a.size}
+                          </span>
+                          <span className="text-[10px] text-[#8892b0]">at {a.price}</span>
+                        </div>
+                        <Link href={`/markets/${a.marketId}`} className="text-[11px] text-[#8892b0] hover:text-[#57D7BA] transition-colors line-clamp-1">
+                          {a.market}
+                        </Link>
+                      </div>
+
+                      {/* Right side */}
+                      <div className="shrink-0 flex items-center gap-2">
+                        {/* Accuracy badge */}
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#57D7BA]/10">
+                              <Target className="size-2.5 text-[#57D7BA]" />
+                              <span className="text-[9px] font-mono font-bold text-[#57D7BA]">{a.accuracy}%</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-[#222638] border-[#2a2f45] text-[#e2e8f0] text-xs">
+                            Historical accuracy: {a.accuracy}%
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {/* Timestamp */}
+                        <span className="text-[9px] text-[#8892b0] font-mono w-14 text-right shrink-0">{a.time}</span>
+
+                        {/* Actions */}
+                        <div className="hidden sm:flex items-center gap-1">
+                          <Link href={`/markets/${a.marketId}`}>
+                            <Button variant="ghost" size="icon-xs" className="text-[#8892b0] hover:text-[#57D7BA]">
+                              <Eye className="size-3" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => toggleFollow(a.walletId)}
+                            className={followedWhales.has(a.walletId) ? "text-[#57D7BA]" : "text-[#8892b0] hover:text-[#57D7BA]"}
+                          >
+                            <UserPlus className="size-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+
+              {/* ═══ PRICE MOVERS TAB ═════════════════════════════════ */}
+              <TabsContent value="movers" className="pt-5">
+                <Card className="bg-[#222638] border-[#2a2f45]">
+                  <CardContent className="px-0 py-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-[#2a2f45] hover:bg-transparent">
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">CONTRACT</TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium">TREND</TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handlePmSort("price")}>
+                            <span className="flex items-center gap-0.5">PRICE <PmSortIcon col="price" /></span>
+                          </TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handlePmSort("change5m")}>
+                            <span className="flex items-center gap-0.5">5M <PmSortIcon col="change5m" /></span>
+                          </TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handlePmSort("change15m")}>
+                            <span className="flex items-center gap-0.5">15M <PmSortIcon col="change15m" /></span>
+                          </TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handlePmSort("change1h")}>
+                            <span className="flex items-center gap-0.5">1H <PmSortIcon col="change1h" /></span>
+                          </TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium">VOLUME</TableHead>
+                          <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">ACTION</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sortedMovers.map((m) => (
+                          <TableRow key={m.id} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                            <TableCell className="pl-4 py-2.5">
+                              <Link href={`/markets/${m.marketId}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors leading-snug line-clamp-1">
+                                {m.market}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="py-2.5">
+                              <MoverSparkline data={m.spark} positive={m.change1h >= 0} />
+                            </TableCell>
+                            <TableCell className="py-2.5">
+                              <span className="font-mono text-xs font-semibold">{m.price}¢</span>
+                            </TableCell>
+                            {([m.change5m, m.change15m, m.change1h] as number[]).map((ch, i) => (
+                              <TableCell key={i} className="py-2.5">
+                                <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold ${ch >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                                  {ch >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
+                                  {Math.abs(ch)}%
+                                </span>
+                              </TableCell>
+                            ))}
+                            <TableCell className="py-2.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[11px] text-[#8892b0]">{m.volume}</span>
+                                {m.volSpike && (
+                                  <span className="px-1 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[7px] font-bold flex items-center gap-0.5">
+                                    <Volume2 className="size-2" />SPIKE
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="pr-4 py-2.5">
+                              <Link href={`/markets/${m.marketId}`}>
+                                <Button variant="ghost" size="xs" className="text-[#8892b0] hover:text-[#57D7BA]">
+                                  <Eye className="size-3" />View
+                                </Button>
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* ═══ RESOLUTION NEARING TAB ════════════════════════════ */}
+              <TabsContent value="resolution" className="pt-5 space-y-3">
+                {sortedResolutions.map((r) => (
+                  <Card key={r.id} className={`bg-[#222638] border-[#2a2f45] hover:border-[#57D7BA]/10 transition-all ${r.daysLeft <= 7 ? "ring-1 ring-[#ef4444]/20" : ""}`}>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        {/* Countdown */}
+                        <div className="shrink-0 flex flex-col items-center justify-center w-20">
+                          <Countdown days={r.daysLeft} hours={r.hoursLeft} />
+                          {r.daysLeft <= 7 && (
+                            <span className="text-[8px] text-[#ef4444] font-bold uppercase mt-1 flex items-center gap-0.5">
+                              <AlertTriangle className="size-2" />Urgent
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <Link href={`/markets/${r.marketId}`} className="text-sm font-semibold hover:text-[#57D7BA] transition-colors">
+                              {r.market}
+                            </Link>
+                            {r.highConviction && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[8px] font-bold">
+                                <Flame className="size-2.5" />HIGH CONVICTION
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-[10px] text-[#8892b0]">
+                            <span>Resolves: {r.resolves}</span>
+                            <span>{r.whaleCount} whales positioned</span>
+                          </div>
+                          {/* YES/NO bar */}
+                          <div className="mt-2 flex items-center gap-2">
+                            <div className="flex-1 h-2 rounded-full bg-[#1a1e2e] overflow-hidden flex">
+                              <div className="h-full bg-[#22c55e] rounded-l-full" style={{ width: `${r.yesPercent}%` }} />
+                              <div className="h-full bg-[#ef4444] rounded-r-full" style={{ width: `${100 - r.yesPercent}%` }} />
+                            </div>
+                            <div className="flex items-center gap-2 text-[9px] font-mono shrink-0">
+                              <span className="text-[#22c55e] font-semibold">Y {r.yesPercent}%</span>
+                              <span className="text-[#ef4444] font-semibold">N {100 - r.yesPercent}%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right stats */}
+                        <div className="shrink-0 flex items-center gap-3 sm:gap-4">
+                          <div className="text-center">
+                            <div className="text-sm font-bold font-mono text-[#57D7BA]">{r.price}¢</div>
+                            <div className="text-[8px] text-[#8892b0] uppercase">Price</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-bold font-mono text-[#e2e8f0]">{r.volume}</div>
+                            <div className="text-[8px] text-[#8892b0] uppercase">Volume</div>
+                          </div>
+                          <Link href={`/markets/${r.marketId}`}>
+                            <Button size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">
+                              View <ChevronRight className="size-3" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </TabsContent>
+            </Tabs>
+
+            {/* Footer */}
+            <footer className="flex items-center justify-between py-4 border-t border-[#2a2f45] text-[10px] text-[#8892b0]">
+              <span>© 2026 Quiver Markets. Not financial advice.</span>
+              <div className="flex items-center gap-3">
+                <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
+                <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
+                <Link href="/api" className="hover:text-[#57D7BA] transition-colors">API</Link>
+              </div>
+            </footer>
+    </div>
+  );
+}
