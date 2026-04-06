@@ -282,12 +282,24 @@ export function useHomepageData(autoRefreshMs = 45000) {
       cat: m.category,
     }));
 
+  // Build treemap from real market data, filtering out blank/zero entries
+  const liveTreemap = markets.length > 24
+    ? markets
+        .filter((m) => m.question && m.volNum > 0)
+        .slice(0, 20)
+        .map((m) => ({
+          name: m.question.length > 30 ? m.question.slice(0, 28) + "…" : m.question,
+          size: Math.round(m.volNum / 1000),
+          change: m.change,
+        }))
+    : treemapData;
+
   return {
     markets,
     biggestMovers,
     breakingMarkets,
     whaleActivity: homepageWhaleActivity,
-    treemapData,
+    treemapData: liveTreemap,
     source,
     refreshing,
     lastFetched,

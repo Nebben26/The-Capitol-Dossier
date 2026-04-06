@@ -14,7 +14,8 @@ import {
   Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { markets, whales, disagreements } from "@/lib/mockData";
+import { markets as mockMarkets, whales as mockWhales } from "@/lib/mockData";
+import { useMarkets, useWhales, useDisagreements } from "@/hooks/useData";
 import { useDataSource } from "./DataSourceContext";
 import { useAuth } from "./AuthContext";
 import { LogOut, User } from "lucide-react";
@@ -60,6 +61,11 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const router = useRouter();
   const { source } = useDataSource();
   const { user, setShowLogin, signOut } = useAuth();
+  const { markets: liveMarkets } = useMarkets();
+  const { whales: liveWhales } = useWhales();
+  const { disagreements } = useDisagreements();
+  const markets = liveMarkets.length > 24 ? liveMarkets : mockMarkets;
+  const whales = liveWhales.length > 0 ? liveWhales : mockWhales;
   const [query, setQuery] = useState("");
   const [autoPost, setAutoPost] = useState(false);
   const [open, setOpen] = useState(false);
@@ -73,7 +79,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       markets: markets.filter((m) => m.question.toLowerCase().includes(q) || m.category.toLowerCase().includes(q) || m.id.includes(q)).slice(0, 5),
       whales: whales.filter((w) => w.name.toLowerCase().includes(q) || w.bestCategory.toLowerCase().includes(q)).slice(0, 4),
     };
-  }, [query]);
+  }, [query, markets, whales]);
 
   const hasResults = results.markets.length > 0 || results.whales.length > 0;
 

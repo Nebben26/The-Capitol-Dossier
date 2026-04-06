@@ -160,6 +160,15 @@ async function ingestMarkets() {
   const kalshiMarkets = await fetchKalshiMarkets();
   console.log(`  Got ${kalshiMarkets.length} markets`);
 
+  // Fetch existing prices to compute real change_24h
+  console.log("  Loading existing prices for change computation...");
+  const { data: existingRows } = await supabase.from("markets").select("id, price");
+  const oldPrices = new Map<string, number>();
+  if (existingRows) {
+    for (const r of existingRows) oldPrices.set(r.id, r.price);
+  }
+  console.log(`  Got ${oldPrices.size} existing prices`);
+
   const rows: any[] = [];
 
   // Transform Polymarket
@@ -182,16 +191,19 @@ async function ingestMarkets() {
       if (price <= 1 || price >= 99) continue;
 
       const question = isBinary ? (ev.title || m.question) : (m.groupItemTitle || m.question || ev.title);
+      const marketId = m.slug || `${ev.slug}-${m.id}`.slice(0, 100);
+      const oldPrice = oldPrices.get(marketId);
+      const change24h = oldPrice && oldPrice > 0 ? Math.round(((price - oldPrice) / oldPrice) * 1000) / 10 : 0;
       const daysLeft = Math.max(0, Math.round((new Date(m.endDate || ev.endDate).getTime() - Date.now()) / 86400000));
       rows.push({
-        id: m.slug || `${ev.slug}-${m.id}`.slice(0, 100),
+        id: marketId,
         question,
         slug: m.slug || ev.slug,
         platform: "Polymarket",
         category: guessCategory(question, ev.tags),
         price,
-        previous_price: null,
-        change_24h: 0,
+        previous_price: oldPrice ?? null,
+        change_24h: change24h,
         volume: m.volume || ev.volume || 0,
         volume_24h: m.volume24hr || 0,
         liquidity: m.liquidity || 0,
@@ -214,7 +226,10 @@ async function ingestMarkets() {
   for (const km of kalshiMarkets) {
     const price = Math.round((km.last_price || km.yes_bid || 0.5) * 100);
     if (price <= 1 || price >= 99) continue;
-    const prevPrice = Math.round((km.previous_yes_bid || km.last_price || 0.5) * 100);
+    const kalshiId = km.ticker.toLowerCase();
+    const oldKalshiPrice = oldPrices.get(kalshiId);
+    // Use Supabase old price if available, otherwise Kalshi's previous_yes_bid
+    const prevPrice = oldKalshiPrice ?? Math.round((km.previous_yes_bid || km.last_price || 0.5) * 100);
     const change = prevPrice > 0 ? Math.round(((price - prevPrice) / prevPrice) * 1000) / 10 : 0;
     const title = km.title || km.subtitle || km.yes_sub_title || km.ticker;
     const daysLeft = Math.max(0, Math.round((new Date(km.close_time).getTime() - Date.now()) / 86400000));

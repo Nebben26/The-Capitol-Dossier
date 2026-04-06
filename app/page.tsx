@@ -217,7 +217,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#57D7BA]/5 via-transparent to-[#ef4444]/5 pointer-events-none" />
         <CardContent className="p-5 relative">
           <div className="flex flex-col lg:flex-row items-center gap-6">
-            <PulseGauge value={68} label="Fear & Greed" />
+            <PulseGauge value={Math.min(100, Math.max(0, Math.round(50 + allMarkets.slice(0, 20).reduce((s, m) => s + m.change, 0) / 2)))} label="Fear & Greed" />
             <div className="flex-1 text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-xs font-semibold">
@@ -225,15 +225,18 @@ export default function HomePage() {
                 </span>
                 <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
               </div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-[#ef4444] mb-1">The Market Disagrees</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#ef4444] mb-1">Market Intelligence</p>
               <h1 className="text-xl sm:text-2xl font-bold leading-tight tracking-tight mb-2">
-                Prediction markets are pricing in a{" "}
-                <span className="text-[#57D7BA]">68% chance of recession</span>{" "}
-                by Dec — biggest jump in 3 months
+                {allMarkets.length > 24 ? (
+                  <>Tracking <span className="text-[#57D7BA]">{allMarkets.length.toLocaleString()} markets</span> across Polymarket &amp; Kalshi</>
+                ) : (
+                  <>Prediction markets are pricing in a <span className="text-[#57D7BA]">68% chance of recession</span> by Dec</>
+                )}
               </h1>
               <p className="text-sm text-[#8892b0] max-w-2xl">
-                Whale wallets moved $14.2M into recession YES contracts in the last 24h.
-                Polymarket volume up 340% on economic markets. Kalshi odds diverge by 8 points.
+                {allMarkets.length > 24
+                  ? `Top market: "${allMarkets[0]?.question}" at ${allMarkets[0]?.price}¢. ${allMarkets.filter(m => Math.abs(m.change) > 5).length} markets moved >5% today.`
+                  : "Whale wallets moved $14.2M into recession YES contracts in the last 24h."}
               </p>
             </div>
             <div className="hidden xl:block w-64 h-24">

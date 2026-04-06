@@ -123,7 +123,16 @@ export default function WhaleProfilePage() {
   const params = useParams();
   const id = params.id as string;
   const { whale: loadedWhale, pnlHistory, currentPositions, historicalTrades, categoryPerformance, calibrationData, biggestWins, biggestLosses } = useWhaleProfile(id);
-  const whale = loadedWhale ?? whaleById["w1"];
+  const whale = loadedWhale ?? whaleById["w1"] ?? null;
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!loadedWhale && !whaleById[id]) {
+      const timer = setTimeout(() => { if (!loadedWhale) setNotFound(true); }, 3000);
+      return () => clearTimeout(timer);
+    }
+    if (loadedWhale) setNotFound(false);
+  }, [loadedWhale, id]);
 
   const [loading, setLoading] = useState(true);
   const [histSort, setHistSort] = useState<HistSortKey>("pnl");
@@ -155,6 +164,15 @@ export default function WhaleProfilePage() {
   };
 
   const perfectLine = Array.from({ length: 11 }, (_, i) => ({ predicted: i * 10, actual: i * 10 }));
+
+  if (notFound || !whale) return (
+    <div className="max-w-[1440px] mx-auto px-4 py-20 text-center">
+      <div className="text-6xl font-bold font-mono text-[#2f374f] mb-4">404</div>
+      <h1 className="text-xl font-bold mb-2">Whale Not Found</h1>
+      <p className="text-sm text-[#8892b0] mb-6">The wallet &quot;{id}&quot; isn&apos;t in our leaderboard yet.</p>
+      <Link href="/whales" className="text-sm text-[#57D7BA] hover:underline">Browse all whales →</Link>
+    </div>
+  );
 
   if (loading) return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">

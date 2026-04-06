@@ -65,7 +65,7 @@ import {
 } from "lucide-react";
 import { useMarketDetail } from "@/hooks/useData";
 import { genPriceHistory } from "@/lib/mockData";
-import type { OrderbookLevel } from "@/lib/mockData";
+import type { OrderbookLevel, Market } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { ShareCardButton } from "@/components/ui/share-card-button";
 import { WatchlistButton } from "@/components/ui/watchlist-button";
@@ -146,18 +146,27 @@ export default function MarketDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { market: loadedMarket, whaleFlows, crossPlatformPrices, orderbookBids, orderbookAsks, resolutionHistory, source, refreshing, lastFetched } = useMarketDetail(id);
-  const market = loadedMarket ?? { id: "recession-2026", question: "Loading...", price: 50, change: 0, volume: "$0", volNum: 0, category: "Economics", platform: "Polymarket", resolution: "TBD", daysLeft: 0, trending: false, whaleCount: 0, traders: 0, spark: [], desc: "", creator: "", created: "", liquidity: "$0" };
+  const [notFound, setNotFound] = useState(false);
+  const placeholder: Market = { id, question: "Loading...", price: 50, change: 0, volume: "$0", volNum: 0, category: "Economics", platform: "Polymarket", resolution: "TBD", daysLeft: 0, trending: false, whaleCount: 0, traders: 0, spark: [], desc: "", creator: "", created: "", liquidity: "$0" };
+  const market = loadedMarket ?? placeholder;
   const { setSource } = useDataSource();
   useEffect(() => { setSource(source); }, [source, setSource]);
   const [timeRange, setTimeRange] = useState<"1D" | "7D" | "30D" | "90D" | "ALL">("30D");
   const [chartMode, setChartMode] = useState<"area" | "candle">("area");
 
+  // If market not found after data loads, show not-found state
+  useEffect(() => {
+    if (!loadedMarket && source !== "mock") {
+      const timer = setTimeout(() => { if (!loadedMarket) setNotFound(true); }, 3000);
+      return () => clearTimeout(timer);
+    }
+    if (loadedMarket) setNotFound(false);
+  }, [loadedMarket, source]);
+
   const priceData = useMemo(() => {
     const points = { "1D": 24, "7D": 48, "30D": 90, "90D": 180, ALL: 365 }[timeRange];
-    // Use real price history when available, sliced to match time range
     if (market.priceHistory && market.priceHistory.length > 0) {
       const history = market.priceHistory;
-      // Slice from the end to match requested number of points
       return history.slice(Math.max(0, history.length - points));
     }
     return genPriceHistory(market.price - 15, points, 6);
@@ -171,6 +180,17 @@ export default function MarketDetailPage() {
     const timer = setTimeout(() => setLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  if (notFound) {
+    return (
+      <div className="max-w-[1440px] mx-auto px-4 py-20 text-center">
+        <div className="text-6xl font-bold font-mono text-[#2f374f] mb-4">404</div>
+        <h1 className="text-xl font-bold mb-2">Market Not Found</h1>
+        <p className="text-sm text-[#8892b0] mb-6">The market &quot;{id}&quot; doesn&apos;t exist or hasn&apos;t been indexed yet.</p>
+        <Link href="/markets" className="text-sm text-[#57D7BA] hover:underline">Browse all markets →</Link>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

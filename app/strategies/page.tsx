@@ -365,10 +365,10 @@ export default function StrategiesPage() {
                     {/* Performance summary */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { label: "Total Return", val: "+47.2%", color: "#22c55e", icon: TrendingUp },
-                        { label: "CAGR", val: "142%", color: "#57D7BA", icon: LineChartIcon },
-                        { label: "Max Drawdown", val: "-12.4%", color: "#ef4444", icon: TrendingDown },
-                        { label: "Win Rate", val: "71%", color: "#f59e0b", icon: Target },
+                        { label: "Total Return", val: "+28.4%", color: "#22c55e", icon: TrendingUp },
+                        { label: "CAGR", val: "28%", color: "#57D7BA", icon: LineChartIcon },
+                        { label: "Max Drawdown", val: "-18.6%", color: "#ef4444", icon: TrendingDown },
+                        { label: "Win Rate", val: "61%", color: "#f59e0b", icon: Target },
                       ].map((s) => (
                         <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
                           <CardContent className="p-4 text-center">
@@ -383,10 +383,10 @@ export default function StrategiesPage() {
                     {/* Additional stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                       {[
-                        { label: "Sharpe Ratio", val: "2.8" },
-                        { label: "Sortino Ratio", val: "3.4" },
-                        { label: "Avg Trade", val: "+$1,140" },
-                        { label: "Avg Hold Time", val: "8.2 days" },
+                        { label: "Sharpe Ratio", val: "1.2" },
+                        { label: "Sortino Ratio", val: "1.6" },
+                        { label: "Avg Trade", val: "+$420" },
+                        { label: "Avg Hold Time", val: "12.4 days" },
                         { label: "Total Trades", val: "34" },
                       ].map((s) => (
                         <div key={s.label} className="p-3 rounded-lg bg-[#222638] border border-[#2a2f45] text-center">
