@@ -63,7 +63,7 @@ import {
   CandlestickChart,
   LineChart as LineChartIcon,
 } from "lucide-react";
-import { useMarketDetail, useMarkets } from "@/hooks/useData";
+import { useMarketDetail } from "@/hooks/useData";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -73,39 +73,6 @@ import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 
-
-// Related markets are fetched dynamically from useMarkets()
-
-// ─── GAUGE COMPONENT ──────────────────────────────────────────────────
-function SmartMoneyGauge({ value }: { value: number }) {
-  const angle = (value / 100) * 180 - 90;
-  const rad = (angle * Math.PI) / 180;
-  const needleX = 100 + 60 * Math.cos(rad);
-  const needleY = 90 + 60 * Math.sin(rad);
-  const sentiment = value >= 70 ? "Strongly Bullish" : value >= 55 ? "Bullish" : value >= 45 ? "Neutral" : value >= 30 ? "Bearish" : "Strongly Bearish";
-  const sentColor = value >= 55 ? "#22c55e" : value >= 45 ? "#f59e0b" : "#ef4444";
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 110" className="w-36 h-auto">
-        <defs>
-          <linearGradient id="smartGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ef4444" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#22c55e" />
-          </linearGradient>
-        </defs>
-        <path d="M 25 90 A 75 75 0 0 1 175 90" fill="none" stroke="#2a2f45" strokeWidth="10" strokeLinecap="round" />
-        <path d="M 25 90 A 75 75 0 0 1 175 90" fill="none" stroke="url(#smartGaugeGrad)" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${(value / 100) * 236} 236`} />
-        <line x1="100" y1="90" x2={needleX} y2={needleY} stroke="#57D7BA" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="100" cy="90" r="3.5" fill="#57D7BA" />
-        <text x="100" y="78" textAnchor="middle" fill="#e2e8f0" fontSize="20" fontWeight="700">{value}</text>
-      </svg>
-      <span className="text-xs font-semibold mt-0.5" style={{ color: sentColor }}>{sentiment}</span>
-      <span className="text-[10px] text-[#8892b0] tracking-wide uppercase">Smart Money Score</span>
-    </div>
-  );
-}
 
 // ─── DEPTH CHART ──────────────────────────────────────────────────────
 function DepthChart({ bids, asks }: { bids: OrderbookLevel[]; asks: OrderbookLevel[] }) {
@@ -172,15 +139,6 @@ export default function MarketDetailPage() {
   const maxAskTotal = Math.max(...orderbookAsks.map((a) => a.total));
 
   const [loading, setLoading] = useState(true);
-  // Dynamic related markets — same category, sorted by volume, exclude current
-  const { markets: allLiveMarkets } = useMarkets();
-  const relatedMarkets = useMemo(() => {
-    return allLiveMarkets
-      .filter((m) => m.category === market.category && m.id !== id)
-      .slice(0, 3)
-      .map((m) => ({ id: m.id, q: m.question, price: m.price, change: m.change }));
-  }, [allLiveMarkets, market.category, id]);
-
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1200);
     return () => clearTimeout(timer);
@@ -323,170 +281,13 @@ export default function MarketDetailPage() {
           </div>
 
           {/* ─── OVERVIEW TAB ──────────────────────────────────────── */}
-          <TabsContent value="overview" className="pt-5 space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Smart Money Gauge */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardContent className="p-5 flex flex-col items-center">
-                  <SmartMoneyGauge value={72} />
-                </CardContent>
-              </Card>
-
-              {/* Key Stats */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Target className="size-4 text-[#57D7BA]" />
-                    Key Statistics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {[
-                    { label: "7-Day Avg Price", val: "62¢", sub: "+9.7% from avg" },
-                    { label: "All-Time High", val: "74¢", sub: "Mar 28, 2026" },
-                    { label: "All-Time Low", val: "12¢", sub: "Jan 18, 2026" },
-                    { label: "Implied Probability", val: "68%", sub: "Based on last trade" },
-                  ].map((s) => (
-                    <div key={s.label} className="flex items-center justify-between">
-                      <span className="text-xs text-[#8892b0]">{s.label}</span>
-                      <div className="text-right">
-                        <span className="text-xs font-semibold font-mono">{s.val}</span>
-                        <span className="block text-[9px] text-[#8892b0]">{s.sub}</span>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Market Sentiment */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Zap className="size-4 text-[#f59e0b]" />
-                    Market Sentiment
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-[#22c55e] font-medium">YES Holders</span>
-                      <span className="font-mono text-[#22c55e]">72%</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-[#1a1e2e] overflow-hidden">
-                      <div className="h-full rounded-full bg-[#22c55e]" style={{ width: "72%" }} />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-[#ef4444] font-medium">NO Holders</span>
-                      <span className="font-mono text-[#ef4444]">28%</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-[#1a1e2e] overflow-hidden">
-                      <div className="h-full rounded-full bg-[#ef4444]" style={{ width: "28%" }} />
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-[#2a2f45] space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#8892b0]">Whale Concentration</span>
-                      <span className="font-mono font-semibold text-[#f59e0b]">High</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#8892b0]">Smart Money Direction</span>
-                      <span className="font-mono font-semibold text-[#22c55e]">Bullish YES</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#8892b0]">Volume Trend (7D)</span>
-                      <span className="font-mono font-semibold text-[#57D7BA]">+340%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <TabsContent value="overview" className="pt-5">
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm text-[#8892b0] text-center max-w-md">
+                Detailed analytics will populate as we accumulate historical data on this market.
+                Check the <span className="text-[#57D7BA]">Price Chart</span> and <span className="text-[#57D7BA]">Whale Flows</span> tabs for available data.
+              </p>
             </div>
-
-            {/* Top Whales in this Market */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Wallet className="size-4 text-[#8b5cf6]" />
-                  Top Whales in This Market
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-0 pb-2">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#2a2f45] hover:bg-transparent">
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">WHALE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">SIDE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">SIZE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">ACCURACY</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {whaleFlows.slice(0, 4).map((w) => (
-                      <TableRow key={w.id} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
-                        <TableCell className="pl-4 py-2">
-                          <Link href={`/whales/${w.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors">
-                            <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119]">
-                              #{w.rank}
-                            </div>
-                            <span className="text-xs font-medium">{w.wallet}</span>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-2">
-                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                            w.side === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"
-                          }`}>
-                            {w.side === "YES" ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
-                            {w.side}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-2">
-                          <span className="font-mono text-xs font-semibold">{w.size}</span>
-                        </TableCell>
-                        <TableCell className="py-2">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-12 h-1 rounded-full bg-[#1a1e2e] overflow-hidden">
-                              <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.acc}%` }} />
-                            </div>
-                            <span className="text-[10px] text-[#57D7BA] font-mono">{w.acc}%</span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-
-            {/* Related Markets */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Layers className="size-4 text-[#57D7BA]" />
-                  Related Markets
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {relatedMarkets.map((rm) => (
-                    <Link key={rm.id} href={`/markets/${rm.id}`} className="group">
-                      <div className="p-3 rounded-lg border border-[#2a2f45] hover:border-[#57D7BA]/20 transition-all">
-                        <p className="text-xs font-medium group-hover:text-[#57D7BA] transition-colors leading-snug mb-2">
-                          {rm.q}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-sm font-semibold text-[#57D7BA]">{rm.price}¢</span>
-                          <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold ${rm.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                            {rm.change >= 0 ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-                            {Math.abs(rm.change)}%
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* ─── PRICE CHART TAB ───────────────────────────────────── */}

@@ -42,9 +42,8 @@ import {
   ArrowDownRight,
   Wallet,
 } from "lucide-react";
-import { useHomepageData, useDisagreements, useSmartMoneyMoves, useInsights } from "@/hooks/useData";
-import { Newspaper, ExternalLink } from "lucide-react";
-import { Brain, Target as TargetIcon } from "lucide-react";
+import { useHomepageData, useDisagreements } from "@/hooks/useData";
+import { ExternalLink } from "lucide-react";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
 import { AlertTriangle, GitCompareArrows } from "lucide-react";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
@@ -129,8 +128,6 @@ export default function HomePage() {
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
-  const { moves: smartMoves } = useSmartMoneyMoves();
-  const { insights } = useInsights();
   const { setSource } = useDataSource();
 
   useEffect(() => { setSource(source); }, [source, setSource]);
@@ -518,48 +515,6 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          {/* ─── SMART MONEY MOVES ────────────────────────── */}
-          {smartMoves.length > 0 && (
-            <Card className="bg-[#222638] border-[#2f374f] mt-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Brain className="size-4 text-[#f59e0b]" />
-                  Smart Money Moves
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1.5 pb-3">
-                {smartMoves.slice(0, 5).map((m, i) => (
-                  <div key={`sm-${i}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#57D7BA]/5 transition-all">
-                    <div className="size-5 rounded-full bg-gradient-to-br from-[#f59e0b] to-[#ec4899] flex items-center justify-center text-[7px] font-bold text-[#0f1119] shrink-0">
-                      #{m.rank}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1">
-                        <Link href={`/whales/${m.walletId}`} className="text-[10px] font-semibold text-[#e2e8f0] hover:text-[#57D7BA] transition-colors truncate">
-                          {m.wallet}
-                        </Link>
-                        <span className={`px-1 py-0.5 rounded text-[7px] font-bold ${m.side === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
-                          {m.side} {m.size}
-                        </span>
-                      </div>
-                      <Link href={`/markets/${m.marketId}`} className="text-[9px] text-[#8892b0] hover:text-[#57D7BA] transition-colors truncate block">
-                        {m.market}
-                      </Link>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <div className="flex items-center gap-0.5">
-                        <TargetIcon className="size-2.5 text-[#57D7BA]" />
-                        <span className="text-[9px] font-mono font-semibold text-[#8892b0] tabular-nums">{m.accuracy}%</span>
-                      </div>
-                      <span className={`text-[8px] font-mono font-bold tabular-nums ${m.accImpact.startsWith("+") ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                        {m.accImpact}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
 
@@ -587,43 +542,6 @@ export default function HomePage() {
         </CardContent>
       </Card>
 
-      {/* ─── LATEST INSIGHTS ──────────────────────────────────── */}
-      <Card className="bg-[#222638] border-[#2f374f]">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Newspaper className="size-4 text-[#6366f1]" />
-              Latest Insights
-            </CardTitle>
-            <Link href="/insights" className="text-[10px] text-[#57D7BA] hover:underline">View all →</Link>
-          </div>
-          <CardDescription className="text-[10px] text-[#8892b0]">News and catalysts moving prediction markets right now</CardDescription>
-        </CardHeader>
-        <CardContent className="pb-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {insights.slice(0, 5).map((ins) => (
-              <Link key={ins.id} href={`/markets/${ins.marketId}`} className="group block">
-                <div className="p-3 rounded-lg border border-[#2f374f] hover:border-[#6366f1]/30 transition-all h-full flex flex-col">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className={`size-1.5 rounded-full shrink-0 ${ins.impact === "bullish" ? "bg-[#22c55e]" : ins.impact === "bearish" ? "bg-[#ef4444]" : "bg-[#8892b0]"}`} />
-                    <span className="text-[8px] text-[#8892b0] truncate">{ins.source}</span>
-                    <span className="text-[8px] text-[#8892b0] shrink-0 ml-auto">{ins.time}</span>
-                  </div>
-                  <p className="text-[11px] font-semibold text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors leading-snug line-clamp-3 flex-1 mb-2">
-                    {ins.headline}
-                  </p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="px-1.5 py-0.5 rounded text-[7px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{ins.category}</span>
-                    <span className={`font-mono text-[10px] font-bold tabular-nums ${ins.impact === "bullish" ? "text-[#22c55e]" : ins.impact === "bearish" ? "text-[#ef4444]" : "text-[#8892b0]"}`}>
-                      {ins.priceMove}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* ─── FOOTER ──────────────────────────────────────────── */}
       <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">

@@ -228,10 +228,12 @@ export default function WhaleProfilePage() {
                   <span className="px-2 py-0.5 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-semibold">
                     Rank #{whale.rank}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-[#22c55e]/10 text-[#22c55e] text-[10px] font-semibold flex items-center gap-1">
-                    <Flame className="size-2.5" />
-                    {whale.streak}-trade win streak
-                  </span>
+                  {whale.streak > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#22c55e]/10 text-[#22c55e] text-[10px] font-semibold flex items-center gap-1">
+                      <Flame className="size-2.5" />
+                      {whale.streak}-trade win streak
+                    </span>
+                  )}
                   <span className="px-2 py-0.5 rounded-full bg-[#222638] text-[#8892b0] text-[10px] font-medium border border-[#2a2f45] flex items-center gap-1">
                     <Clock className="size-2.5" />
                     Since {whale.memberSince}
@@ -321,144 +323,13 @@ export default function WhaleProfilePage() {
           </div>
 
           {/* ─── OVERVIEW TAB ──────────────────────────────────────── */}
-          <TabsContent value="overview" className="pt-5 space-y-5">
-            {/* P&L Sparkline */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <TrendingUp className="size-4 text-[#22c55e]" />
-                    Cumulative P&L
-                  </CardTitle>
-                  <span className="text-xs text-[#8892b0] font-mono">Last 12 months</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <div className="h-48 sm:h-56 w-full">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                    <AreaChart data={pnlHistory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="pnlGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.5} />
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                      <XAxis dataKey="month" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} />
-                      <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v) => `$${v}K`} />
-                      <Area type="monotone" dataKey="pnl" stroke="#22c55e" strokeWidth={2} fill="url(#pnlGrad)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 3-Column Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Biggest Wins */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Trophy className="size-4 text-[#22c55e]" />
-                    Biggest Wins
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 pb-3">
-                  {biggestWins.map((w, i) => (
-                    <Link key={i} href={`/markets/${w.marketId}`} className="group block">
-                      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-[#57D7BA]/5 transition-all">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="size-6 rounded-full bg-[#22c55e]/10 flex items-center justify-center shrink-0">
-                            <ArrowUpRight className="size-3 text-[#22c55e]" />
-                          </div>
-                          <span className="text-xs text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors truncate">
-                            {w.market}
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-[#22c55e] shrink-0 ml-2">{w.pnl}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Biggest Losses */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <TrendingDown className="size-4 text-[#ef4444]" />
-                    Biggest Losses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 pb-3">
-                  {biggestLosses.map((l, i) => (
-                    <Link key={i} href={`/markets/${l.marketId}`} className="group block">
-                      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-[#ef4444]/5 transition-all">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="size-6 rounded-full bg-[#ef4444]/10 flex items-center justify-center shrink-0">
-                            <ArrowDownRight className="size-3 text-[#ef4444]" />
-                          </div>
-                          <span className="text-xs text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors truncate">
-                            {l.market}
-                          </span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-[#ef4444] shrink-0 ml-2">{l.pnl}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Accuracy by Category (mini) */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Target className="size-4 text-[#57D7BA]" />
-                    Accuracy by Category
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 pb-3">
-                  {categoryPerformance.slice(0, 5).map((c) => (
-                    <div key={c.category} className="flex items-center gap-2">
-                      <span className="text-[11px] text-[#8892b0] w-20 shrink-0">{c.category}</span>
-                      <div className="flex-1 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${c.winRate}%`, backgroundColor: c.color }} />
-                      </div>
-                      <span className="text-[10px] font-mono font-semibold w-8 text-right" style={{ color: c.color }}>
-                        {c.winRate}%
-                      </span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+          <TabsContent value="overview" className="pt-5">
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm text-[#8892b0] text-center max-w-md">
+                Detailed performance analytics will populate as we accumulate trade history for this wallet.
+                Check the <span className="text-[#57D7BA]">On-Chain Positions</span> tab for current holdings.
+              </p>
             </div>
-
-            {/* Whales Also Betting On */}
-            <Card className="bg-[#222638] border-[#2f374f]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Users className="size-4 text-[#8b5cf6]" />
-                  Whales Also Betting On
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {markets.filter(m => m.trending).slice(0, 3).map((rm) => (
-                    <Link key={rm.id} href={`/markets/${rm.id}`} className="group">
-                      <div className="p-3 rounded-lg border border-[#2f374f] hover:border-[#57D7BA]/20 transition-all">
-                        <p className="text-xs font-medium group-hover:text-[#57D7BA] transition-colors leading-snug mb-2 line-clamp-2">{rm.question}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-sm font-semibold text-[#e2e8f0] tabular-nums">{rm.price}¢</span>
-                          <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${rm.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                            {rm.change >= 0 ? "+" : ""}{rm.change}%
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* ─── ON-CHAIN POSITIONS TAB ──────────────────────────── */}
