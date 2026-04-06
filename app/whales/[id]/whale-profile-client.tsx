@@ -123,11 +123,11 @@ export default function WhaleProfilePage() {
   const params = useParams();
   const id = params.id as string;
   const { whale: loadedWhale, pnlHistory, currentPositions, historicalTrades, categoryPerformance, calibrationData, biggestWins, biggestLosses } = useWhaleProfile(id);
-  const whale = loadedWhale ?? whaleById["w1"] ?? null;
+  const whale = loadedWhale ?? null;
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!loadedWhale && !whaleById[id]) {
+    if (!loadedWhale) {
       const timer = setTimeout(() => { if (!loadedWhale) setNotFound(true); }, 3000);
       return () => clearTimeout(timer);
     }

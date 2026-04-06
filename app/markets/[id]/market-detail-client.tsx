@@ -63,7 +63,7 @@ import {
   CandlestickChart,
   LineChart as LineChartIcon,
 } from "lucide-react";
-import { useMarketDetail } from "@/hooks/useData";
+import { useMarketDetail, useMarkets } from "@/hooks/useData";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -74,11 +74,7 @@ import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 
 
-const relatedMarkets = [
-  { id: "fed-rate-cut", q: "Fed cuts rates before July?", price: 42, change: -8.2 },
-  { id: "btc-150k", q: "Bitcoin above $150K by EOY?", price: 23, change: -3.1 },
-  { id: "student-debt", q: "Student debt relief bill passes?", price: 37, change: -6.5 },
-];
+// Related markets are fetched dynamically from useMarkets()
 
 // ─── GAUGE COMPONENT ──────────────────────────────────────────────────
 function SmartMoneyGauge({ value }: { value: number }) {
@@ -176,6 +172,15 @@ export default function MarketDetailPage() {
   const maxAskTotal = Math.max(...orderbookAsks.map((a) => a.total));
 
   const [loading, setLoading] = useState(true);
+  // Dynamic related markets — same category, sorted by volume, exclude current
+  const { markets: allLiveMarkets } = useMarkets();
+  const relatedMarkets = useMemo(() => {
+    return allLiveMarkets
+      .filter((m) => m.category === market.category && m.id !== id)
+      .slice(0, 3)
+      .map((m) => ({ id: m.id, q: m.question, price: m.price, change: m.change }));
+  }, [allLiveMarkets, market.category, id]);
+
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1200);
     return () => clearTimeout(timer);

@@ -239,7 +239,7 @@ export async function getMarketDetail(id: string): Promise<ApiResult<Market | un
     }
     if (market) return { data: market, source };
   } catch { /* fall through */ }
-  return { data: mockMarketById[id], source: "mock" };
+  return { data: undefined, source: "mock" };
 }
 
 /**
@@ -350,7 +350,7 @@ export async function getWhaleById(address: string): Promise<ApiResult<Whale | u
     const whale = allWhales.find((w) => w.id === address);
     if (whale) return { data: whale, source };
   } catch { /* fall through */ }
-  return { data: mockWhaleById[address], source: "mock" };
+  return { data: undefined, source: "mock" };
 }
 
 /**
