@@ -317,6 +317,27 @@ async function ingestWhaleLeaderboard() {
     };
   });
 
+  // Enrich top 25 with real position counts
+  console.log("  Enriching top 25 wallets with position data...");
+  for (let i = 0; i < Math.min(25, whaleRows.length); i++) {
+    const wallet = whaleRows[i].address;
+    try {
+      const res = await fetch(`${DATA_API_BASE}/v1/positions?user=${wallet}`);
+      if (res.ok) {
+        const positions = await res.json();
+        if (Array.isArray(positions) && positions.length > 0) {
+          const uniqueMarkets = new Set(positions.map((p: any) => p.market?.slug || p.asset?.condition_id || ""));
+          whaleRows[i].positions_count = positions.length;
+          whaleRows[i].markets_traded = uniqueMarkets.size;
+          console.log(`    ${whaleRows[i].display_name}: ${positions.length} positions, ${uniqueMarkets.size} markets`);
+        }
+      }
+    } catch {
+      // Skip this wallet, keep estimates
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+
   const { error } = await supabase.from("whales").upsert(whaleRows, { onConflict: "address" });
   if (error) console.error("  Whales upsert error:", error.message);
   else console.log(`  Upserted ${whaleRows.length} whale profiles from leaderboard`);
@@ -359,7 +380,18 @@ async function ingestDisagreements(markets: any[]) {
   console.log("\n=== Computing cross-platform disagreements ===");
 
   const polyMarkets = markets.filter((m: any) => m.platform === "Polymarket");
-  const kalshiMarkets = markets.filter((m: any) => m.platform === "Kalshi");
+  // Filter out multi-outcome Kalshi markets with concatenated titles like "yes Cleveland,yes New York,..."
+  // Also filter out prop-bet style titles like "yes James Harden: 3+,yes James Harden: 8+"
+  const kalshiMarkets = markets.filter((m: any) => {
+    if (m.platform !== "Kalshi") return false;
+    const q = m.question || "";
+    // Skip if it starts with "yes " — these are outcome labels, not questions
+    if (/^yes\s/i.test(q)) return false;
+    // Skip if it contains multiple "yes " segments (concatenated outcomes)
+    if ((q.match(/yes\s/gi) || []).length >= 2) return false;
+    return true;
+  });
+  console.log(`  Polymarket: ${polyMarkets.length}, Kalshi (filtered): ${kalshiMarkets.length}`);
 
   if (polyMarkets.length === 0 || kalshiMarkets.length === 0) {
     console.log("  Skipping — need markets from both platforms");
@@ -373,20 +405,24 @@ async function ingestDisagreements(markets: any[]) {
     const pmWords = new Set(normalize(pm.question).split(/\s+/).filter((w: string) => w.length > 3));
     let bestMatch: any = null;
     let bestScore = 0;
+    let bestOverlap = 0;
 
     for (const km of kalshiMarkets) {
       const kmWords = normalize(km.question).split(/\s+/).filter((w: string) => w.length > 3);
       const overlap = kmWords.filter((w: string) => pmWords.has(w)).length;
+      // Require at least 2 overlapping non-trivial words to avoid false positives
+      if (overlap < 2) continue;
       const score = overlap / Math.max(pmWords.size, kmWords.length, 1);
       if (score > bestScore && score >= 0.25) {
         bestScore = score;
+        bestOverlap = overlap;
         bestMatch = km;
       }
     }
 
     if (bestMatch) {
       const spread = Math.abs(pm.price - bestMatch.price);
-      console.log(`  Match (score=${bestScore.toFixed(2)}, spread=${spread}): "${pm.question}" ↔ "${bestMatch.question}"`);
+      console.log(`  Match (score=${bestScore.toFixed(2)}, overlap=${bestOverlap}, spread=${spread}): "${pm.question}" ↔ "${bestMatch.question}"`);
       if (spread >= 3) {
         rows.push({
           id: `d-${pm.id}`,
