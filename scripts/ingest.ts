@@ -378,7 +378,7 @@ async function ingestDisagreements(markets: any[]) {
       const kmWords = normalize(km.question).split(/\s+/).filter((w: string) => w.length > 3);
       const overlap = kmWords.filter((w: string) => pmWords.has(w)).length;
       const score = overlap / Math.max(pmWords.size, kmWords.length, 1);
-      if (score > bestScore && score >= 0.4) {
+      if (score > bestScore && score >= 0.25) {
         bestScore = score;
         bestMatch = km;
       }
@@ -386,7 +386,8 @@ async function ingestDisagreements(markets: any[]) {
 
     if (bestMatch) {
       const spread = Math.abs(pm.price - bestMatch.price);
-      if (spread >= 5) {
+      console.log(`  Match (score=${bestScore.toFixed(2)}, spread=${spread}): "${pm.question}" ↔ "${bestMatch.question}"`);
+      if (spread >= 3) {
         rows.push({
           id: `d-${pm.id}`,
           question: pm.question,
@@ -404,7 +405,7 @@ async function ingestDisagreements(markets: any[]) {
     }
   }
 
-  console.log(`  Found ${rows.length} disagreements (spread >= 5pts)`);
+  console.log(`  Found ${rows.length} disagreements (spread >= 3pts)`);
 
   if (rows.length > 0) {
     // Clear old and insert fresh
