@@ -98,16 +98,46 @@ async function fetchKalshiMarkets(): Promise<KalshiMarketRaw[]> {
   return all;
 }
 
-// ─── 3. FETCH TRADES (whale detection) ───────────────────────────────
-async function fetchRecentTrades(): Promise<any[]> {
-  try {
-    const res = await fetch(`${DATA_API_BASE}/trades?limit=100`);
-    if (!res.ok) return [];
-    return await res.json();
-  } catch { return []; }
+// ─── 3. FETCH LEADERBOARD ────────────────────────────────────────────
+interface LeaderboardEntry {
+  rank: number;
+  proxyWallet: string;
+  userName: string;
+  vol: number;
+  pnl: number;
+  profileImage?: string;
+  xUsername?: string;
+  verifiedBadge?: boolean;
 }
 
-// ─── 4. FETCH PRICE HISTORY ──────────────────────────────────────────
+async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
+  try {
+    console.log("  Fetching leaderboard from /v1/leaderboard...");
+    const res = await fetch(`${DATA_API_BASE}/v1/leaderboard`);
+    if (!res.ok) { console.error(`  Leaderboard API ${res.status}`); return []; }
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("  Leaderboard fetch error:", err);
+    return [];
+  }
+}
+
+// ─── 4. FETCH ACTIVITY (whale trade detection) ──────────────────────
+async function fetchRecentActivity(): Promise<any[]> {
+  try {
+    console.log("  Fetching activity from /v1/activity...");
+    const res = await fetch(`${DATA_API_BASE}/v1/activity?limit=200`);
+    if (!res.ok) { console.error(`  Activity API ${res.status}`); return []; }
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("  Activity fetch error:", err);
+    return [];
+  }
+}
+
+// ─── 5. FETCH PRICE HISTORY ──────────────────────────────────────────
 async function fetchPriceHistory(tokenId: string): Promise<{ t: number; p: number }[]> {
   try {
     const res = await fetch(`${CLOB_BASE}/prices-history?market=${encodeURIComponent(tokenId)}&interval=max&fidelity=100`);
@@ -120,7 +150,7 @@ async function fetchPriceHistory(tokenId: string): Promise<{ t: number; p: numbe
   } catch { return []; }
 }
 
-// ─── 5. UPSERT MARKETS ──────────────────────────────────────────────
+// ─── 6. UPSERT MARKETS ──────────────────────────────────────────────
 async function ingestMarkets() {
   console.log("\n=== Fetching Polymarket events ===");
   const polyEvents = await fetchPolymarketEvents();
@@ -216,7 +246,7 @@ async function ingestMarkets() {
   return rows;
 }
 
-// ─── 6. INGEST PRICE HISTORY ─────────────────────────────────────────
+// ─── 7. INGEST PRICE HISTORY ─────────────────────────────────────────
 async function ingestPriceHistory(markets: any[]) {
   // Get top 20 Polymarket markets with clobTokenIds
   const polyMarkets = markets
@@ -253,68 +283,78 @@ async function ingestPriceHistory(markets: any[]) {
   }
 }
 
-// ─── 7. INGEST WHALE TRADES ─────────────────────────────────────────
+// ─── 8. INGEST WHALE LEADERBOARD ─────────────────────────────────────
+async function ingestWhaleLeaderboard() {
+  console.log("\n=== Fetching whale leaderboard ===");
+  const entries = await fetchLeaderboard();
+  console.log(`  Got ${entries.length} leaderboard entries`);
+
+  if (entries.length === 0) return;
+
+  const whaleRows = entries.slice(0, 100).map((e: any) => {
+    // Clean display name: strip trailing "-<digits>" timestamp artifacts, fallback to truncated wallet
+    let name = e.userName || "";
+    if (!name || /^0x[a-fA-F0-9]/.test(name)) {
+      name = name.replace(/-\d{5,}$/, ""); // strip "-1774116788380" style suffixes
+      if (!name || /^0x[a-fA-F0-9]/.test(name)) {
+        const wallet = e.proxyWallet || "";
+        name = wallet.length > 10 ? `${wallet.slice(0, 6)}...${wallet.slice(-4)}` : wallet;
+      }
+    }
+    const vol = e.vol || 0;
+    const marketsTraded = e.numTrades || e.marketsTraded || (vol > 0 ? Math.round(vol / 500) : 0);
+
+    return {
+      address: e.proxyWallet,
+      display_name: name,
+      total_pnl: e.pnl || 0,
+      total_volume: vol,
+      win_rate: 0,
+      accuracy: 0,
+      positions_count: 0,
+      markets_traded: marketsTraded,
+      rank: e.rank || 0,
+    };
+  });
+
+  const { error } = await supabase.from("whales").upsert(whaleRows, { onConflict: "address" });
+  if (error) console.error("  Whales upsert error:", error.message);
+  else console.log(`  Upserted ${whaleRows.length} whale profiles from leaderboard`);
+}
+
+// ─── 9. INGEST WHALE TRADES (from activity) ─────────────────────────
 async function ingestWhaleTrades() {
-  console.log("\n=== Fetching recent trades (whale detection) ===");
-  const trades = await fetchRecentTrades();
-  console.log(`  Got ${trades.length} trades`);
+  console.log("\n=== Fetching activity for whale trade detection ===");
+  const activities = await fetchRecentActivity();
+  console.log(`  Got ${activities.length} activity entries`);
 
   // Filter for whale-sized trades (>$10K)
-  const whaleTrades = trades.filter((t: any) => parseFloat(t.size) > 10000);
+  const whaleTrades = activities.filter((t: any) => {
+    const size = parseFloat(t.size || t.amount || "0");
+    return size > 10_000;
+  });
   console.log(`  ${whaleTrades.length} whale trades (>$10K)`);
 
   if (whaleTrades.length === 0) return;
 
-  const rows = whaleTrades.map((t: any) => ({
-    id: t.id || `trade-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    wallet_address: t.owner || t.maker_address || "unknown",
-    market_id: null, // Can't reliably map condition IDs to our market slugs
-    side: t.side || "BUY",
-    size_usd: parseFloat(t.size) || 0,
-    price: parseFloat(t.price) || 0,
-    outcome: t.outcome || null,
-    timestamp: t.match_time || new Date().toISOString(),
-    transaction_hash: t.transaction_hash || null,
+  const rows = whaleTrades.map((t: any, i: number) => ({
+    id: t.id || t.transactionHash || `trade-${Date.now()}-${i}`,
+    wallet_address: t.proxyWallet || t.owner || t.maker_address || "unknown",
+    market_id: null,
+    side: (t.side || t.type || "BUY").toUpperCase(),
+    size_usd: parseFloat(t.size || t.amount || "0"),
+    price: parseFloat(t.price || "0.5"),
+    outcome: t.outcome || t.title || null,
+    timestamp: t.timestamp || t.match_time || t.createdAt || new Date().toISOString(),
+    transaction_hash: t.transactionHash || t.transaction_hash || null,
   }));
 
   const { error } = await supabase.from("whale_trades").upsert(rows, { onConflict: "id" });
   if (error) console.error("  Whale trades upsert error:", error.message);
   else console.log(`  Upserted ${rows.length} whale trades`);
-
-  // Aggregate whale stats from trades
-  const walletMap = new Map<string, { volume: number; count: number }>();
-  for (const t of whaleTrades) {
-    const addr = t.owner || t.maker_address;
-    if (!addr) continue;
-    const existing = walletMap.get(addr) || { volume: 0, count: 0 };
-    existing.volume += parseFloat(t.size) || 0;
-    existing.count += 1;
-    walletMap.set(addr, existing);
-  }
-
-  const whaleRows = Array.from(walletMap.entries())
-    .sort((a, b) => b[1].volume - a[1].volume)
-    .slice(0, 50)
-    .map(([addr, stats], i) => ({
-      address: addr,
-      display_name: `${addr.slice(0, 6)}...${addr.slice(-4)}`,
-      total_pnl: 0,
-      total_volume: stats.volume,
-      win_rate: 0,
-      accuracy: 0,
-      positions_count: stats.count,
-      markets_traded: stats.count,
-      rank: i + 1,
-    }));
-
-  if (whaleRows.length > 0) {
-    const { error: wErr } = await supabase.from("whales").upsert(whaleRows, { onConflict: "address" });
-    if (wErr) console.error("  Whales upsert error:", wErr.message);
-    else console.log(`  Upserted ${whaleRows.length} whale profiles`);
-  }
 }
 
-// ─── 8. COMPUTE DISAGREEMENTS ────────────────────────────────────────
+// ─── 10. COMPUTE DISAGREEMENTS ───────────────────────────────────────
 async function ingestDisagreements(markets: any[]) {
   console.log("\n=== Computing cross-platform disagreements ===");
 
@@ -385,6 +425,7 @@ async function main() {
 
   const markets = await ingestMarkets();
   await ingestPriceHistory(markets);
+  await ingestWhaleLeaderboard();
   await ingestWhaleTrades();
   await ingestDisagreements(markets);
 
