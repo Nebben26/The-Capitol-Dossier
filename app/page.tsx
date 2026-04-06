@@ -128,12 +128,26 @@ export default function HomePage() {
   const [priceOffsets, setPriceOffsets] = useState<Record<string, number>>({});
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
-  const { disagreements } = useDisagreements();
+  const { disagreements: rawDisagreements } = useDisagreements();
   const { moves: smartMoves } = useSmartMoneyMoves();
   const { insights } = useInsights();
   const { setSource } = useDataSource();
 
   useEffect(() => { setSource(source); }, [source, setSource]);
+
+  // Enrich disagreements with market volumes from loaded markets
+  const disagreements = useMemo(() => {
+    if (!allMarkets.length) return rawDisagreements;
+    const marketMap = new Map(allMarkets.map((m) => [m.id, m]));
+    return rawDisagreements.map((d) => {
+      const polyM = marketMap.get(d.marketId);
+      return {
+        ...d,
+        polyVol: (d.polyVol && d.polyVol !== "$0") ? d.polyVol : (polyM?.volume || d.polyVol),
+        kalshiVol: (d.kalshiVol && d.kalshiVol !== "$0") ? d.kalshiVol : d.kalshiVol,
+      };
+    });
+  }, [rawDisagreements, allMarkets]);
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
 
@@ -344,8 +358,8 @@ export default function HomePage() {
                 <span className="text-[10px] text-[#8892b0] font-mono">24H</span>
               </div>
             </CardHeader>
-            <CardContent className="px-0 pb-2">
-              <Table>
+            <CardContent className="px-0 pb-2 overflow-x-hidden">
+              <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow className="border-[#2f374f] hover:bg-transparent">
                     <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">CONTRACT</TableHead>

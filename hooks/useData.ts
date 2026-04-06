@@ -286,6 +286,7 @@ export function useBacktestData() {
 // ─── HOMEPAGE HOOK (with auto-refresh) ────────────────────────────────
 export function useHomepageData(autoRefreshMs = 45000) {
   const { markets, source, refreshing, lastFetched, error, retry } = useMarkets(autoRefreshMs);
+  const { whales: liveWhaleList } = useWhales();
 
   const biggestMovers = [...markets]
     .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
@@ -327,23 +328,25 @@ export function useHomepageData(autoRefreshMs = 45000) {
         }))
     : breakingMarkets;
 
-  // "Whale Activity" — derive from top markets with highest whale counts
-  const liveWhaleActivity = markets.length > 24
+  // "Whale Activity" — pair real whale names with top markets
+  const liveWhaleActivity = markets.length > 24 && liveWhaleList.length > 5
     ? markets
-        .filter((m) => m.question && m.whaleCount > 5)
-        .sort((a, b) => b.whaleCount - a.whaleCount)
+        .filter((m) => m.question && m.volNum > 100000)
         .slice(0, 5)
-        .map((m, i) => ({
-          id: `whale-${i}`,
-          name: `Whale #${i + 1}`,
-          rank: i + 1,
-          acc: 65 + Math.floor(Math.random() * 20),
-          pos: `YES $${(m.volNum / 1000000).toFixed(1)}M`,
-          market: m.question,
-          marketId: m.id,
-          time: i === 0 ? "3m ago" : `${(i + 1) * 8}m ago`,
-          side: "long" as const,
-        }))
+        .map((m, i) => {
+          const whale = liveWhaleList[i % liveWhaleList.length];
+          return {
+            id: whale?.id || `whale-${i}`,
+            name: whale?.name || `Whale #${i + 1}`,
+            rank: whale?.rank || i + 1,
+            acc: whale?.accuracy || 65,
+            pos: `YES $${(m.volNum / 1000000).toFixed(1)}M`,
+            market: m.question,
+            marketId: m.id,
+            time: i === 0 ? "3m ago" : `${(i + 1) * 8}m ago`,
+            side: "long" as const,
+          };
+        })
     : homepageWhaleActivity;
 
   return {

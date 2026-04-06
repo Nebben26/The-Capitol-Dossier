@@ -421,7 +421,7 @@ export default function StrategiesPage() {
                                 </linearGradient>
                               </defs>
                               <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                              <XAxis dataKey="day" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} label={{ value: "Day", position: "bottom", fill: "#8892b0", fontSize: 10, offset: 0 }} />
+                              <XAxis dataKey="day" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(day: number) => { const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const d = new Date(2025, 0, day); return `${months[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`; }} />
                               <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}K`} />
                               <Area type="monotone" dataKey="equity" stroke="#57D7BA" strokeWidth={2} fill="url(#equityGrad)" />
                               <Area type="monotone" dataKey="benchmark" stroke="#8892b0" strokeWidth={1} strokeDasharray="4 4" fill="none" />
