@@ -51,7 +51,7 @@ interface PolyEvent {
   volume: number; liquidity: number; endDate: string; createdAt: string;
   tags?: { label: string }[];
   markets: {
-    id: string; question: string; slug: string;
+    id: string; question: string; slug: string; groupItemTitle?: string;
     outcomePrices: string; outcomes?: string; clobTokenIds?: string;
     volume: number; volume24hr: number; liquidity: number;
     active: boolean; closed: boolean; endDate: string; createdAt: string;
@@ -164,42 +164,50 @@ async function ingestMarkets() {
 
   // Transform Polymarket
   for (const ev of polyEvents) {
-    const m = ev.markets?.[0];
-    if (!m) continue;
-    // outcomePrices is a JSON string like '["0.68","0.32"]' — parse then convert to numbers
-    const rawPrices = safeParse<string[]>(m.outcomePrices || "[]", ["0.5", "0.5"]);
-    const prices = rawPrices.map((p: any) => parseFloat(String(p)) || 0.5);
-    const outcomes = safeParse<string[]>(m.outcomes || '["Yes","No"]', ["Yes", "No"]);
-    const tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
-    const yesPrice = prices[0] || 0.5;
-    const price = Math.round(yesPrice * 100);
-    if (price <= 1 || price >= 99) continue;
+    if (!ev.markets?.length) continue;
 
-    const daysLeft = Math.max(0, Math.round((new Date(m.endDate || ev.endDate).getTime() - Date.now()) / 86400000));
-    rows.push({
-      id: m.slug || ev.slug || m.id,
-      question: m.question || ev.title,
-      slug: m.slug || ev.slug,
-      platform: "Polymarket",
-      category: guessCategory(m.question || ev.title, ev.tags),
-      price,
-      previous_price: null,
-      change_24h: 0,
-      volume: m.volume || ev.volume || 0,
-      volume_24h: m.volume24hr || 0,
-      liquidity: m.liquidity || 0,
-      traders: Math.floor((m.volume || 0) / 500) + 100,
-      end_date: m.endDate || ev.endDate || null,
-      days_left: daysLeft,
-      outcomes,
-      outcome_prices: prices,
-      clob_token_ids: tokenIds,
-      ticker: null,
-      url: `https://polymarket.com/event/${ev.slug}`,
-      description: ev.description || m.question || ev.title,
-      resolved: m.closed,
-      resolution: null,
-    });
+    // For multi-outcome events (>2 markets), ingest each sub-market individually
+    // For binary events (1-2 markets), ingest the first market with the event title
+    const isBinary = ev.markets.length <= 2;
+    const marketsToProcess = isBinary ? [ev.markets[0]] : ev.markets;
+
+    for (const m of marketsToProcess) {
+      // outcomePrices is a JSON string like '["0.68","0.32"]'
+      const rawPrices = safeParse<string[]>(m.outcomePrices || "[]", ["0.5", "0.5"]);
+      const prices = rawPrices.map((p: any) => parseFloat(String(p)) || 0);
+      const outcomes = safeParse<string[]>(m.outcomes || '["Yes","No"]', ["Yes", "No"]);
+      const tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
+      const yesPrice = prices[0] || 0;
+      const price = Math.round(yesPrice * 100);
+      if (price <= 1 || price >= 99) continue;
+
+      const question = isBinary ? (ev.title || m.question) : (m.groupItemTitle || m.question || ev.title);
+      const daysLeft = Math.max(0, Math.round((new Date(m.endDate || ev.endDate).getTime() - Date.now()) / 86400000));
+      rows.push({
+        id: m.slug || `${ev.slug}-${m.id}`.slice(0, 100),
+        question,
+        slug: m.slug || ev.slug,
+        platform: "Polymarket",
+        category: guessCategory(question, ev.tags),
+        price,
+        previous_price: null,
+        change_24h: 0,
+        volume: m.volume || ev.volume || 0,
+        volume_24h: m.volume24hr || 0,
+        liquidity: m.liquidity || 0,
+        traders: Math.floor((m.volume || 0) / 500) + 100,
+        end_date: m.endDate || ev.endDate || null,
+        days_left: daysLeft,
+        outcomes,
+        outcome_prices: prices,
+        clob_token_ids: tokenIds,
+        ticker: null,
+        url: `https://polymarket.com/event/${ev.slug}`,
+        description: ev.description || question,
+        resolved: m.closed,
+        resolution: null,
+      });
+    }
   }
 
   // Transform Kalshi
