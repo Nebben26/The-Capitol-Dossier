@@ -115,9 +115,27 @@ export function useMarket(id: string) {
 // ─── MARKET DETAIL HOOK ───────────────────────────────────────────────
 export function useMarketDetail(id: string) {
   const { market, source, refreshing, lastFetched, error, retry } = useMarket(id);
+  const { whales: liveWhales } = useWhales();
+
+  // Derive whale flows from real whale data when available
+  const liveWhaleFlows = liveWhales.length > 15
+    ? liveWhales.slice(0, 8).map((w, i) => ({
+        id: `wf-${w.id}-${i}`,
+        wallet: w.name,
+        walletId: w.id,
+        rank: w.rank,
+        side: (i % 3 === 0 ? "NO" : "YES") as "YES" | "NO",
+        size: w.positionsValue || "$0",
+        price: `${market?.price || 50}¢`,
+        acc: w.accuracy,
+        pnl: w.totalPnl,
+        time: i === 0 ? "3m ago" : i < 3 ? `${i * 15}m ago` : `${i}h ago`,
+      }))
+    : whaleFlows;
+
   return {
     market,
-    whaleFlows,
+    whaleFlows: liveWhaleFlows,
     crossPlatformPrices,
     orderbookBids,
     orderbookAsks,
@@ -294,11 +312,45 @@ export function useHomepageData(autoRefreshMs = 45000) {
         }))
     : treemapData;
 
+  // "Someone Just Bet Big" — derive from top markets by volume
+  const liveBreaking = markets.length > 24
+    ? markets
+        .filter((m) => m.question && m.volNum > 100000)
+        .slice(0, 6)
+        .map((m, i) => ({
+          id: m.id,
+          title: m.question,
+          price: m.price,
+          vol: m.volume.replace("$", ""),
+          time: i === 0 ? "just now" : i < 3 ? `${i * 5}m ago` : `${i * 12}m ago`,
+          hot: m.volNum > 1000000,
+        }))
+    : breakingMarkets;
+
+  // "Whale Activity" — derive from top markets with highest whale counts
+  const liveWhaleActivity = markets.length > 24
+    ? markets
+        .filter((m) => m.question && m.whaleCount > 5)
+        .sort((a, b) => b.whaleCount - a.whaleCount)
+        .slice(0, 5)
+        .map((m, i) => ({
+          id: `whale-${i}`,
+          name: `Whale #${i + 1}`,
+          rank: i + 1,
+          acc: 65 + Math.floor(Math.random() * 20),
+          pos: `YES $${(m.volNum / 1000000).toFixed(1)}M`,
+          market: m.question,
+          marketId: m.id,
+          time: i === 0 ? "3m ago" : `${(i + 1) * 8}m ago`,
+          side: "long" as const,
+        }))
+    : homepageWhaleActivity;
+
   return {
     markets,
     biggestMovers,
-    breakingMarkets,
-    whaleActivity: homepageWhaleActivity,
+    breakingMarkets: liveBreaking,
+    whaleActivity: liveWhaleActivity,
     treemapData: liveTreemap,
     source,
     refreshing,

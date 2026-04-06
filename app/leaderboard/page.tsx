@@ -427,8 +427,8 @@ export default function LeaderboardPage() {
                             <TableCell className="py-3 hidden xl:table-cell">
                               <span className="font-mono text-xs text-[#8892b0]">{t.activeMarkets}</span>
                             </TableCell>
-                            <TableCell className="py-3">
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${t.bestCatColor}15`, color: t.bestCatColor }}>
+                            <TableCell className="py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap" style={{ backgroundColor: `${t.bestCatColor}15`, color: t.bestCatColor }}>
                                 {t.bestCategory}
                               </span>
                             </TableCell>

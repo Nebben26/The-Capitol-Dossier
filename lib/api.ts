@@ -532,14 +532,19 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
     // Enrich with market data for volume and resolution
     try {
       const { data: allMarkets } = await getAllMarkets();
+      const marketMap = new Map(allMarkets.map((m) => [m.id, m]));
+      // Build a map from disagreement ID to kalshi_market_id
+      const kalshiIdMap = new Map((data || []).map((r: any) => [r.id, r.kalshi_market_id]));
+
       for (const d of disagreements) {
-        const polyMarket = allMarkets.find((m) => m.id === d.marketId);
+        const polyMarket = marketMap.get(d.marketId);
         if (polyMarket) {
           d.polyVol = polyMarket.volume;
           d.resolution = polyMarket.resolution;
           d.daysLeft = polyMarket.daysLeft;
         }
-        const kalshiMarket = allMarkets.find((m) => m.id === (data.find((r: any) => r.id === d.id)?.kalshi_market_id));
+        const kalshiId = kalshiIdMap.get(d.id);
+        const kalshiMarket = kalshiId ? marketMap.get(kalshiId) : undefined;
         if (kalshiMarket) {
           d.kalshiVol = kalshiMarket.volume;
         }
