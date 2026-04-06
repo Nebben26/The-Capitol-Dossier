@@ -317,7 +317,7 @@ export default function WhaleProfilePage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="h-48 sm:h-56 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <AreaChart data={pnlHistory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="pnlGrad" x1="0" y1="0" x2="0" y2="1">
@@ -685,7 +685,7 @@ export default function WhaleProfilePage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="h-72 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <BarChart
                       data={categoryPerformance}
                       layout="vertical"
@@ -775,7 +775,7 @@ export default function WhaleProfilePage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="h-72 sm:h-96 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <ScatterChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
                       <XAxis

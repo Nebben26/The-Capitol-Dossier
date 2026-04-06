@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Quiver Markets — Prediction Market Intelligence",
   description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection. Track the smartest money in prediction markets.",
-  metadataBase: new URL("https://quivermarkets.com"),
+  metadataBase: new URL("https://amazing-kitsune-139d51.netlify.app"),
   openGraph: {
     title: "Quiver Markets — Prediction Market Intelligence",
     description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",

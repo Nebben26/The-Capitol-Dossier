@@ -70,7 +70,7 @@ type SortDir = "asc" | "desc";
 function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
     <div className="h-8 w-20">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id={positive ? "sparkGreen" : "sparkRed"} x1="0" y1="0" x2="0" y2="1">
@@ -116,7 +116,7 @@ function RankBadge({ rank }: { rank: number }) {
 function MiniCalibration({ data }: { data: { predicted: number; actual: number }[] }) {
   return (
     <div className="h-20 w-28">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <ScatterChart margin={{ top: 4, right: 4, left: 4, bottom: 4 }}>
           <XAxis type="number" dataKey="predicted" domain={[0, 100]} tick={false} axisLine={{ stroke: "#2a2f45" }} />
           <YAxis type="number" dataKey="actual" domain={[0, 100]} tick={false} axisLine={{ stroke: "#2a2f45" }} />

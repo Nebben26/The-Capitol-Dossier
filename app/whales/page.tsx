@@ -58,7 +58,7 @@ function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; po
   const color = positive ? "#22c55e" : "#ef4444";
   return (
     <div className="h-8 w-20">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <AreaChart data={data}>
           <defs><linearGradient id={positive ? "wsg" : "wsr"} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={color} stopOpacity={0.3} /><stop offset="95%" stopColor={color} stopOpacity={0} /></linearGradient></defs>
           <Area type="monotone" dataKey="v" stroke={color} strokeWidth={1.5} fill={`url(#${positive ? "wsg" : "wsr"})`} dot={false} />

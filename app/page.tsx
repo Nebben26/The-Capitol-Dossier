@@ -57,7 +57,7 @@ import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
     <div className="h-8 w-16">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <LineChart data={data}>
           <Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={2} dot={false} />
         </LineChart>
@@ -237,7 +237,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="hidden xl:block w-64 h-24">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <AreaChart data={sparkGen(40, 4)}>
                   <defs>
                     <linearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
@@ -372,7 +372,7 @@ export default function HomePage() {
                             <div className="space-y-2">
                               <p className="text-xs font-medium">{m.q}</p>
                               <div className="h-12 w-40">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                   <AreaChart data={m.spark}>
                                     <defs>
                                       <linearGradient id={`tip-${m.id}`} x1="0" y1="0" x2="0" y2="1">
@@ -563,7 +563,7 @@ export default function HomePage() {
         </CardHeader>
         <CardContent className="pb-3">
           <div className="h-64 sm:h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <Treemap data={treemapData} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
             </ResponsiveContainer>
           </div>

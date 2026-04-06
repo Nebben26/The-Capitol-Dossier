@@ -327,7 +327,7 @@ export default function CalibrationPage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <ScatterChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" />
                       <XAxis type="number" dataKey="predicted" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `${v}%`} />
@@ -359,7 +359,7 @@ export default function CalibrationPage() {
               </CardHeader>
               <CardContent className="pb-3">
                 <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <AreaChart data={pnlCurve} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="calPnl" x1="0" y1="0" x2="0" y2="1">
@@ -389,7 +389,7 @@ export default function CalibrationPage() {
               <CardContent className="pb-3">
                 {catPerf.length > 0 ? (
                   <div className="h-48 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={catPerf} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" horizontal={false} />
                         <XAxis type="number" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `${v}%`} />

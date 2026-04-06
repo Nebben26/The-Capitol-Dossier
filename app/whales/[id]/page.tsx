@@ -16,28 +16,18 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!whale) {
     return {
       title: "Whale Profile | Quiver Markets",
-      description: "Prediction market whale trader profile.",
+      description: "Prediction market whale trader profile and analytics.",
     };
   }
 
   const title = `${whale.name} | Rank #${whale.rank} | Quiver Markets`;
-  const description = `${whale.name} — ${whale.totalPnl} lifetime P&L, ${whale.accuracy}% accuracy, ${whale.totalTrades} trades. ${whale.bio}`;
+  const description = `${whale.name} — ${whale.totalPnl} lifetime P&L, ${whale.accuracy}% accuracy, ${whale.totalTrades} trades.`;
 
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "profile",
-      images: [{ url: "/og-image.svg", width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/og-image.svg"],
-    },
+    openGraph: { title, description, type: "profile", images: [{ url: "/og-image.svg", width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", title, description, images: ["/og-image.svg"] },
   };
 }
 

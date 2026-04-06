@@ -14,7 +14,7 @@ export function EmbedButton({
   label?: string;
 }) {
   const [copied, setCopied] = useState(false);
-  const base = "https://quivermarkets.com";
+  const base = "https://amazing-kitsune-139d51.netlify.app";
   const dims = type === "sparkline" ? 'width="300" height="140"' : 'width="400" height="220"';
   const code = `<iframe src="${base}/embed/${type}?id=${id}" ${dims} frameborder="0" style="border-radius:12px;overflow:hidden;" loading="lazy"></iframe>`;
 

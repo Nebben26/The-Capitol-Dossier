@@ -56,6 +56,7 @@ export interface Market {
   // Optional enrichment fields (populated by API layer)
   clobTokenIds?: string[];
   ticker?: string;
+  platformUrl?: string;
   priceHistory?: { time: string; price: number; vol: number; open: number; high: number; low: number; close: number }[];
   volAnomaly?: boolean;
 }

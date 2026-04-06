@@ -55,7 +55,7 @@ function MarketWatchCard({ market, onRemove }: { market: Market; onRemove: () =>
         </Link>
         {/* Sparkline */}
         <div className="h-10 w-full mb-2">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={market.spark}>
               <defs>
                 <linearGradient id={`wl-${market.id}`} x1="0" y1="0" x2="0" y2="1">
@@ -121,7 +121,7 @@ function WhaleWatchCard({ whale, onRemove }: { whale: Whale; onRemove: () => voi
         </div>
         {/* Sparkline */}
         <div className="h-10 w-full mb-3">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <AreaChart data={whale.spark}>
               <defs>
                 <linearGradient id={`wlw-${whale.id}`} x1="0" y1="0" x2="0" y2="1">

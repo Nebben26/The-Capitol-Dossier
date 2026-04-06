@@ -118,7 +118,7 @@ function DepthChart({ bids, asks }: { bids: OrderbookLevel[]; asks: OrderbookLev
   const combined = [...bidData.reverse(), ...askData];
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
       <AreaChart data={combined} margin={{ top: 10, right: 20, left: 20, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
         <XAxis dataKey="price" tick={{ fill: "#8892b0", fontSize: 10 }} tickFormatter={(v) => `${v}¢`} />
@@ -260,8 +260,8 @@ export default function MarketDetailPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
-                <TradeButton side="YES" price={market.price} />
-                <TradeButton side="NO" price={market.price} />
+                <TradeButton side="YES" price={market.price} url={market.platformUrl} />
+                <TradeButton side="NO" price={market.price} url={market.platformUrl} />
               </div>
               <div className="mt-3 flex justify-center gap-2">
                 <ShareCardButton title={market.question} price={market.price} change={market.change} />
@@ -511,7 +511,7 @@ export default function MarketDetailPage() {
               <CardContent className="pb-3">
                 {/* Price Chart */}
                 <div className="h-72 sm:h-96 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     {chartMode === "area" ? (
                       <AreaChart data={priceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <defs>
@@ -538,7 +538,7 @@ export default function MarketDetailPage() {
 
                 {/* Volume Bars */}
                 <div className="h-20 w-full mt-2">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <BarChart data={priceData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
                       <XAxis dataKey="time" tick={false} axisLine={{ stroke: "#2a2f45" }} />
                       <Bar dataKey="vol" fill="#57D7BA" fillOpacity={0.2} radius={[1, 1, 0, 0]} />

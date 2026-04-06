@@ -25,7 +25,7 @@ function SparklineEmbed() {
       </div>
       <p className="text-[9px] text-[#8892b0] truncate mb-1">{m.question}</p>
       <div className="h-14 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <AreaChart data={m.spark}>
             <defs>
               <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">

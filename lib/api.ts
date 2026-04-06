@@ -95,6 +95,7 @@ function dbMarketToFrontend(row: any): Market {
     liquidity: (row.liquidity || 0) >= 1_000_000 ? `$${((row.liquidity || 0) / 1_000_000).toFixed(1)}M` : `$${((row.liquidity || 0) / 1_000).toFixed(0)}K`,
     clobTokenIds: row.clob_token_ids || undefined,
     ticker: row.ticker || undefined,
+    platformUrl: row.url || undefined,
     volAnomaly: false,
   };
 }

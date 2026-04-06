@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import MarketDetailPage from "./market-detail-client";
 import { marketById } from "@/lib/mockData";
 
+// Pre-render mock market pages at build time; real markets served via SPA fallback
 export function generateStaticParams() {
   return [
     { id: "recession-2026" }, { id: "fed-rate-cut" }, { id: "trump-2028" },
@@ -15,18 +16,19 @@ export function generateStaticParams() {
   ];
 }
 
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const market = marketById[id];
   if (!market) {
     return {
-      title: "Market Not Found | Quiver Markets",
-      description: "This prediction market could not be found.",
+      title: "Market | Quiver Markets",
+      description: "Prediction market analytics and intelligence.",
     };
   }
 
   const title = `${market.question} | ${market.price}% | Quiver Markets`;
-  const description = `${market.question} — Currently trading at ${market.price}¢ on ${market.platform}. ${market.volume} volume, ${market.traders.toLocaleString()} traders. ${market.desc}`;
+  const description = `${market.question} — Currently trading at ${market.price}¢ on ${market.platform}. ${market.volume} volume, ${market.traders.toLocaleString()} traders.`;
 
   return {
     title,

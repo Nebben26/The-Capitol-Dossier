@@ -65,7 +65,7 @@ type ViewMode = "grid" | "table";
 function MiniSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
     <div className="h-8 w-16">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <LineChart data={data}>
           <Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} dot={false} />
         </LineChart>
@@ -80,7 +80,7 @@ function TooltipSparkline({ data, positive }: { data: { d: number; v: number }[]
   const color = positive ? "#22c55e" : "#ef4444";
   return (
     <div className="h-14 w-36">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id={gId} x1="0" y1="0" x2="0" y2="1">
@@ -151,7 +151,7 @@ function MarketCard({ m }: { m: Market }) {
 
               {/* Sparkline */}
               <div className="h-8 w-full mb-2">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <AreaChart data={m.spark}>
                     <defs>
                       <linearGradient id={`card-${m.id}`} x1="0" y1="0" x2="0" y2="1">

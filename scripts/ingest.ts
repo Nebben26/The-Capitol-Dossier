@@ -166,10 +166,13 @@ async function ingestMarkets() {
   for (const ev of polyEvents) {
     const m = ev.markets?.[0];
     if (!m) continue;
-    const prices = safeParse<number[]>(m.outcomePrices || "[]", [0.5, 0.5]).map(Number);
+    // outcomePrices is a JSON string like '["0.68","0.32"]' — parse then convert to numbers
+    const rawPrices = safeParse<string[]>(m.outcomePrices || "[]", ["0.5", "0.5"]);
+    const prices = rawPrices.map((p: any) => parseFloat(String(p)) || 0.5);
     const outcomes = safeParse<string[]>(m.outcomes || '["Yes","No"]', ["Yes", "No"]);
     const tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
-    const price = Math.round((prices[0] || 0.5) * 100);
+    const yesPrice = prices[0] || 0.5;
+    const price = Math.round(yesPrice * 100);
     if (price <= 1 || price >= 99) continue;
 
     const daysLeft = Math.max(0, Math.round((new Date(m.endDate || ev.endDate).getTime() - Date.now()) / 86400000));

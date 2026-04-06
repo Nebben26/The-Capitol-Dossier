@@ -64,7 +64,7 @@ const sortOptions: { label: string; key: SortKey }[] = [
 function MiniSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
     <div className="h-8 w-16">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <LineChart data={data}><Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} dot={false} /></LineChart>
       </ResponsiveContainer>
     </div>
@@ -93,7 +93,7 @@ function ScreenerCard({ m, spread }: { m: Market; spread: number | null }) {
           </div>
           <p className="text-xs font-semibold leading-snug group-hover:text-[#57D7BA] transition-colors line-clamp-2 mb-2 flex-1">{m.question}</p>
           <div className="h-8 w-full mb-2">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={m.spark}>
                 <defs><linearGradient id={`sc-${m.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={positive ? "#22c55e" : "#ef4444"} stopOpacity={0.3} /><stop offset="95%" stopColor={positive ? "#22c55e" : "#ef4444"} stopOpacity={0} /></linearGradient></defs>
                 <Area type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} fill={`url(#sc-${m.id})`} dot={false} />

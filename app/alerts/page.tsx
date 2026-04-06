@@ -66,7 +66,7 @@ type SortDir = "asc" | "desc";
 function MoverSparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
   return (
     <div className="h-8 w-16">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
         <LineChart data={data}>
           <Line type="monotone" dataKey="v" stroke={positive ? "#22c55e" : "#ef4444"} strokeWidth={1.5} dot={false} />
         </LineChart>
