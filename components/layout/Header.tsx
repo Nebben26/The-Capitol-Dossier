@@ -216,6 +216,20 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           <Send className="size-3" />
           {autoPost ? "Auto-Post ON" : "Auto-Post"}
         </button>
+        <button
+          onClick={() => {
+            const topDisagree = disagreements[0];
+            const text = topDisagree
+              ? `🔴 The Market Disagrees\n\n"${topDisagree.question}"\n\nPolymarket: ${topDisagree.polyPrice}¢\nKalshi: ${topDisagree.kalshiPrice}¢\nSpread: ${topDisagree.spread}pts\n\nvia Quiver Markets`
+              : "Check out Quiver Markets — prediction market intelligence";
+            window.open(`https://t.me/share/url?text=${encodeURIComponent(text)}`, "_blank", "width=550,height=420");
+          }}
+          className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#2AABEE]/10 text-[#2AABEE] text-[9px] font-bold hover:bg-[#2AABEE]/20 transition-colors border border-[#2AABEE]/20"
+          title="Share top disagree to Telegram"
+        >
+          <svg viewBox="0 0 24 24" className="size-3" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
+          Share
+        </button>
         <MiniPulseGauge />
         <Button variant="ghost" size="icon" className="text-[#8892b0] hover:text-[#e2e8f0]">
           <Bell className="size-4" />

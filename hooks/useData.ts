@@ -33,8 +33,9 @@ import {
   sparkGen,
   STRAT_CATEGORIES,
   disagreements as mockDisagreements,
+  insights as mockInsights,
 } from "@/lib/mockData";
-import type { Disagreement } from "@/lib/mockData";
+import type { Disagreement, Insight } from "@/lib/mockData";
 
 // ─── AUTO-REFRESH HOOK ────────────────────────────────────────────────
 function useAutoRefresh(
@@ -131,25 +132,28 @@ export function useMarketDetail(id: string) {
 
 // ─── ALERTS HOOK (with auto-refresh) ──────────────────────────────────
 export function useAlertData(autoRefreshMs = 45000) {
+  const [whaleAlerts, setWhaleAlerts] = useState(initialWhaleAlerts);
   const [priceMovers, setPriceMovers] = useState(mockPriceMovers);
   const [resolution, setResolution] = useState(mockResolution);
   const [source, setSource] = useState<DataSource>("mock");
 
   const fetchAlerts = useCallback(async () => {
     const api = await import("@/lib/api");
-    const [pmRes, rnRes] = await Promise.all([
+    const [waRes, pmRes, rnRes] = await Promise.all([
+      api.getWhaleActivity(),
       api.getPriceMovers(),
       api.getResolutionNearing(),
     ]);
+    setWhaleAlerts(waRes.data);
     setPriceMovers(pmRes.data);
     setResolution(rnRes.data);
-    if (pmRes.source === "live" || rnRes.source === "live") setSource("live");
+    if (waRes.source === "live" || pmRes.source === "live" || rnRes.source === "live") setSource("live");
   }, []);
 
   const { refreshing, lastFetched, error, retry } = useAutoRefresh(fetchAlerts, autoRefreshMs);
 
   return {
-    initialWhaleAlerts,
+    initialWhaleAlerts: whaleAlerts,
     incomingAlerts,
     priceMovers,
     resolutionNearing: resolution,
@@ -179,7 +183,21 @@ export function useWhales(autoRefreshMs = 60000) {
 
 export function useWhale(id: string) {
   const { whales, source, refreshing, lastFetched } = useWhales();
-  const whale = whales.find((w) => w.id === id) ?? mockWhaleById[id];
+  const [enrichedWhale, setEnrichedWhale] = useState<Whale | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { getWhaleById } = await import("@/lib/api");
+        const result = await getWhaleById(id);
+        if (!cancelled && result.data) setEnrichedWhale(result.data);
+      } catch { /* fallback handled below */ }
+    })();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  const whale = enrichedWhale ?? whales.find((w) => w.id === id) ?? mockWhaleById[id];
   return { whale, source, refreshing, lastFetched };
 }
 
@@ -303,6 +321,17 @@ export function useDisagreements(autoRefreshMs = 45000) {
   };
 }
 
+// ─── INSIGHTS HOOK ────────────────────────────────────────────────────
+export function useInsights() {
+  // Structured for future RSS/API integration
+  return {
+    insights: mockInsights,
+    source: "mock" as DataSource,
+    refreshing: false,
+    lastFetched: new Date(),
+  };
+}
+
 // ─── RE-EXPORTS ───────────────────────────────────────────────────────
 export { sparkGen, STRAT_CATEGORIES };
-export type { Market, Whale, Strategy, Disagreement, DataSource };
+export type { Market, Whale, Strategy, Disagreement, Insight, DataSource };

@@ -47,6 +47,8 @@ import {
   CheckCircle,
   XCircle,
   Trophy,
+  Copy,
+  Check,
 } from "lucide-react";
 import { useAlertData } from "@/hooks/useData";
 import type { WhaleAlert, PriceMover, ResolutionItem } from "@/lib/mockData";
@@ -55,6 +57,7 @@ import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 import { CopyAlertButton } from "@/components/ui/copy-alert-button";
+import { TrialBanner } from "@/components/ui/pro-gate";
 
 // ─── SORT ─────────────────────────────────────────────────────────────
 type PmSort = "change5m" | "change15m" | "change1h" | "price";
@@ -79,6 +82,51 @@ function Countdown({ days, hours }: { days: number; hours: number }) {
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${urgency} ${bg}`}>
       <Timer className="size-2.5" />{days}d {hours % 24}h
     </span>
+  );
+}
+
+// ─── BROADCAST BUTTON ─────────────────────────────────────────────────
+function BroadcastButton({ alerts }: { alerts: WhaleAlert[] }) {
+  const [sent, setSent] = useState(false);
+
+  const broadcastText = alerts.map((a, i) =>
+    `${i + 1}. 🐋 ${a.wallet} → ${a.side} ${a.size} on "${a.market}" @ ${a.price}`
+  ).join("\n") + "\n\n📡 Live from Quiver Markets";
+
+  const handleBroadcast = () => {
+    window.open(`https://t.me/share/url?text=${encodeURIComponent(broadcastText)}`, "_blank", "width=550,height=420");
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(broadcastText);
+    setSent(true);
+    setTimeout(() => setSent(false), 2000);
+  };
+
+  return (
+    <Card className="bg-[#222638] border-[#2AABEE]/20">
+      <CardContent className="p-3 flex items-center gap-3">
+        <div className="size-8 rounded-lg bg-[#2AABEE]/10 flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" className="size-4 text-[#2AABEE]" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
+        </div>
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-[#e2e8f0]">Broadcast top {alerts.length} alerts</p>
+          <p className="text-[9px] text-[#8892b0]">Send the latest whale moves to your Telegram channel</p>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Button onClick={handleCopy} variant="outline" size="xs" className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] gap-1">
+            {sent ? <Check className="size-3 text-[#22c55e]" /> : <Copy className="size-3" />}
+            Copy
+          </Button>
+          <Button onClick={handleBroadcast} size="xs" className="bg-[#2AABEE] text-white hover:bg-[#2AABEE]/80 gap-1">
+            <Radio className="size-3" />
+            Broadcast
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -166,13 +214,16 @@ export default function AlertsPage() {
         </div>
       </div>
 
+      {/* Broadcast */}
+      <BroadcastButton alerts={alerts.slice(0, 3)} />
+
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: "Whale Alerts", val: "142", icon: Wallet, color: "#8b5cf6", sub: "Last 24h" },
-          { label: "Price Spikes", val: "38", icon: TrendingUp, color: "#22c55e", sub: ">5% in 1h" },
-          { label: "Vol Spikes", val: "24", icon: Volume2, color: "#f59e0b", sub: ">3x avg" },
-          { label: "Resolving Soon", val: String(sortedResolutions.length), icon: Timer, color: "#ef4444", sub: "Within 30d" },
+          { label: "Whale Alerts", val: String(alerts.length), icon: Wallet, color: "#8b5cf6", sub: "Last 24h" },
+          { label: "Price Spikes", val: String(sortedMovers.filter((m) => Math.abs(m.change1h) > 5).length), icon: TrendingUp, color: "#22c55e", sub: ">5% in 1h" },
+          { label: "Vol Spikes", val: String(sortedMovers.filter((m) => m.volSpike).length), icon: Volume2, color: "#f59e0b", sub: ">3x avg" },
+          { label: "Resolving Soon", val: String(sortedResolutions.filter((r) => r.daysLeft <= 30).length), icon: Timer, color: "#ef4444", sub: "Within 30d" },
           { label: "Resolved Today", val: String(recentlyResolved.length), icon: CheckCircle, color: "#57D7BA", sub: "Final outcomes" },
         ].map((s) => (
           <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
@@ -188,6 +239,8 @@ export default function AlertsPage() {
           </Card>
         ))}
       </div>
+
+      <TrialBanner />
 
       {/* ─── TABS ──────────────────────────────────────────── */}
       <Tabs defaultValue="whales">
@@ -403,7 +456,7 @@ export default function AlertsPage() {
       </Tabs>
 
       <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
+        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>

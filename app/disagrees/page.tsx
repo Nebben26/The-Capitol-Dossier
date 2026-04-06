@@ -96,9 +96,19 @@ function DisagreeCard({ d }: { d: Disagreement }) {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className={`text-[9px] font-semibold ${d.direction === "poly-higher" ? "text-[#6366f1]" : "text-[#22c55e]"}`}>
-            {d.direction === "poly-higher" ? "Poly prices higher" : "Kalshi prices higher"}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[9px] font-semibold ${d.direction === "poly-higher" ? "text-[#6366f1]" : "text-[#22c55e]"}`}>
+              {d.direction === "poly-higher" ? "Poly prices higher" : "Kalshi prices higher"}
+            </span>
+            {d.spreadTrend && d.spreadTrend !== "stable" && (
+              <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[7px] font-bold ${
+                d.spreadTrend === "converging" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"
+              }`}>
+                {d.spreadTrend === "converging" ? <ChevronDown className="size-2" /> : <ChevronUp className="size-2" />}
+                {d.spreadTrend === "converging" ? "Converging" : "Diverging"}
+              </span>
+            )}
+          </div>
           <DisagreeShareButton d={d} />
         </div>
       </CardContent>
@@ -239,6 +249,7 @@ export default function DisagreesPage() {
                     <span className="flex items-center gap-0.5">VOLUME <SortIcon col="polyVol" /></span>
                   </TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium hidden lg:table-cell">CAT</TableHead>
+                  <TableHead className="text-[10px] text-[#8892b0] font-medium hidden lg:table-cell">TREND</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden sm:table-cell" onClick={() => handleSort("daysLeft")}>
                     <span className="flex items-center gap-0.5">RESOLVES <SortIcon col="daysLeft" /></span>
                   </TableHead>
@@ -271,6 +282,17 @@ export default function DisagreesPage() {
                     <TableCell className="py-2.5 hidden lg:table-cell">
                       <span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{d.category}</span>
                     </TableCell>
+                    <TableCell className="py-2.5 hidden lg:table-cell">
+                      {d.spreadTrend && d.spreadTrend !== "stable" ? (
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold ${
+                          d.spreadTrend === "converging" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"
+                        }`}>
+                          {d.spreadTrend === "converging" ? "Converging" : "Diverging"}
+                        </span>
+                      ) : (
+                        <span className="text-[8px] text-[#8892b0]">Stable</span>
+                      )}
+                    </TableCell>
                     <TableCell className="py-2.5 hidden sm:table-cell">
                       <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{d.daysLeft}d</span>
                     </TableCell>
@@ -300,7 +322,7 @@ export default function DisagreesPage() {
       )}
 
       <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
+        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>

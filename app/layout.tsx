@@ -16,7 +16,27 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Quiver Markets — Prediction Market Intelligence",
-  description: "Real-time prediction market analytics, whale tracking, and market intelligence.",
+  description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection. Track the smartest money in prediction markets.",
+  metadataBase: new URL("https://quivermarkets.com"),
+  openGraph: {
+    title: "Quiver Markets — Prediction Market Intelligence",
+    description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",
+    siteName: "Quiver Markets",
+    type: "website",
+    locale: "en_US",
+    images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: "Quiver Markets — Prediction Market Intelligence" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Quiver Markets — Prediction Market Intelligence",
+    description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",
+    creator: "@quivermarkets",
+    images: ["/og-image.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

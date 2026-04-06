@@ -124,6 +124,11 @@ function MarketCard({ m }: { m: Market }) {
                     <Flame className="size-2" />HOT
                   </span>
                 )}
+                {m.volAnomaly && (
+                  <span className="px-1 py-0.5 rounded bg-[#ec4899]/10 text-[#ec4899] text-[8px] font-bold flex items-center gap-0.5">
+                    <ArrowUpRight className="size-2" />VOL
+                  </span>
+                )}
                 <span className="px-1.5 py-0.5 rounded text-[8px] font-medium bg-[#2a2f45] text-[#8892b0]">{m.platform}</span>
               </div>
 
@@ -142,6 +147,21 @@ function MarketCard({ m }: { m: Market }) {
                   <div className="h-full bg-[#22c55e] rounded-l-full transition-all" style={{ width: `${m.price}%` }} />
                   <div className="h-full bg-[#ef4444] rounded-r-full transition-all" style={{ width: `${100 - m.price}%` }} />
                 </div>
+              </div>
+
+              {/* Sparkline */}
+              <div className="h-8 w-full mb-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={m.spark}>
+                    <defs>
+                      <linearGradient id={`card-${m.id}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={m.change >= 0 ? "#22c55e" : "#ef4444"} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={m.change >= 0 ? "#22c55e" : "#ef4444"} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <Area type="monotone" dataKey="v" stroke={m.change >= 0 ? "#22c55e" : "#ef4444"} strokeWidth={1.5} fill={`url(#card-${m.id})`} dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
 
               {/* Bottom stats */}
@@ -209,7 +229,7 @@ export default function MarketsBrowsePage() {
       else { av = a.price; bv = b.price; }
       return sortDir === "desc" ? bv - av : av - bv;
     });
-  }, [category, platform, searchQuery, sortBy, sortDir]);
+  }, [allMarkets, category, platform, searchQuery, sortBy, sortDir]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
@@ -352,6 +372,9 @@ export default function MarketsBrowsePage() {
                         </TableCell>
                         <TableCell className="py-2.5">
                           <span className="font-mono text-[11px] text-[#8892b0]">{m.volume}</span>
+                          {m.volAnomaly && (
+                            <span className="ml-1 px-1 py-0.5 rounded bg-[#ec4899]/10 text-[#ec4899] text-[7px] font-bold">3x</span>
+                          )}
                         </TableCell>
                         <TableCell className="py-2.5">
                           <ResBadge days={m.daysLeft} />
@@ -410,7 +433,7 @@ export default function MarketsBrowsePage() {
   
       {/* Footer */}
       <footer className="flex items-center justify-between py-4 border-t border-[#2a2f45] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
+        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>

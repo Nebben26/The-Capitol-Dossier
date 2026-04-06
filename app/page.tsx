@@ -42,11 +42,13 @@ import {
   ArrowDownRight,
   Wallet,
 } from "lucide-react";
-import { useHomepageData, useDisagreements, useSmartMoneyMoves } from "@/hooks/useData";
+import { useHomepageData, useDisagreements, useSmartMoneyMoves, useInsights } from "@/hooks/useData";
+import { Newspaper, ExternalLink } from "lucide-react";
 import { Brain, Target as TargetIcon } from "lucide-react";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
 import { AlertTriangle, GitCompareArrows } from "lucide-react";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
+import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
@@ -128,6 +130,7 @@ export default function HomePage() {
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements } = useDisagreements();
   const { moves: smartMoves } = useSmartMoneyMoves();
+  const { insights } = useInsights();
   const { setSource } = useDataSource();
 
   useEffect(() => { setSource(source); }, [source, setSource]);
@@ -159,7 +162,7 @@ export default function HomePage() {
         spark: m.spark,
         cat: m.category,
       }));
-  }, [activeCategory]);
+  }, [allMarkets, activeCategory]);
 
   const sortedMovers = useMemo(() => {
     const parseVol = (v: string) => parseFloat(v.replace("M", ""));
@@ -190,7 +193,7 @@ export default function HomePage() {
     const catMarketIds = allMarkets.filter((m) => m.category === activeCategory).map((m) => m.id);
     const filtered = breakingMarkets.filter((b) => catMarketIds.includes(b.id));
     return filtered.length > 0 ? filtered : breakingMarkets;
-  }, [activeCategory]);
+  }, [allMarkets, breakingMarkets, activeCategory]);
 
   // Filter whale activity by category
   const filteredWhales = useMemo(() => {
@@ -198,7 +201,7 @@ export default function HomePage() {
     const catMarketIds = allMarkets.filter((m) => m.category === activeCategory).map((m) => m.id);
     const filtered = whaleActivity.filter((w) => catMarketIds.includes(w.marketId));
     return filtered.length > 0 ? filtered : whaleActivity;
-  }, [activeCategory]);
+  }, [allMarkets, whaleActivity, activeCategory]);
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortKey !== col) return <ChevronDown className="size-3 opacity-30" />;
@@ -295,7 +298,10 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] text-[#8892b0]">Vol: {d.polyVol} / {d.kalshiVol}</span>
-                    <DisagreeShareButton d={d} />
+                    <div className="flex items-center gap-1.5">
+                      <EmbedButton type="disagree" id={d.id} label="Embed" />
+                      <DisagreeShareButton d={d} />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -564,9 +570,47 @@ export default function HomePage() {
         </CardContent>
       </Card>
 
+      {/* ─── LATEST INSIGHTS ──────────────────────────────────── */}
+      <Card className="bg-[#222638] border-[#2f374f]">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Newspaper className="size-4 text-[#6366f1]" />
+              Latest Insights
+            </CardTitle>
+            <Link href="/insights" className="text-[10px] text-[#57D7BA] hover:underline">View all →</Link>
+          </div>
+          <CardDescription className="text-[10px] text-[#8892b0]">News and catalysts moving prediction markets right now</CardDescription>
+        </CardHeader>
+        <CardContent className="pb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {insights.slice(0, 5).map((ins) => (
+              <Link key={ins.id} href={`/markets/${ins.marketId}`} className="group block">
+                <div className="p-3 rounded-lg border border-[#2f374f] hover:border-[#6366f1]/30 transition-all h-full flex flex-col">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className={`size-1.5 rounded-full shrink-0 ${ins.impact === "bullish" ? "bg-[#22c55e]" : ins.impact === "bearish" ? "bg-[#ef4444]" : "bg-[#8892b0]"}`} />
+                    <span className="text-[8px] text-[#8892b0] truncate">{ins.source}</span>
+                    <span className="text-[8px] text-[#8892b0] shrink-0 ml-auto">{ins.time}</span>
+                  </div>
+                  <p className="text-[11px] font-semibold text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors leading-snug line-clamp-3 flex-1 mb-2">
+                    {ins.headline}
+                  </p>
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="px-1.5 py-0.5 rounded text-[7px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{ins.category}</span>
+                    <span className={`font-mono text-[10px] font-bold tabular-nums ${ins.impact === "bullish" ? "text-[#22c55e]" : ins.impact === "bearish" ? "text-[#ef4444]" : "text-[#8892b0]"}`}>
+                      {ins.priceMove}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ─── FOOTER ──────────────────────────────────────────── */}
       <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
+        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>

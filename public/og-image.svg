@@ -1,0 +1,37 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#1a1e2e"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#57D7BA"/>
+  <!-- Grid lines -->
+  <line x1="0" y1="157" x2="1200" y2="157" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="0" y1="472" x2="1200" y2="472" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="300" y1="0" x2="300" y2="630" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="900" y1="0" x2="900" y2="630" stroke="#2f374f" stroke-width="1" stroke-dasharray="4 4"/>
+  <!-- Decorative chart line -->
+  <path d="M0 450 Q150 420 300 380 T600 300 T900 250 T1200 200" stroke="#57D7BA" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M0 450 Q150 420 300 380 T600 300 T900 250 T1200 200 V630 H0 Z" fill="url(#grad)" opacity="0.1"/>
+  <defs>
+    <linearGradient id="grad" x1="600" y1="200" x2="600" y2="630">
+      <stop offset="0%" stop-color="#57D7BA" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#57D7BA" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Logo / Brand -->
+  <text x="100" y="220" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="800" fill="#e2e8f0" letter-spacing="-2">Quiver Markets</text>
+  <text x="100" y="290" font-family="Inter, system-ui, sans-serif" font-size="28" fill="#8892b0">Prediction Market Intelligence</text>
+  <!-- Stats row -->
+  <rect x="100" y="340" width="200" height="80" rx="12" fill="#222638" stroke="#2f374f" stroke-width="1"/>
+  <text x="200" y="375" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="#57D7BA" text-anchor="middle">60+</text>
+  <text x="200" y="405" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#8892b0" text-anchor="middle">Markets Tracked</text>
+  <rect x="330" y="340" width="200" height="80" rx="12" fill="#222638" stroke="#2f374f" stroke-width="1"/>
+  <text x="430" y="375" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="#f59e0b" text-anchor="middle">2</text>
+  <text x="430" y="405" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#8892b0" text-anchor="middle">Platforms</text>
+  <rect x="560" y="340" width="200" height="80" rx="12" fill="#222638" stroke="#2f374f" stroke-width="1"/>
+  <text x="660" y="375" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700" fill="#ec4899" text-anchor="middle">LIVE</text>
+  <text x="660" y="405" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#8892b0" text-anchor="middle">Whale Tracking</text>
+  <!-- Tagline -->
+  <text x="100" y="490" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#8892b0">Track whales. Spot arbitrage. Predict smarter.</text>
+  <!-- URL -->
+  <text x="100" y="560" font-family="JetBrains Mono, monospace" font-size="16" fill="#57D7BA">quivermarkets.com</text>
+</svg>

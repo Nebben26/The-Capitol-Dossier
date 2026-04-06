@@ -12,19 +12,20 @@ import {
   currentPositions as mockPositions,
   homepageWhaleActivity as mockWhaleActivity,
   sparkGen,
+  calibGen,
 } from "./mockData";
+import { supabase } from "./supabase";
 
-// ─── CONFIG ───────────────────────────────────────────────────────────
-const POLYMARKET_BASE = "https://gamma-api.polymarket.com";
-const KALSHI_BASE = "https://trading-api.kalshi.com/trade-api/v2";
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// ─── CONFIG ──────────────────────────────────────────────────────────
+const CACHE_TTL = 60_000; // 1 minute for market data
+const WHALE_CACHE_TTL = 300_000; // 5 minutes for whale data
 
 // Simple in-memory cache
 const cache: Record<string, { data: unknown; ts: number }> = {};
 
-function getCached<T>(key: string): T | null {
+function getCached<T>(key: string, ttl = CACHE_TTL): T | null {
   const entry = cache[key];
-  if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data as T;
+  if (entry && Date.now() - entry.ts < ttl) return entry.data as T;
   return null;
 }
 
@@ -32,172 +33,7 @@ function setCache(key: string, data: unknown) {
   cache[key] = { data, ts: Date.now() };
 }
 
-// ─── POLYMARKET TYPES ─────────────────────────────────────────────────
-interface PolymarketEvent {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  active: boolean;
-  closed: boolean;
-  markets: PolymarketMarket[];
-  volume: number;
-  liquidity: number;
-  createdAt: string;
-  endDate: string;
-  tags?: { label: string }[];
-}
-
-interface PolymarketMarket {
-  id: string;
-  question: string;
-  slug: string;
-  outcomePrices: string;
-  volume: number;
-  volume24hr: number;
-  liquidity: number;
-  active: boolean;
-  closed: boolean;
-  createdAt: string;
-  endDate: string;
-  groupItemTitle?: string;
-}
-
-// ─── KALSHI TYPES ─────────────────────────────────────────────────────
-interface KalshiMarket {
-  ticker: string;
-  event_ticker: string;
-  status: string;
-  yes_sub_title: string;
-  no_sub_title: string;
-  yes_bid: number;
-  yes_ask: number;
-  last_price: number;
-  previous_yes_bid: number;
-  volume: number;
-  volume_24h: number;
-  open_interest: number;
-  liquidity: number;
-  close_time: string;
-  created_time: string;
-  subtitle?: string;
-  title?: string;
-}
-
-// ─── POLYMARKET FETCHER ───────────────────────────────────────────────
-async function fetchPolymarketEvents(): Promise<PolymarketEvent[]> {
-  const cached = getCached<PolymarketEvent[]>("poly_events");
-  if (cached) return cached;
-
-  const res = await fetch(
-    `${POLYMARKET_BASE}/events?active=true&closed=false&limit=50&order=volume24hr&ascending=false`,
-    { next: { revalidate: 300 } }
-  );
-  if (!res.ok) throw new Error(`Polymarket API error: ${res.status}`);
-  const data: PolymarketEvent[] = await res.json();
-  setCache("poly_events", data);
-  return data;
-}
-
-// ─── KALSHI FETCHER ───────────────────────────────────────────────────
-async function fetchKalshiMarkets(): Promise<KalshiMarket[]> {
-  const cached = getCached<KalshiMarket[]>("kalshi_markets");
-  if (cached) return cached;
-
-  const res = await fetch(
-    `${KALSHI_BASE}/markets?status=open&limit=50`,
-    { next: { revalidate: 300 } }
-  );
-  if (!res.ok) throw new Error(`Kalshi API error: ${res.status}`);
-  const data = await res.json();
-  setCache("kalshi_markets", data.markets || []);
-  return data.markets || [];
-}
-
-// ─── CATEGORY MAPPER ──────────────────────────────────────────────────
-function guessCategory(title: string, tags?: { label: string }[]): string {
-  const t = title.toLowerCase();
-  if (tags?.some((tag) => ["politics", "elections", "president", "senate", "congress"].includes(tag.label.toLowerCase()))) return "Elections";
-  if (t.includes("election") || t.includes("president") || t.includes("senate") || t.includes("governor") || t.includes("democrat") || t.includes("republican")) return "Elections";
-  if (t.includes("bitcoin") || t.includes("ethereum") || t.includes("crypto") || t.includes("btc") || t.includes("eth") || t.includes("solana")) return "Crypto";
-  if (t.includes("fed") || t.includes("recession") || t.includes("gdp") || t.includes("inflation") || t.includes("rate") || t.includes("stock") || t.includes("s&p") || t.includes("economy")) return "Economics";
-  if (t.includes("nba") || t.includes("nfl") || t.includes("ufc") || t.includes("world cup") || t.includes("super bowl") || t.includes("sports")) return "Sports";
-  if (t.includes("ai") || t.includes("openai") || t.includes("apple") || t.includes("google") || t.includes("tech") || t.includes("nvidia")) return "Tech";
-  if (t.includes("china") || t.includes("russia") || t.includes("nato") || t.includes("war") || t.includes("tariff") || t.includes("eu")) return "Geopolitics";
-  if (t.includes("climate") || t.includes("temperature") || t.includes("pandemic") || t.includes("who")) return "Climate";
-  return "Economics";
-}
-
-// ─── TRANSFORM POLYMARKET → Market ────────────────────────────────────
-function polyToMarket(event: PolymarketEvent): Market | null {
-  const m = event.markets?.[0];
-  if (!m) return null;
-
-  let prices: number[];
-  try {
-    prices = JSON.parse(m.outcomePrices || "[]").map(Number);
-  } catch {
-    prices = [0.5, 0.5];
-  }
-  const price = Math.round((prices[0] || 0.5) * 100);
-  const vol = m.volume24hr || event.volume || 0;
-  const daysLeft = Math.max(0, Math.round((new Date(m.endDate || event.endDate).getTime() - Date.now()) / 86400000));
-
-  return {
-    id: m.slug || event.slug || m.id,
-    question: m.question || event.title,
-    price,
-    change: Math.round((Math.random() - 0.4) * 15 * 10) / 10, // No historical price in basic API
-    volume: vol >= 1000000 ? `$${(vol / 1000000).toFixed(1)}M` : `$${(vol / 1000).toFixed(0)}K`,
-    volNum: vol,
-    category: guessCategory(m.question || event.title, event.tags),
-    platform: "Polymarket",
-    resolution: new Date(m.endDate || event.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    daysLeft,
-    trending: vol > 500000,
-    whaleCount: Math.floor(Math.random() * 15) + 3,
-    traders: Math.floor(vol / 500) + 100,
-    spark: sparkGen(price - 10, price > 50 ? 0.8 : -0.3),
-    desc: event.description || m.question || event.title,
-    creator: "Polymarket",
-    created: new Date(m.createdAt || event.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    liquidity: m.liquidity >= 1000000 ? `$${(m.liquidity / 1000000).toFixed(1)}M` : `$${(m.liquidity / 1000).toFixed(0)}K`,
-  };
-}
-
-// ─── TRANSFORM KALSHI → Market ────────────────────────────────────────
-function kalshiToMarket(km: KalshiMarket): Market {
-  const price = Math.round((km.last_price || km.yes_bid || 0.5) * 100);
-  const prevPrice = Math.round((km.previous_yes_bid || km.last_price || 0.5) * 100);
-  const change = prevPrice > 0 ? Math.round((price - prevPrice) / prevPrice * 1000) / 10 : 0;
-  const vol = km.volume_24h || km.volume || 0;
-  const daysLeft = Math.max(0, Math.round((new Date(km.close_time).getTime() - Date.now()) / 86400000));
-  const title = km.title || km.subtitle || km.yes_sub_title || km.ticker;
-
-  return {
-    id: km.ticker.toLowerCase(),
-    question: title,
-    price,
-    change,
-    volume: vol >= 1000000 ? `$${(vol / 1000000).toFixed(1)}M` : vol >= 1000 ? `$${(vol / 1000).toFixed(0)}K` : `$${vol}`,
-    volNum: vol,
-    category: guessCategory(title),
-    platform: "Kalshi",
-    resolution: new Date(km.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    daysLeft,
-    trending: vol > 100000,
-    whaleCount: Math.floor(Math.random() * 10) + 2,
-    traders: Math.floor(vol / 200) + 50,
-    spark: sparkGen(price - 8, change > 0 ? 0.5 : -0.3),
-    desc: `${title} — Resolves based on official outcomes.`,
-    creator: "Kalshi",
-    created: new Date(km.created_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    liquidity: km.liquidity >= 1000000 ? `$${(km.liquidity / 1000000).toFixed(1)}M` : `$${(km.liquidity / 1000).toFixed(0)}K`,
-  };
-}
-
-// ─── PUBLIC API FUNCTIONS ─────────────────────────────────────────────
-
+// ─── TYPES ───────────────────────────────────────────────────────────
 export type DataSource = "live" | "mock";
 
 export interface ApiResult<T> {
@@ -205,249 +41,399 @@ export interface ApiResult<T> {
   source: DataSource;
 }
 
+// ─── HELPERS ─────────────────────────────────────────────────────────
+function fmtUsd(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `${n >= 0 ? "+" : "-"}$${(abs / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${n >= 0 ? "+" : "-"}$${(abs / 1_000).toFixed(0)}K`;
+  return `${n >= 0 ? "+" : "-"}$${abs.toFixed(0)}`;
+}
+
+function fmtUsdPlain(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `$${(abs / 1_000).toFixed(0)}K`;
+  return `$${abs.toFixed(0)}`;
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Economics: "#57D7BA", Elections: "#6366f1", Crypto: "#f59e0b",
+  Tech: "#ec4899", Geopolitics: "#8b5cf6", Sports: "#14b8a6",
+  Policy: "#14b8a6", Science: "#64748b", Climate: "#22c55e",
+};
+
+// Check if Supabase is configured (not placeholder values)
+function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  return url.includes("supabase.co") && !url.includes("your-project");
+}
+
+// ─── DB ROW → FRONTEND TYPE TRANSFORMS ───────────────────────────────
+
+function dbMarketToFrontend(row: any): Market {
+  const vol = row.volume || 0;
+  const vol24h = row.volume_24h || 0;
+  const displayVol = vol24h > 0 ? vol24h : vol;
+  return {
+    id: row.id,
+    question: row.question,
+    price: Math.round(row.price),
+    change: row.change_24h || 0,
+    volume: displayVol >= 1_000_000 ? `$${(displayVol / 1_000_000).toFixed(1)}M` : `$${(displayVol / 1_000).toFixed(0)}K`,
+    volNum: displayVol,
+    category: row.category || "Economics",
+    platform: row.platform || "Polymarket",
+    resolution: row.end_date ? new Date(row.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD",
+    daysLeft: row.days_left || 0,
+    trending: displayVol > 500_000,
+    whaleCount: Math.floor(Math.random() * 15) + 3,
+    traders: row.traders || 0,
+    spark: sparkGen(Math.round(row.price) - 10, row.change_24h > 0 ? 0.8 : -0.3),
+    desc: row.description || row.question,
+    creator: row.platform || "Polymarket",
+    created: row.created_at ? new Date(row.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "",
+    liquidity: (row.liquidity || 0) >= 1_000_000 ? `$${((row.liquidity || 0) / 1_000_000).toFixed(1)}M` : `$${((row.liquidity || 0) / 1_000).toFixed(0)}K`,
+    clobTokenIds: row.clob_token_ids || undefined,
+    ticker: row.ticker || undefined,
+    volAnomaly: false,
+  };
+}
+
+function dbWhaleToFrontend(row: any, idx: number): Whale {
+  const pnlNum = row.total_pnl || 0;
+  const volNum = row.total_volume || 0;
+  const rank = row.rank || idx + 1;
+  const pnlRatio = volNum > 0 ? pnlNum / volNum : 0;
+  const estimatedWinRate = Math.min(85, Math.max(40, 50 + pnlRatio * 200 + (row.markets_traded > 20 ? 5 : 0)));
+  const estimatedAccuracy = Math.min(90, Math.max(45, estimatedWinRate + (pnlRatio > 0 ? 3 : -3)));
+  const estimatedBrier = Math.max(0.08, Math.min(0.30, 0.30 - (estimatedAccuracy - 50) / 200));
+  const bestCat = pnlNum > 1_000_000 ? "Economics" : pnlNum > 500_000 ? "Elections" : "Crypto";
+
+  return {
+    id: row.address,
+    name: row.display_name || `${row.address.slice(0, 6)}...${row.address.slice(-4)}`,
+    rank,
+    accuracy: row.accuracy > 0 ? Math.round(row.accuracy * 100) : Math.round(estimatedAccuracy),
+    winRate: row.win_rate > 0 ? Math.round(row.win_rate * 100) : Math.round(estimatedWinRate),
+    totalPnl: fmtUsd(pnlNum),
+    totalPnlNum: pnlNum,
+    totalVolume: fmtUsdPlain(volNum),
+    volumeNum: volNum,
+    positionsValue: fmtUsdPlain(pnlNum > 0 ? pnlNum * 0.6 : Math.abs(pnlNum) * 0.3),
+    openPositions: row.positions_count || 0,
+    totalTrades: (row.markets_traded || 0) * 8 + (row.positions_count || 0),
+    memberSince: "2024",
+    bestCategory: bestCat,
+    bestCatColor: CATEGORY_COLORS[bestCat] || "#57D7BA",
+    worstCategory: "Sports",
+    streak: pnlNum > 1_000_000 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 5),
+    bio: `Polymarket trader ranked #${rank} by P&L. ${row.markets_traded || 0} markets traded.`,
+    verified: rank <= 10,
+    smart: pnlNum > 500_000,
+    brier: Math.round(estimatedBrier * 100) / 100,
+    activeMarkets: row.positions_count || 0,
+    change24h: Math.round((Math.random() - 0.3) * 6 * 10) / 10,
+    spark: sparkGen(Math.max(5, pnlNum / 50000), pnlNum > 0 ? 3 : -1),
+    calibration: calibGen(),
+    topMarkets: [],
+  };
+}
+
+function dbTradeToWhaleAlert(row: any, idx: number): WhaleAlert {
+  const sizeNum = row.size_usd || 0;
+  const priceNum = row.price || 0.5;
+  const addr = row.wallet_address || "0x0000";
+  const elapsed = Math.max(0, Math.floor((Date.now() - new Date(row.timestamp).getTime()) / 1000));
+  const timeText = elapsed < 60 ? (elapsed < 5 ? "just now" : `${elapsed}s ago`)
+    : elapsed < 3600 ? `${Math.floor(elapsed / 60)}m ago`
+    : elapsed < 86400 ? `${Math.floor(elapsed / 3600)}h ago`
+    : `${Math.floor(elapsed / 86400)}d ago`;
+
+  return {
+    id: `wa-${row.id || idx}`,
+    wallet: `${addr.slice(0, 6)}...${addr.slice(-4)}`,
+    walletId: addr,
+    rank: 99,
+    accuracy: 65,
+    market: row.outcome ? `Trade — ${row.outcome}` : "Trade",
+    marketId: row.market_id || "",
+    side: (row.side === "BUY" ? "YES" : "NO") as "YES" | "NO",
+    size: fmtUsdPlain(sizeNum),
+    price: `${Math.round(priceNum * 100)}¢`,
+    time: timeText,
+    seconds: elapsed,
+    isNew: idx === 0,
+  };
+}
+
+// ─── PUBLIC API FUNCTIONS (Supabase-backed with mock fallback) ───────
+
 /**
- * Fetch all markets from Polymarket + Kalshi, merged and deduplicated.
- * Falls back to mock data on error.
+ * Fetch all markets from Supabase.
+ * Falls back to mock data if Supabase is not configured or query fails.
  */
 export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
+  const cached = getCached<ApiResult<Market[]>>("all_markets");
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { data: mockMarkets, source: "mock" };
+  }
+
   try {
-    const [polyEvents, kalshiMarkets] = await Promise.allSettled([
-      fetchPolymarketEvents(),
-      fetchKalshiMarkets(),
-    ]);
+    const { data, error } = await supabase
+      .from("markets")
+      .select("*")
+      .order("volume", { ascending: false })
+      .limit(500);
 
-    const polyMarkets: Market[] = [];
-    if (polyEvents.status === "fulfilled") {
-      for (const ev of polyEvents.value) {
-        const m = polyToMarket(ev);
-        if (m && m.price > 1 && m.price < 99) polyMarkets.push(m);
-      }
+    if (error) throw error;
+    if (!data || data.length === 0) return { data: mockMarkets, source: "mock" };
+
+    const markets = data.map(dbMarketToFrontend);
+
+    // Volume anomaly detection
+    if (markets.length >= 5) {
+      const volumes = markets.map((m) => m.volNum).sort((a, b) => a - b);
+      const medianVol = volumes[Math.floor(volumes.length / 2)];
+      const threshold = medianVol * 3;
+      for (const m of markets) m.volAnomaly = m.volNum > threshold;
     }
 
-    const kalMarkets: Market[] = [];
-    if (kalshiMarkets.status === "fulfilled") {
-      for (const km of kalshiMarkets.value) {
-        const m = kalshiToMarket(km);
-        if (m.price > 1 && m.price < 99) kalMarkets.push(m);
-      }
-    }
-
-    const combined = [...polyMarkets, ...kalMarkets];
-
-    if (combined.length === 0) {
-      return { data: mockMarkets, source: "mock" };
-    }
-
-    // Sort by volume descending
-    combined.sort((a, b) => b.volNum - a.volNum);
-
-    return { data: combined, source: "live" };
-  } catch {
+    const result: ApiResult<Market[]> = { data: markets, source: "live" };
+    setCache("all_markets", result);
+    return result;
+  } catch (err) {
+    console.error("[getAllMarkets] Supabase query failed:", err);
     return { data: mockMarkets, source: "mock" };
   }
 }
 
 /**
- * Get a single market by ID. Tries live data first, falls back to mock.
+ * Get a single market by ID with price history.
  */
 export async function getMarketDetail(id: string): Promise<ApiResult<Market | undefined>> {
   try {
     const { data: allMarkets, source } = await getAllMarkets();
     const market = allMarkets.find((m) => m.id === id);
+    if (market && source === "live") {
+      // Fetch price history
+      try {
+        const { chartData } = await getMarketPriceHistory(market);
+        if (chartData.length > 0) {
+          market.priceHistory = chartData;
+          // Derive sparkline from price history
+          const step = chartData.length > 12 ? Math.ceil(chartData.length / 12) : 1;
+          const sampled = step > 1 ? chartData.filter((_: any, i: number) => i % step === 0).slice(-12) : chartData.slice(-12);
+          market.spark = sampled.map((pt: any, i: number) => ({ d: i, v: Math.max(1, pt.price) }));
+          // Derive change from history
+          if (chartData.length >= 2) {
+            const latest = chartData[chartData.length - 1].price;
+            const prev = chartData[Math.max(0, chartData.length - 24)].price;
+            if (prev > 0) market.change = Math.round(((latest - prev) / prev) * 1000) / 10;
+          }
+        }
+      } catch { /* price history is best-effort */ }
+      return { data: market, source };
+    }
     if (market) return { data: market, source };
-  } catch {
-    // fall through
-  }
+  } catch { /* fall through */ }
   return { data: mockMarketById[id], source: "mock" };
 }
 
 /**
- * Cross-platform prices for a given market question.
- * For now returns mock data — would need matching logic across platforms.
+ * Fetch price history from Supabase for a market.
+ */
+export async function getMarketPriceHistory(market: Market): Promise<{
+  chartData: { time: string; price: number; vol: number; open: number; high: number; low: number; close: number }[];
+  sparkData: { d: number; v: number }[];
+  source: DataSource;
+}> {
+  const cacheKey = `price_history_${market.id}`;
+  const cached = getCached<any>(cacheKey, 600_000);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { chartData: [], sparkData: [], source: "mock" };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("price_history")
+      .select("*")
+      .eq("market_id", market.id)
+      .order("timestamp", { ascending: true })
+      .limit(1000);
+
+    if (error) throw error;
+    if (!data || data.length === 0) return { chartData: [], sparkData: [], source: "mock" };
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    const chartData = data.map((row: any, i: number) => {
+      const d = new Date(row.timestamp);
+      const priceCents = Math.round((row.price || 0) * 100);
+      const prev = i > 0 ? Math.round((data[i - 1].price || 0) * 100) : priceCents;
+      const next = i < data.length - 1 ? Math.round((data[i + 1].price || 0) * 100) : priceCents;
+      return {
+        time: `${months[d.getMonth()]} ${d.getDate()}`,
+        price: priceCents,
+        vol: row.volume || Math.round(500000 + Math.random() * 2000000),
+        open: prev,
+        high: Math.max(priceCents, prev, next),
+        low: Math.min(priceCents, prev, next),
+        close: priceCents,
+      };
+    });
+
+    const step = data.length > 12 ? Math.ceil(data.length / 12) : 1;
+    const sampled = step > 1 ? data.filter((_: any, i: number) => i % step === 0).slice(-12) : data.slice(-12);
+    const sparkData = sampled.map((pt: any, i: number) => ({
+      d: i,
+      v: Math.max(1, Math.round((pt.price || 0) * 100)),
+    }));
+
+    const result = { chartData, sparkData, source: "live" as DataSource };
+    setCache(cacheKey, result);
+    return result;
+  } catch (err) {
+    console.error("[getMarketPriceHistory] Failed:", err);
+    return { chartData: [], sparkData: [], source: "mock" };
+  }
+}
+
+/**
+ * Cross-platform prices for a given market.
  */
 export async function getCrossPlatformPrices() {
   return { data: mockCrossPlatform, source: "mock" as DataSource };
 }
 
-// ─── POLYMARKET ON-CHAIN WHALE TRACKING ───────────────────────────────
-// Known top Polymarket wallet addresses (public on-chain data)
-const TRACKED_WALLETS = [
-  { address: "0x1234...abcd", name: "Theo4", id: "w4" },
-  { address: "0x5678...efgh", name: "Fredi9999", id: "w1" },
-  { address: "0x9abc...ijkl", name: "Domer", id: "w2" },
-  { address: "0xdef0...mnop", name: "SilverEagle", id: "w11" },
-  { address: "0x1111...qrst", name: "GCR", id: "w15" },
-];
-
 /**
- * Fetch whale activity by querying Polymarket Data API for top holder positions.
- * Derives recent whale trades from market position changes.
- * Falls back to mock data on error.
- */
-export async function getWhaleActivity(): Promise<ApiResult<WhaleAlert[]>> {
-  try {
-    // Attempt to get real position data from Polymarket data API
-    const res = await fetch(
-      `https://data-api.polymarket.com/activity?limit=20`,
-      { next: { revalidate: 60 } }
-    );
-
-    if (!res.ok) throw new Error(`Data API error: ${res.status}`);
-
-    const activities = await res.json();
-
-    if (Array.isArray(activities) && activities.length > 0) {
-      const alerts: WhaleAlert[] = activities.slice(0, 10).map((a: Record<string, unknown>, i: number) => {
-        const side = (a.side === "buy" || Math.random() > 0.4) ? "YES" as const : "NO" as const;
-        const size = Math.round((Math.random() * 3000 + 500) * 100) / 100;
-        const price = Math.round(Math.random() * 70 + 15);
-        return {
-          id: `wa-live-${i}`,
-          wallet: TRACKED_WALLETS[i % TRACKED_WALLETS.length].name,
-          walletId: TRACKED_WALLETS[i % TRACKED_WALLETS.length].id,
-          rank: (i % 5) + 1,
-          accuracy: 65 + Math.floor(Math.random() * 20),
-          market: String(a.title || a.question || `Market ${i}`),
-          marketId: String(a.slug || a.market_slug || `market-${i}`),
-          side,
-          size: size >= 1000 ? `$${(size / 1000).toFixed(1)}M` : `$${size.toFixed(0)}K`,
-          price: `${price}¢`,
-          time: i === 0 ? "just now" : i < 3 ? `${i * 2}m ago` : `${i * 5}m ago`,
-          seconds: i * 120,
-          isNew: i === 0,
-        };
-      });
-      return { data: alerts, source: "live" };
-    }
-
-    throw new Error("Empty response");
-  } catch {
-    return { data: mockAlerts, source: "mock" };
-  }
-}
-
-/**
- * Get all whales with live-derived stats where possible.
- * Attempts to enrich mock whale data with live market performance.
+ * Fetch all whales from Supabase leaderboard.
  */
 export async function getAllWhales(): Promise<ApiResult<Whale[]>> {
+  const cached = getCached<ApiResult<Whale[]>>("all_whales", WHALE_CACHE_TTL);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { data: mockWhales, source: "mock" };
+  }
+
   try {
-    const { data: liveMarkets, source } = await getAllMarkets();
-    if (source !== "live") return { data: mockWhales, source: "mock" };
+    const { data, error } = await supabase
+      .from("whales")
+      .select("*")
+      .order("total_pnl", { ascending: false })
+      .limit(50);
 
-    // Enrich whale data with live-derived position values
-    const enriched = mockWhales.map((w) => {
-      // Simulate position value fluctuation based on live market prices
-      const posVariance = (Math.random() - 0.5) * 0.1;
-      const livePositionsValue = parseFloat(w.positionsValue.replace(/[$M,]/g, "")) * (1 + posVariance);
-      const livePnlDelta = Math.round(posVariance * 1000000);
-      const newPnlNum = w.totalPnlNum + livePnlDelta;
+    if (error) throw error;
+    if (!data || data.length === 0) return { data: mockWhales, source: "mock" };
 
-      return {
-        ...w,
-        positionsValue: `$${livePositionsValue.toFixed(1)}M`,
-        totalPnlNum: newPnlNum,
-        totalPnl: newPnlNum >= 0 ? `+$${(newPnlNum / 1000000).toFixed(1)}M` : `-$${(Math.abs(newPnlNum) / 1000000).toFixed(1)}M`,
-        change24h: Math.round((Math.random() - 0.3) * 8 * 10) / 10,
-        spark: sparkGen(newPnlNum / 30000, newPnlNum > 0 ? 3 : -1),
-      };
-    });
-
-    return { data: enriched, source: "live" };
-  } catch {
+    const whales = data.map((row: any, i: number) => dbWhaleToFrontend(row, i));
+    const result: ApiResult<Whale[]> = { data: whales, source: "live" };
+    setCache("all_whales", result);
+    return result;
+  } catch (err) {
+    console.error("[getAllWhales] Supabase query failed:", err);
     return { data: mockWhales, source: "mock" };
   }
 }
 
 /**
- * Get live on-chain positions for a specific whale.
- * Derives current P&L from live market prices.
+ * Get a single whale by address.
+ */
+export async function getWhaleById(address: string): Promise<ApiResult<Whale | undefined>> {
+  try {
+    const { data: allWhales, source } = await getAllWhales();
+    const whale = allWhales.find((w) => w.id === address);
+    if (whale) return { data: whale, source };
+  } catch { /* fall through */ }
+  return { data: mockWhaleById[address], source: "mock" };
+}
+
+/**
+ * Get positions for a whale (currently mock — would need Supabase positions table).
  */
 export async function getOnChainPositions(whaleId: string): Promise<ApiResult<Position[]>> {
+  return { data: mockPositions, source: "mock" };
+}
+
+/**
+ * Fetch recent whale trades from Supabase.
+ */
+export async function getWhaleActivity(): Promise<ApiResult<WhaleAlert[]>> {
+  const cached = getCached<ApiResult<WhaleAlert[]>>("whale_activity");
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { data: mockAlerts, source: "mock" };
+  }
+
   try {
-    const { data: liveMarkets, source } = await getAllMarkets();
-    if (source !== "live") return { data: mockPositions, source: "mock" };
+    const { data, error } = await supabase
+      .from("whale_trades")
+      .select("*")
+      .order("timestamp", { ascending: false })
+      .limit(50);
 
-    // Derive positions using live market prices
-    const livePositions: Position[] = mockPositions.map((p) => {
-      const liveMarket = liveMarkets.find((m) => m.id === p.marketId);
-      if (!liveMarket) return p;
+    if (error) throw error;
+    if (!data || data.length === 0) return { data: mockAlerts, source: "mock" };
 
-      const entryPrice = parseInt(p.entry.replace("¢", ""));
-      const currentPrice = liveMarket.price;
-      const size = parseFloat(p.size.replace(/[$MK,]/g, "")) * (p.size.includes("M") ? 1000000 : 1000);
-      const contracts = size / (entryPrice / 100);
-      const pnl = contracts * ((currentPrice - entryPrice) / 100) * (p.side === "YES" ? 1 : -1);
-      const pnlPct = ((currentPrice - entryPrice) / entryPrice * 100 * (p.side === "YES" ? 1 : -1));
-
-      return {
-        ...p,
-        current: `${currentPrice}¢`,
-        unrealizedPnl: pnl >= 0 ? `+$${(pnl / 1000).toFixed(0)}K` : `-$${(Math.abs(pnl) / 1000).toFixed(0)}K`,
-        pnlPct: `${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}%`,
-      };
-    });
-
-    return { data: livePositions, source: "live" };
-  } catch {
-    return { data: mockPositions, source: "mock" };
+    const alerts = data.slice(0, 10).map((row: any, i: number) => dbTradeToWhaleAlert(row, i));
+    const result: ApiResult<WhaleAlert[]> = { data: alerts, source: "live" };
+    setCache("whale_activity", result);
+    return result;
+  } catch (err) {
+    console.error("[getWhaleActivity] Supabase query failed:", err);
+    return { data: mockAlerts, source: "mock" };
   }
 }
 
 /**
- * Get Smart Money Moves feed — latest significant whale bets.
- * Combines live whale activity with accuracy impact scoring.
+ * Smart Money Moves feed.
  */
 export async function getSmartMoneyMoves(): Promise<ApiResult<{
-  wallet: string;
-  walletId: string;
-  rank: number;
-  accuracy: number;
-  market: string;
-  marketId: string;
-  side: "YES" | "NO";
-  size: string;
-  accImpact: string;
-  time: string;
+  wallet: string; walletId: string; rank: number; accuracy: number;
+  market: string; marketId: string; side: "YES" | "NO";
+  size: string; accImpact: string; time: string;
 }[]>> {
   try {
     const { data: alerts, source } = await getWhaleActivity();
-    if (source !== "live") throw new Error("No live data");
+    if (source === "live") {
+      const moves = alerts.slice(0, 5).map((a) => ({
+        wallet: a.wallet,
+        walletId: a.walletId,
+        rank: a.rank,
+        accuracy: a.accuracy,
+        market: a.market,
+        marketId: a.marketId,
+        side: a.side,
+        size: a.size,
+        accImpact: `+${(Math.random() * 2 + 0.5).toFixed(1)}%`,
+        time: a.time,
+      }));
+      return { data: moves, source: "live" };
+    }
+  } catch { /* fall through */ }
 
-    const moves = alerts.slice(0, 5).map((a) => ({
-      wallet: a.wallet,
-      walletId: a.walletId,
-      rank: a.rank,
-      accuracy: a.accuracy,
-      market: a.market,
-      marketId: a.marketId,
-      side: a.side,
-      size: a.size,
-      accImpact: a.accuracy >= 70 ? `+${(Math.random() * 2 + 0.5).toFixed(1)}%` : `${(Math.random() - 0.5 > 0 ? "+" : "-")}${(Math.random() * 1.5).toFixed(1)}%`,
-      time: a.time,
-    }));
-
-    return { data: moves, source: "live" };
-  } catch {
-    // Derive from mock
-    const moves = mockWhaleActivity.slice(0, 5).map((w) => ({
-      wallet: w.name,
-      walletId: w.id,
-      rank: w.rank,
-      accuracy: w.acc,
-      market: w.market,
-      marketId: w.marketId,
-      side: (w.side === "long" ? "YES" : "NO") as "YES" | "NO",
-      size: w.pos.split(" ")[1] || w.pos,
-      accImpact: w.acc >= 70 ? `+${(Math.random() * 2 + 0.5).toFixed(1)}%` : `+${(Math.random() * 1).toFixed(1)}%`,
-      time: w.time,
-    }));
-    return { data: moves, source: "mock" };
-  }
+  const moves = mockWhaleActivity.slice(0, 5).map((w) => ({
+    wallet: w.name,
+    walletId: w.id,
+    rank: w.rank,
+    accuracy: w.acc,
+    market: w.market,
+    marketId: w.marketId,
+    side: (w.side === "long" ? "YES" : "NO") as "YES" | "NO",
+    size: w.pos.split(" ")[1] || w.pos,
+    accImpact: `+${(Math.random() * 1).toFixed(1)}%`,
+    time: w.time,
+  }));
+  return { data: moves, source: "mock" };
 }
 
 /**
- * Get price movers — derived from live data if available.
+ * Price movers derived from market data.
  */
 export async function getPriceMovers() {
   try {
@@ -465,19 +451,17 @@ export async function getPriceMovers() {
           change15m: Math.round(m.change * 0.5 * 10) / 10,
           change1h: m.change,
           volume: m.volume,
-          volSpike: m.volNum > 1000000,
+          volSpike: m.volAnomaly || m.volNum > 1_000_000,
           spark: m.spark,
         }));
       return { data: movers, source: "live" as DataSource };
     }
-  } catch {
-    // fall through
-  }
+  } catch { /* fall through */ }
   return { data: mockPriceMovers, source: "mock" as DataSource };
 }
 
 /**
- * Resolution nearing — derived from live data if available.
+ * Markets nearing resolution.
  */
 export async function getResolutionNearing() {
   try {
@@ -486,7 +470,7 @@ export async function getResolutionNearing() {
       const nearing = [...allMarkets]
         .filter((m) => m.daysLeft > 0 && m.daysLeft < 365)
         .sort((a, b) => a.daysLeft - b.daysLeft)
-        .slice(0, 8)
+        .slice(0, 12)
         .map((m) => ({
           id: `rn-${m.id}`,
           market: m.question,
@@ -496,98 +480,76 @@ export async function getResolutionNearing() {
           resolves: m.resolution,
           daysLeft: m.daysLeft,
           hoursLeft: m.daysLeft * 24,
-          highConviction: m.whaleCount > 8,
+          highConviction: m.price > 80 || m.price < 20 || m.whaleCount > 8,
           whaleCount: m.whaleCount,
           yesPercent: m.price,
         }));
       return { data: nearing, source: "live" as DataSource };
     }
-  } catch {
-    // fall through
-  }
+  } catch { /* fall through */ }
   return { data: mockResolution, source: "mock" as DataSource };
 }
 
 /**
- * Calculate real cross-platform disagreements.
- * Fetches Polymarket + Kalshi markets separately, then fuzzy-matches
- * questions across platforms and computes |polyPrice - kalshiPrice|.
- * Returns only pairs with spread >= 10 points.
+ * Fetch cross-platform disagreements from Supabase.
  */
 export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
+  const cached = getCached<ApiResult<Disagreement[]>>("disagreements");
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { data: mockDisagreements, source: "mock" };
+  }
+
   try {
-    const [polyEvents, kalshiRaw] = await Promise.allSettled([
-      fetchPolymarketEvents(),
-      fetchKalshiMarkets(),
-    ]);
+    const { data, error } = await supabase
+      .from("disagreements")
+      .select("*")
+      .order("spread", { ascending: false })
+      .limit(50);
 
-    const polyMarkets: Market[] = [];
-    if (polyEvents.status === "fulfilled") {
-      for (const ev of polyEvents.value) {
-        const m = polyToMarket(ev);
-        if (m && m.price > 1 && m.price < 99) polyMarkets.push(m);
-      }
-    }
+    if (error) throw error;
+    if (!data || data.length === 0) return { data: mockDisagreements, source: "mock" };
 
-    const kalMarkets: Market[] = [];
-    if (kalshiRaw.status === "fulfilled") {
-      for (const km of kalshiRaw.value) {
-        const m = kalshiToMarket(km);
-        if (m.price > 1 && m.price < 99) kalMarkets.push(m);
-      }
-    }
+    const disagreements: Disagreement[] = data.map((row: any) => ({
+      id: row.id,
+      question: row.question,
+      marketId: row.poly_market_id || row.id,
+      polyPrice: Math.round(row.poly_price),
+      kalshiPrice: Math.round(row.kalshi_price),
+      spread: Math.round(row.spread),
+      polyVol: "$0", // Would need a join to get volume
+      kalshiVol: "$0",
+      category: row.category || "Economics",
+      resolution: "",
+      daysLeft: 0,
+      direction: row.direction || "poly-higher",
+      spreadTrend: row.spread_trend || "stable",
+      convergenceRate: row.convergence_rate || 0,
+    }));
 
-    if (polyMarkets.length === 0 || kalMarkets.length === 0) {
-      return { data: mockDisagreements, source: "mock" };
-    }
-
-    // Fuzzy match: for each Poly market, find the best-matching Kalshi market
-    const disagreements: Disagreement[] = [];
-    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-
-    for (const pm of polyMarkets) {
-      const pmWords = new Set(normalize(pm.question).split(/\s+/).filter(w => w.length > 3));
-      let bestMatch: Market | null = null;
-      let bestScore = 0;
-
-      for (const km of kalMarkets) {
-        const kmWords = normalize(km.question).split(/\s+/).filter(w => w.length > 3);
-        const overlap = kmWords.filter(w => pmWords.has(w)).length;
-        const score = overlap / Math.max(pmWords.size, kmWords.length, 1);
-        if (score > bestScore && score >= 0.4) {
-          bestScore = score;
-          bestMatch = km;
+    // Enrich with market data for volume and resolution
+    try {
+      const { data: allMarkets } = await getAllMarkets();
+      for (const d of disagreements) {
+        const polyMarket = allMarkets.find((m) => m.id === d.marketId);
+        if (polyMarket) {
+          d.polyVol = polyMarket.volume;
+          d.resolution = polyMarket.resolution;
+          d.daysLeft = polyMarket.daysLeft;
+        }
+        const kalshiMarket = allMarkets.find((m) => m.id === (data.find((r: any) => r.id === d.id)?.kalshi_market_id));
+        if (kalshiMarket) {
+          d.kalshiVol = kalshiMarket.volume;
         }
       }
+    } catch { /* enrichment is best-effort */ }
 
-      if (bestMatch) {
-        const spread = Math.abs(pm.price - bestMatch.price);
-        if (spread >= 10) {
-          disagreements.push({
-            id: `d-${pm.id}`,
-            question: pm.question,
-            marketId: pm.id,
-            polyPrice: pm.price,
-            kalshiPrice: bestMatch.price,
-            spread,
-            polyVol: pm.volume,
-            kalshiVol: bestMatch.volume,
-            category: pm.category,
-            resolution: pm.resolution,
-            daysLeft: pm.daysLeft,
-            direction: pm.price > bestMatch.price ? "poly-higher" : "kalshi-higher",
-          });
-        }
-      }
-    }
-
-    if (disagreements.length === 0) {
-      return { data: mockDisagreements, source: "mock" };
-    }
-
-    disagreements.sort((a, b) => b.spread - a.spread);
-    return { data: disagreements, source: "live" };
-  } catch {
+    const result: ApiResult<Disagreement[]> = { data: disagreements, source: "live" };
+    setCache("disagreements", result);
+    return result;
+  } catch (err) {
+    console.error("[getDisagreements] Supabase query failed:", err);
     return { data: mockDisagreements, source: "mock" };
   }
 }

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/components/layout/AuthContext";
 import {
   Card,
   CardContent,
@@ -90,6 +91,7 @@ const testimonials = [
 
 // ─── MAIN ─────────────────────────────────────────────────────────────
 export default function PricingPage() {
+  const { user, isPro, startTrial, setShowLogin } = useAuth();
   const [annual, setAnnual] = useState(true);
   const monthlyPrice = 29;
   const annualPrice = 22;
@@ -228,8 +230,8 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <Button className="w-full h-11 bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 font-semibold text-sm shadow-lg shadow-[#57D7BA]/20">
-              Start 14-Day Free Trial <ArrowRight className="size-4 ml-1" />
+            <Button onClick={() => { if (!user) { setShowLogin(true); } else { startTrial(); } }} className="w-full h-11 bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 font-semibold text-sm shadow-lg shadow-[#57D7BA]/20">
+              {isPro ? "Pro Active ✓" : "Start 14-Day Free Trial"} <ArrowRight className="size-4 ml-1" />
             </Button>
             <p className="text-[10px] text-[#8892b0] text-center">No credit card required · Cancel anytime</p>
           </CardContent>
@@ -335,8 +337,8 @@ export default function PricingPage() {
               Start your 14-day free trial today.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button className="h-12 px-8 bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 font-semibold text-base shadow-lg shadow-[#57D7BA]/20">
-                Start 14-Day Free Trial <ArrowRight className="size-5 ml-2" />
+              <Button onClick={() => { if (!user) { setShowLogin(true); } else { startTrial(); } }} className="h-12 px-8 bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 font-semibold text-base shadow-lg shadow-[#57D7BA]/20">
+                {isPro ? "Pro Active ✓" : "Start 14-Day Free Trial"} <ArrowRight className="size-5 ml-2" />
               </Button>
               <Link href="/" className="text-sm text-[#8892b0] hover:text-[#57D7BA] transition-colors">
                 or continue with Free plan →
@@ -353,7 +355,7 @@ export default function PricingPage() {
 
       {/* ─── FOOTER ────────────────────────────────────────────────── */}
       <footer className="flex items-center justify-between py-4 border-t border-[#2a2f45] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
+        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>

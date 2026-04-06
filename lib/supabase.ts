@@ -5,7 +5,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "your-anon-
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Database types for our tables
+// Database types for user features
 export interface DbPrediction {
   id?: string;
   user_id: string;

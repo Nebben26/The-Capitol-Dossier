@@ -10,23 +10,29 @@ import {
   Bell,
   Home,
   Target,
-  Shield,
   X,
   GitCompareArrows,
   Crosshair,
+  Star,
+  Newspaper,
+  Code,
+  BarChart3,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Markets", icon: Target, href: "/markets" },
+  { label: "Screener", icon: BarChart3, href: "/screener" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
+  { label: "Insights", icon: Newspaper, href: "/insights" },
   { label: "Whales", icon: Users, href: "/whales" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
   { label: "Strategies", icon: Zap, href: "/strategies" },
+  { label: "Watchlist", icon: Star, href: "/watchlist" },
   { label: "Calibration", icon: Crosshair, href: "/calibration" },
   { label: "Alerts", icon: Bell, href: "/alerts" },
+  { label: "Widgets", icon: Code, href: "/widgets" },
 ];
 
 export function Sidebar({
@@ -46,7 +52,7 @@ export function Sidebar({
   return (
     <>
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#171b28] border-r border-[#2a2f45] flex flex-col transition-transform duration-200 lg:relative lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#171b28] border-r border-[#2a2f45] flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -87,27 +93,12 @@ export function Sidebar({
           })}
         </nav>
         <div className="px-3 pb-4">
-          <Card className="bg-[#222638] border-[#2a2f45]">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="size-3.5 text-[#57D7BA]" />
-                <span className="text-xs font-medium">Pro Access</span>
-              </div>
-              <p className="text-[10px] text-[#8892b0] leading-relaxed">
-                Unlock real-time whale alerts, advanced analytics & API access.
-              </p>
-              <Link href="/pricing">
-                <Button className="w-full mt-2 h-7 text-xs bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">
-                  Upgrade
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <SidebarUpgradeCard />
         </div>
       </aside>
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity duration-300"
           onClick={onClose}
         />
       )}

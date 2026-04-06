@@ -69,6 +69,7 @@ import type { OrderbookLevel } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { ShareCardButton } from "@/components/ui/share-card-button";
 import { WatchlistButton } from "@/components/ui/watchlist-button";
+import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 
@@ -153,8 +154,14 @@ export default function MarketDetailPage() {
 
   const priceData = useMemo(() => {
     const points = { "1D": 24, "7D": 48, "30D": 90, "90D": 180, ALL: 365 }[timeRange];
+    // Use real price history when available, sliced to match time range
+    if (market.priceHistory && market.priceHistory.length > 0) {
+      const history = market.priceHistory;
+      // Slice from the end to match requested number of points
+      return history.slice(Math.max(0, history.length - points));
+    }
     return genPriceHistory(market.price - 15, points, 6);
-  }, [timeRange, market.price]);
+  }, [timeRange, market.price, market.priceHistory]);
 
   const maxBidTotal = Math.max(...orderbookBids.map((b) => b.total));
   const maxAskTotal = Math.max(...orderbookAsks.map((a) => a.total));
@@ -259,6 +266,7 @@ export default function MarketDetailPage() {
               <div className="mt-3 flex justify-center gap-2">
                 <ShareCardButton title={market.question} price={market.price} change={market.change} />
                 <WatchlistButton type="market" itemId={market.id} name={market.question} />
+                <EmbedButton type="market" id={market.id} label="Embed" />
               </div>
             </CardContent>
           </Card>
@@ -513,15 +521,15 @@ export default function MarketDetailPage() {
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} />
-                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v) => `${v}¢`} domain={["dataMin - 5", "dataMax + 5"]} />
+                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} interval="preserveStartEnd" />
+                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v: number) => `${Math.round(v)}¢`} domain={[0, 100]} />
                         <Area type="monotone" dataKey="price" stroke="#57D7BA" strokeWidth={2} fill="url(#priceGradient)" />
                       </AreaChart>
                     ) : (
                       <BarChart data={priceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} />
-                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v) => `${v}¢`} domain={["dataMin - 5", "dataMax + 5"]} />
+                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} interval="preserveStartEnd" />
+                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v: number) => `${Math.round(v)}¢`} domain={[0, 100]} />
                         <Bar dataKey="close" fill="#57D7BA" radius={[2, 2, 0, 0]} />
                       </BarChart>
                     )}

@@ -11,22 +11,26 @@ export const calibGen = () =>
     return { predicted: p, actual: p + (Math.random() - 0.5) * 14 };
   });
 
-export const genPriceHistory = (base: number, points: number, volatility: number) =>
-  Array.from({ length: points }, (_, i) => {
+export const genPriceHistory = (base: number, points: number, volatility: number) => {
+  const now = new Date();
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return Array.from({ length: points }, (_, i) => {
     const trend = Math.sin(i / (points / 4)) * 15;
     const noise = (Math.random() - 0.5) * volatility;
     const price = Math.max(3, Math.min(97, base + trend + noise + (i / points) * 10));
     const vol = 500000 + Math.random() * 2000000;
+    const d = new Date(now.getTime() - (points - i) * 86400000);
     return {
-      time: `${Math.floor(i / (points / 30)) + 1}`,
-      price: Math.round(price * 10) / 10,
+      time: `${months[d.getMonth()]} ${d.getDate()}`,
+      price: Math.round(price),
       vol: Math.round(vol),
-      open: Math.round((price + (Math.random() - 0.5) * 3) * 10) / 10,
-      high: Math.round((price + Math.random() * 4) * 10) / 10,
-      low: Math.round((price - Math.random() * 4) * 10) / 10,
-      close: Math.round(price * 10) / 10,
+      open: Math.round(price + (Math.random() - 0.5) * 3),
+      high: Math.round(price + Math.random() * 4),
+      low: Math.round(price - Math.random() * 4),
+      close: Math.round(price),
     };
   });
+};
 
 // ─── SHARED TYPES ─────────────────────────────────────────────────────
 export interface Market {
@@ -49,6 +53,11 @@ export interface Market {
   creator: string;
   created: string;
   liquidity: string;
+  // Optional enrichment fields (populated by API layer)
+  clobTokenIds?: string[];
+  ticker?: string;
+  priceHistory?: { time: string; price: number; vol: number; open: number; high: number; low: number; close: number }[];
+  volAnomaly?: boolean;
 }
 
 export interface Whale {
@@ -546,6 +555,8 @@ export interface Disagreement {
   resolution: string;
   daysLeft: number;
   direction: "poly-higher" | "kalshi-higher";
+  spreadTrend?: "converging" | "diverging" | "stable";
+  convergenceRate?: number;
 }
 
 export const disagreements: Disagreement[] = [
@@ -559,6 +570,35 @@ export const disagreements: Disagreement[] = [
   { id: "d8", question: "Will oil prices exceed $100/barrel in 2026?", marketId: "oil-100", polyPrice: 33, kalshiPrice: 22, spread: 11, polyVol: "$7.1M", kalshiVol: "$3.4M", category: "Economics", resolution: "Dec 31, 2026", daysLeft: 271, direction: "poly-higher" },
   { id: "d9", question: "Will Solana's market cap flip Ethereum in 2026?", marketId: "sol-flip-eth", polyPrice: 11, kalshiPrice: 22, spread: 11, polyVol: "$8.9M", kalshiVol: "$5.1M", category: "Crypto", resolution: "Dec 31, 2026", daysLeft: 271, direction: "kalshi-higher" },
   { id: "d10", question: "Will the Senate flip in 2026 midterms?", marketId: "senate-flip", polyPrice: 38, kalshiPrice: 27, spread: 11, polyVol: "$14.2M", kalshiVol: "$6.8M", category: "Elections", resolution: "Nov 3, 2026", daysLeft: 213, direction: "poly-higher" },
+];
+
+// ─── INSIGHTS / NEWS ──────────────────────────────────────────────────
+export interface Insight {
+  id: string;
+  headline: string;
+  summary: string;
+  marketId: string;
+  marketQuestion: string;
+  impact: "bullish" | "bearish" | "neutral";
+  priceMove: string;
+  source: string;
+  sourceType: "twitter" | "news" | "research" | "official";
+  category: string;
+  time: string;
+  minutesAgo: number;
+}
+
+export const insights: Insight[] = [
+  { id: "i1", headline: "NBER economists signal 'elevated recession risk' in Q3 outlook", summary: "The National Bureau of Economic Research published a preliminary assessment showing leading indicators pointing to significant economic slowdown by late 2026.", marketId: "recession-2026", marketQuestion: "US recession by Dec 2026?", impact: "bullish", priceMove: "+4.2%", source: "NBER", sourceType: "research", category: "Economics", time: "12m ago", minutesAgo: 12 },
+  { id: "i2", headline: "Fed Governor Waller hints at 'patience' on rate cuts in CNBC interview", summary: "Federal Reserve Governor Christopher Waller suggested the central bank is in no rush to cut rates, citing persistent services inflation.", marketId: "fed-rate-cut", marketQuestion: "Fed cuts rates before July?", impact: "bearish", priceMove: "-3.1%", source: "CNBC", sourceType: "news", category: "Economics", time: "28m ago", minutesAgo: 28 },
+  { id: "i3", headline: "Trump campaign announces $50M fundraising haul in Q1 2026", summary: "The Trump 2028 campaign reported its strongest fundraising quarter, significantly outpacing other potential Republican candidates.", marketId: "trump-2028", marketQuestion: "Trump wins 2028 election?", impact: "bullish", priceMove: "+2.8%", source: "@realDonaldTrump", sourceType: "twitter", category: "Elections", time: "1h ago", minutesAgo: 62 },
+  { id: "i4", headline: "Bitcoin ETF inflows hit $2.1B in single week — highest since launch", summary: "Spot Bitcoin ETFs recorded their largest weekly inflows ever, driven by institutional allocation shifts and macro hedging demand.", marketId: "btc-150k", marketQuestion: "Bitcoin above $150K by EOY?", impact: "bullish", priceMove: "+1.9%", source: "Bloomberg", sourceType: "news", category: "Crypto", time: "2h ago", minutesAgo: 124 },
+  { id: "i5", headline: "EU Commission formally begins retaliatory tariff process against US goods", summary: "The European Commission voted to initiate a formal tariff response process targeting $18B in US agricultural and tech exports.", marketId: "eu-tariff", marketQuestion: "EU retaliatory tariffs by Q3?", impact: "bullish", priceMove: "+6.1%", source: "Reuters", sourceType: "news", category: "Geopolitics", time: "3h ago", minutesAgo: 185 },
+  { id: "i6", headline: "OpenAI CFO confirms 'significant revenue acceleration' in earnings call leak", summary: "An alleged transcript from an internal OpenAI board meeting shows the company tracking toward $12B annualized revenue by mid-2026.", marketId: "openai-revenue", marketQuestion: "OpenAI hits $10B revenue by mid-2026?", impact: "bullish", priceMove: "+3.4%", source: "@theinformation", sourceType: "twitter", category: "Tech", time: "4h ago", minutesAgo: 248 },
+  { id: "i7", headline: "Polymarket whale drops $4.1M YES on recession contract", summary: "QuantWhale, one of the platform's most accurate traders (80% accuracy), placed the largest single bet of the week on the recession market.", marketId: "recession-2026", marketQuestion: "US recession by Dec 2026?", impact: "bullish", priceMove: "+1.2%", source: "On-chain data", sourceType: "research", category: "Economics", time: "5h ago", minutesAgo: 310 },
+  { id: "i8", headline: "Senate Majority Leader signals bipartisan support for student debt compromise", summary: "In a floor speech, the Senate Majority Leader indicated willingness to negotiate a reduced student debt relief package, boosting passage odds.", marketId: "student-debt", marketQuestion: "Student debt relief bill passes?", impact: "bullish", priceMove: "+5.8%", source: "C-SPAN", sourceType: "official", category: "Elections", time: "6h ago", minutesAgo: 370 },
+  { id: "i9", headline: "NVIDIA CEO teases 'major announcement' at upcoming GTC keynote", summary: "Jensen Huang posted a cryptic teaser on social media hinting at a significant corporate action, fueling stock split speculation.", marketId: "nvidia-split", marketQuestion: "NVIDIA 10:1 stock split?", impact: "bullish", priceMove: "+2.1%", source: "@JensenHuang", sourceType: "twitter", category: "Economics", time: "8h ago", minutesAgo: 480 },
+  { id: "i10", headline: "Kalshi sees 40% volume surge on political markets ahead of midterms", summary: "Kalshi reported record trading volume on 2026 midterm election contracts, with Senate control markets leading the activity.", marketId: "senate-flip", marketQuestion: "Senate flips in 2026 midterms?", impact: "neutral", priceMove: "+0.3%", source: "Kalshi Blog", sourceType: "official", category: "Elections", time: "10h ago", minutesAgo: 600 },
 ];
 
 // Homepage whale activity (top 5 recent whale moves)
