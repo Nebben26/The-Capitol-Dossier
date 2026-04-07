@@ -209,7 +209,7 @@ export default function DisagreesPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {disagreements.length > 0 && <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "Active Spreads", val: `${disagreements.length}`, color: "#f59e0b" },
           { label: "Avg Spread", val: `${Math.round(disagreements.reduce((s, d) => s + d.spread, 0) / disagreements.length)}pt`, color: "#ef4444" },
@@ -223,7 +223,7 @@ export default function DisagreesPage() {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div>}
 
       {/* Grid view */}
       {viewMode === "grid" && (
@@ -311,7 +311,17 @@ export default function DisagreesPage() {
         </Card>
       )}
 
-      {filtered.length === 0 && (
+      {disagreements.length === 0 && (
+        <Card className="bg-[#222638] border-[#2f374f]">
+          <CardContent className="py-16 text-center">
+            <GitCompareArrows className="size-12 text-[#2f374f] mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No active arbitrage opportunities right now</h3>
+            <p className="text-sm text-[#8892b0]">Check back in 30 minutes — disagreements are recalculated each ingestion cycle.</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {disagreements.length > 0 && filtered.length === 0 && (
         <Card className="bg-[#222638] border-[#2f374f]">
           <CardContent className="py-16 text-center">
             <GitCompareArrows className="size-12 text-[#2f374f] mx-auto mb-4" />

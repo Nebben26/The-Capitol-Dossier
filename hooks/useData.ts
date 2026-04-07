@@ -32,7 +32,6 @@ import {
   homepageWhaleActivity,
   sparkGen,
   STRAT_CATEGORIES,
-  disagreements as mockDisagreements,
   insights as mockInsights,
 } from "@/lib/mockData";
 import type { Disagreement, Insight } from "@/lib/mockData";
@@ -369,7 +368,7 @@ export function useHomepageData(autoRefreshMs = 45000) {
 
 // ─── DISAGREES HOOK (with auto-refresh) ──────────────────────────────
 export function useDisagreements(autoRefreshMs = 45000) {
-  const [disagreements, setDisagreements] = useState(mockDisagreements);
+  const [disagreements, setDisagreements] = useState<Disagreement[]>([]);
   const [source, setSource] = useState<DataSource>("mock");
 
   const fetchDisagreements = useCallback(async () => {

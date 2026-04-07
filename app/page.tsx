@@ -96,10 +96,11 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
 
 // ─── GAUGE COMPONENT ──────────────────────────────────────────────────
 function PulseGauge({ value, label }: { value: number; label: string }) {
-  // Half-circle: 0=left, 50=top, 100=right. SVG y-axis is inverted.
-  const rad = ((value / 100) * Math.PI) - (Math.PI / 2);
-  const needleX = 100 + 65 * Math.sin(rad);
-  const needleY = 95 - 65 * Math.cos(rad);
+  // Arc dot position: center=(100,95), radius=80
+  const angle = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const dotX = 100 + 80 * Math.sin(angle);
+  const dotY = 95 - 80 * Math.cos(angle);
+  const dotColor = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 200 115" className="w-48 h-auto">
@@ -112,9 +113,8 @@ function PulseGauge({ value, label }: { value: number; label: string }) {
         </defs>
         <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="#2a2f45" strokeWidth="12" strokeLinecap="round" />
         <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" strokeDasharray={`${(value / 100) * 251} 251`} />
-        <line x1="100" y1="95" x2={needleX} y2={needleY} stroke="#57D7BA" strokeWidth="2.5" strokeLinecap="round" />
-        <circle cx="100" cy="95" r="4" fill="#57D7BA" />
-        <text x="100" y="82" textAnchor="middle" fill="#e2e8f0" fontSize="22" fontWeight="700">{value}</text>
+        <circle cx={dotX} cy={dotY} r={6} fill="#fff" stroke={dotColor} strokeWidth={2} />
+        <text x="100" y="85" textAnchor="middle" fill="#e2e8f0" fontSize="22" fontWeight="700">{value}</text>
       </svg>
       <span className="text-xs text-[#8892b0] mt-1 tracking-wide uppercase">{label}</span>
     </div>

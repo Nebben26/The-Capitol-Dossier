@@ -30,9 +30,10 @@ function MiniPulseGauge() {
     return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
   }, [pulseMarkets]);
 
-  const rad = ((value / 100) * Math.PI) - (Math.PI / 2);
-  const nx = 50 + 30 * Math.sin(rad);
-  const ny = 46 - 30 * Math.cos(rad);
+  // Arc dot position: center=(50,46), radius=40
+  const angle = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const dotX = 50 + 40 * Math.sin(angle);
+  const dotY = 46 - 40 * Math.cos(angle);
   const color = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
 
   return (
@@ -47,9 +48,8 @@ function MiniPulseGauge() {
         </defs>
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="#2f374f" strokeWidth="5" strokeLinecap="round" />
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="url(#miniGaugeG)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(value / 100) * 126} 126`} />
-        <line x1="50" y1="46" x2={nx} y2={ny} stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="50" cy="46" r="2" fill={color} />
-        <text x="50" y="40" textAnchor="middle" fill="#e2e8f0" fontSize="11" fontWeight="700">{value}</text>
+        <circle cx={dotX} cy={dotY} r={3} fill="#fff" stroke={color} strokeWidth={1.5} />
+        <text x="50" y="42" textAnchor="middle" fill="#e2e8f0" fontSize="11" fontWeight="700">{value}</text>
       </svg>
       <span className="text-[9px] text-[#8892b0] leading-tight hidden xl:block">Pulse</span>
     </div>

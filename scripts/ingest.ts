@@ -520,18 +520,24 @@ async function ingestWhaleTrades() {
 }
 
 // ─── 10. COMPUTE DISAGREEMENTS ───────────────────────────────────────
+const STOPWORDS = new Set([
+  "will", "what", "when", "where", "which", "have", "been", "before",
+  "after", "than", "they", "this", "that", "with", "from", "into",
+  "does", "much", "many", "more", "most", "about", "would", "could",
+  "should", "their", "there", "these", "those", "being", "other",
+  "some", "only", "also", "over", "under", "between", "through",
+  "during", "2024", "2025", "2026", "2027", "2028", "2029", "2030",
+  "year", "next", "first", "last",
+]);
+
 async function ingestDisagreements(markets: any[]) {
   console.log("\n=== Computing cross-platform disagreements ===");
 
   const polyMarkets = markets.filter((m: any) => m.platform === "Polymarket");
-  // Filter out multi-outcome Kalshi markets with concatenated titles like "yes Cleveland,yes New York,..."
-  // Also filter out prop-bet style titles like "yes James Harden: 3+,yes James Harden: 8+"
   const kalshiMarkets = markets.filter((m: any) => {
     if (m.platform !== "Kalshi") return false;
     const q = m.question || "";
-    // Skip if it starts with "yes " — these are outcome labels, not questions
     if (/^yes\s/i.test(q)) return false;
-    // Skip if it contains multiple "yes " segments (concatenated outcomes)
     if ((q.match(/yes\s/gi) || []).length >= 2) return false;
     return true;
   });
@@ -543,21 +549,25 @@ async function ingestDisagreements(markets: any[]) {
   }
 
   const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+  const contentWords = (s: string) =>
+    normalize(s).split(/\s+/).filter((w: string) => w.length > 3 && !STOPWORDS.has(w));
+
   const rows: any[] = [];
 
   for (const pm of polyMarkets) {
-    const pmWords = new Set(normalize(pm.question).split(/\s+/).filter((w: string) => w.length > 3));
+    const pmWords = new Set(contentWords(pm.question));
+    if (pmWords.size < 2) continue;
     let bestMatch: any = null;
     let bestScore = 0;
     let bestOverlap = 0;
 
     for (const km of kalshiMarkets) {
-      const kmWords = normalize(km.question).split(/\s+/).filter((w: string) => w.length > 3);
+      const kmWords = contentWords(km.question);
+      if (kmWords.length < 2) continue;
       const overlap = kmWords.filter((w: string) => pmWords.has(w)).length;
-      // Require at least 2 overlapping non-trivial words to avoid false positives
-      if (overlap < 2) continue;
+      if (overlap < 3) continue;
       const score = overlap / Math.max(pmWords.size, kmWords.length, 1);
-      if (score > bestScore && score >= 0.25) {
+      if (score > bestScore && score >= 0.4) {
         bestScore = score;
         bestOverlap = overlap;
         bestMatch = km;
@@ -590,9 +600,15 @@ async function ingestDisagreements(markets: any[]) {
   if (rows.length > 0) {
     // Clear old and insert fresh
     await supabase.from("disagreements").delete().neq("id", "");
-    const { error } = await supabase.from("disagreements").upsert(rows, { onConflict: "id" });
-    if (error) console.error("  Disagreements upsert error:", error.message);
-    else console.log(`  Upserted ${rows.length} disagreements`);
+    for (let i = 0; i < rows.length; i += 100) {
+      const chunk = rows.slice(i, i + 100);
+      const { error } = await supabase.from("disagreements").upsert(chunk, { onConflict: "id" });
+      if (error) console.error(`  Disagreements upsert error (batch ${i}):`, error.message);
+      else console.log(`  Upserted batch ${i}-${i + chunk.length}`);
+    }
+  } else {
+    console.log("  No disagreements found — clearing table");
+    await supabase.from("disagreements").delete().neq("id", "");
   }
 }
 

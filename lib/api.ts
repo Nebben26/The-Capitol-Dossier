@@ -8,7 +8,6 @@ import {
   priceMovers as mockPriceMovers,
   resolutionNearing as mockResolution,
   crossPlatformPrices as mockCrossPlatform,
-  disagreements as mockDisagreements,
   currentPositions as mockPositions,
   homepageWhaleActivity as mockWhaleActivity,
   sparkGen,
@@ -584,7 +583,7 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
   if (cached) return cached;
 
   if (!isSupabaseConfigured()) {
-    return { data: mockDisagreements, source: "mock" };
+    return { data: [], source: "mock" };
   }
 
   try {
@@ -595,7 +594,7 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
       .limit(50);
 
     if (error) throw error;
-    if (!data || data.length === 0) return { data: mockDisagreements, source: "mock" };
+    if (!data || data.length === 0) return { data: [], source: "live" };
 
     const disagreements: Disagreement[] = data.map((row: any) => ({
       id: row.id,
@@ -641,6 +640,6 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
     return result;
   } catch (err) {
     console.error("[getDisagreements] Supabase query failed:", err);
-    return { data: mockDisagreements, source: "mock" };
+    return { data: [], source: "mock" };
   }
 }
