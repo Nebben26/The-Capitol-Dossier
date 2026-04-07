@@ -194,7 +194,7 @@ async function fetchRecentActivity(): Promise<any[]> {
 // ─── 5. FETCH PRICE HISTORY ──────────────────────────────────────────
 async function fetchPriceHistory(tokenId: string): Promise<{ t: number; p: number }[]> {
   try {
-    const res = await fetch(`${CLOB_BASE}/prices-history?market=${encodeURIComponent(tokenId)}&interval=max&fidelity=100`);
+    const res = await fetch(`${CLOB_BASE}/prices-history?market=${encodeURIComponent(tokenId)}&interval=max&fidelity=360`);
     if (!res.ok) return [];
     const data = await res.json();
     return (data?.history || []).map((h: { t: number; p: string }) => ({
@@ -385,39 +385,46 @@ async function ingestMarkets() {
 
 // ─── 7. INGEST PRICE HISTORY ─────────────────────────────────────────
 async function ingestPriceHistory(markets: any[]) {
-  // Get top 20 Polymarket markets with clobTokenIds
+  // ALL Polymarket markets with clobTokenIds, sorted by volume
   const polyMarkets = markets
     .filter((m: any) => m.platform === "Polymarket" && m.clob_token_ids?.length > 0)
-    .sort((a: any, b: any) => (b.volume || 0) - (a.volume || 0))
-    .slice(0, 20);
+    .sort((a: any, b: any) => (b.volume || 0) - (a.volume || 0));
 
-  console.log(`\n=== Fetching price history for ${polyMarkets.length} markets ===`);
+  console.log(`\n=== Fetching price history for ${polyMarkets.length} markets (all with CLOB tokens) ===`);
 
+  let fetched = 0;
+  let skipped = 0;
   for (const m of polyMarkets) {
     const tokenId = m.clob_token_ids[0];
-    console.log(`  ${m.id}: fetching CLOB history...`);
-    const points = await fetchPriceHistory(tokenId);
-    if (points.length === 0) { console.log(`    No data`); continue; }
+    try {
+      const points = await fetchPriceHistory(tokenId);
+      if (points.length === 0) { skipped++; continue; }
 
-    const rows = points.map((pt: { t: number; p: number }) => ({
-      market_id: m.id,
-      timestamp: new Date(pt.t * 1000).toISOString(),
-      price: pt.p,
-      volume: 0,
-    }));
+      const rows = points.map((pt: { t: number; p: number }) => ({
+        market_id: m.id,
+        timestamp: new Date(pt.t * 1000).toISOString(),
+        price: pt.p,
+        volume: 0,
+      }));
 
-    // Delete old history for this market, then insert fresh
-    await supabase.from("price_history").delete().eq("market_id", m.id);
-    for (let i = 0; i < rows.length; i += 500) {
-      const chunk = rows.slice(i, i + 500);
-      const { error } = await supabase.from("price_history").insert(chunk);
-      if (error) console.error(`    Insert error:`, error.message);
+      // Delete old history for this market, then insert fresh
+      await supabase.from("price_history").delete().eq("market_id", m.id);
+      for (let i = 0; i < rows.length; i += 500) {
+        const chunk = rows.slice(i, i + 500);
+        const { error } = await supabase.from("price_history").insert(chunk);
+        if (error) console.error(`    ${m.id} insert error:`, error.message);
+      }
+      fetched++;
+      if (fetched % 50 === 0) console.log(`  Progress: ${fetched}/${polyMarkets.length} markets (${skipped} skipped)`);
+    } catch (err) {
+      console.error(`  ${m.id}: fetch failed, skipping`);
+      skipped++;
     }
-    console.log(`    Inserted ${rows.length} points`);
 
-    // Rate limit: small delay between markets
+    // Rate limit
     await new Promise((r) => setTimeout(r, 200));
   }
+  console.log(`  Done: ${fetched} markets with history, ${skipped} skipped`);
 }
 
 // ─── 8. INGEST WHALE LEADERBOARD ─────────────────────────────────────

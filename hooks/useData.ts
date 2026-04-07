@@ -334,24 +334,22 @@ export function useHomepageData(autoRefreshMs = 45000) {
         }))
     : breakingMarkets;
 
-  // "Whale Activity" — show real whale names with top markets (no fabricated bet sizes)
+  // "Top Whales by P&L" — sorted by totalPnlNum descending, re-ranked 1-5
   const liveWhaleActivity = markets.length > 24 && liveWhaleList.length > 5
-    ? liveWhaleList
+    ? [...liveWhaleList]
+        .sort((a, b) => b.totalPnlNum - a.totalPnlNum)
         .slice(0, 5)
-        .map((whale, i) => {
-          const market = markets[i % markets.length];
-          return {
-            id: whale.id,
-            name: whale.name,
-            rank: whale.rank,
-            acc: whale.accuracy,
-            pos: `${whale.totalPnl} P&L`,
-            market: market?.question || "Active trader",
-            marketId: market?.id || "",
-            time: i === 0 ? "3m ago" : `${(i + 1) * 8}m ago`,
-            side: "long" as const,
-          };
-        })
+        .map((whale, i) => ({
+          id: whale.id,
+          name: whale.name,
+          rank: i + 1,
+          acc: whale.accuracy,
+          pos: `${whale.totalPnl} P&L`,
+          market: "",
+          marketId: "",
+          time: "",
+          side: "long" as const,
+        }))
     : homepageWhaleActivity;
 
   return {

@@ -22,13 +22,13 @@ import { LogOut, User } from "lucide-react";
 
 // ─── MINI PULSE GAUGE ─────────────────────────────────────────────────
 function MiniPulseGauge() {
-  const [value, setValue] = useState(68);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setValue((v) => Math.max(30, Math.min(90, v + (Math.random() > 0.5 ? 1 : -1))));
-    }, 12000);
-    return () => clearInterval(interval);
-  }, []);
+  const { markets: pulseMarkets } = useMarkets();
+  const value = useMemo(() => {
+    const top = pulseMarkets.filter(m => m.volNum > 100000 && m.change !== 0);
+    if (top.length === 0) return 50;
+    const avgChange = top.reduce((s, m) => s + m.change, 0) / top.length;
+    return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
+  }, [pulseMarkets]);
 
   const angle = (value / 100) * 180 - 90;
   const rad = (angle * Math.PI) / 180;

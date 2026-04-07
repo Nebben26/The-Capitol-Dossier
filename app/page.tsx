@@ -66,8 +66,8 @@ function Sparkline({ data, positive }: { data: { d: number; v: number }[]; posit
 
 // ─── TREEMAP CUSTOM CONTENT ───────────────────────────────────────────
 function CustomTreemapContent(props: { x?: number; y?: number; width?: number; height?: number; name?: string; change?: number; size?: number }) {
-  const { x = 0, y = 0, width = 0, height = 0, name, change = 0, size = 0 } = props;
-  if (width < 50 || height < 30) return null;
+  const { x = 0, y = 0, width = 0, height = 0, name, change, size = 0 } = props;
+  if (width < 50 || height < 30 || !name || size < 100 || change === undefined || change === null) return null;
   const color = change >= 0 ? "#22c55e" : "#ef4444";
   const bgOpacity = Math.min(Math.abs(change) / 12, 0.85);
   return (
@@ -227,7 +227,12 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#57D7BA]/5 via-transparent to-[#ef4444]/5 pointer-events-none" />
         <CardContent className="p-5 relative">
           <div className="flex flex-col lg:flex-row items-center gap-6">
-            <PulseGauge value={Math.min(100, Math.max(0, Math.round(50 + allMarkets.slice(0, 20).reduce((s, m) => s + m.change, 0) / 2)))} label="Fear & Greed" />
+            <PulseGauge value={(() => {
+              const top = allMarkets.filter(m => m.volNum > 100000 && m.change !== 0);
+              if (top.length === 0) return 50;
+              const avgChange = top.reduce((s, m) => s + m.change, 0) / top.length;
+              return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
+            })()} label="Fear & Greed" />
             <div className="flex-1 text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-xs font-semibold">
@@ -482,14 +487,8 @@ export default function HomePage() {
                     <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119] shrink-0">#{w.rank}</div>
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors">{w.name}</span>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      <div className="mt-0.5">
                         <span className="text-[10px] font-mono font-semibold text-[#22c55e]">{w.pos}</span>
-                        <div className="flex items-center gap-1">
-                          <div className="w-10 h-1 rounded-full bg-[#1a1e2e] overflow-hidden">
-                            <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.acc}%` }} />
-                          </div>
-                          <span className="text-[9px] text-[#8892b0] font-mono tabular-nums">{w.acc}%</span>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -518,7 +517,7 @@ export default function HomePage() {
         <CardContent className="pb-3">
           <div className="h-64 sm:h-80 w-full">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-              <Treemap data={treemapData} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
+              <Treemap data={treemapData.filter(t => t.name && t.size >= 100 && typeof t.change === 'number')} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
             </ResponsiveContainer>
           </div>
         </CardContent>
