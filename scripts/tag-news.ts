@@ -2,6 +2,11 @@
  * Keyword-match recent news articles against active markets.
  * Inserts into news_market_tags (cap 5 markets per article).
  * Run after ingest-news.ts.
+ *
+ * Matching rules (strict):
+ *   - overlap >= 4 words AND score >= 0.35
+ *   - at least 2 overlapping words must be proper nouns in the original article text
+ *   - no fallback relaxation — if nothing matches at this threshold, skip the article
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -13,7 +18,10 @@ const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 const PAGE_SIZE = 1000;
 const MAX_TAGS_PER_ARTICLE = 5;
-const LOOKBACK_HOURS = 48; // only tag articles from last 48h
+const LOOKBACK_HOURS = 48;
+const MIN_OVERLAP = 2;
+const MIN_SCORE = 0.30;
+const MIN_PROPER_NOUNS = 1;
 
 const STOPWORDS = new Set([
   "will", "what", "when", "where", "which", "have", "been", "before",
@@ -25,6 +33,7 @@ const STOPWORDS = new Set([
   "year", "next", "first", "last",
 ]);
 
+/** Lowercase token set for matching */
 function tokenize(text: string): Set<string> {
   return new Set(
     text
@@ -35,26 +44,52 @@ function tokenize(text: string): Set<string> {
   );
 }
 
-function score(articleWords: Set<string>, marketWords: Set<string>): number {
+/** Proper nouns: words >3 chars that start with uppercase in the original text */
+function extractProperNouns(originalText: string): Set<string> {
+  return new Set(
+    originalText
+      .replace(/[^a-zA-Z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3 && /^[A-Z]/.test(w))
+      .map((w) => w.toLowerCase())
+  );
+}
+
+interface MatchResult {
+  score: number;
+  overlap: number;
+  properNounCount: number;
+}
+
+function matchScore(
+  articleWords: Set<string>,
+  marketWords: Set<string>,
+  articleProperNouns: Set<string>
+): MatchResult {
   let overlap = 0;
+  let properNounCount = 0;
   for (const w of articleWords) {
-    if (marketWords.has(w)) overlap++;
+    if (marketWords.has(w)) {
+      overlap++;
+      if (articleProperNouns.has(w)) properNounCount++;
+    }
   }
-  if (overlap === 0) return 0;
-  return overlap / Math.max(articleWords.size, marketWords.size);
+  if (overlap === 0) return { score: 0, overlap: 0, properNounCount: 0 };
+  return {
+    score: overlap / Math.max(articleWords.size, marketWords.size),
+    overlap,
+    properNounCount,
+  };
 }
 
 async function getAllMarkets() {
-  // Count first
   const { count } = await sb
     .from("markets")
     .select("*", { count: "exact", head: true });
-
   if (!count) return [];
 
   const numPages = Math.ceil(count / PAGE_SIZE);
   const allRows: any[] = [];
-
   for (let i = 0; i < numPages; i++) {
     const from = i * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
@@ -65,28 +100,20 @@ async function getAllMarkets() {
       .range(from, to);
     if (data) allRows.push(...data);
   }
-
   return allRows;
 }
 
 async function main() {
-  console.log("=== Tagging news articles ===\n");
+  console.log("=== Tagging news articles (strict matcher) ===\n");
 
-  // Load markets
   const markets = await getAllMarkets();
   console.log(`Loaded ${markets.length} markets`);
 
-  // Pre-tokenize market questions
-  const marketTokens: { id: string; slug: string | null; question: string; words: Set<string> }[] = markets
-    .filter((m) => m.question)
-    .map((m) => ({
-      id: m.id,
-      slug: m.slug,
-      question: m.question,
-      words: tokenize(m.question),
-    }));
+  const marketTokens: { id: string; slug: string | null; question: string; words: Set<string> }[] =
+    markets
+      .filter((m) => m.question)
+      .map((m) => ({ id: m.id, slug: m.slug, question: m.question, words: tokenize(m.question) }));
 
-  // Load recent untagged articles
   const since = new Date(Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000).toISOString();
   const { data: articles, error: artErr } = await sb
     .from("news_articles")
@@ -97,34 +124,32 @@ async function main() {
   if (artErr) { console.error(artErr); process.exit(1); }
   if (!articles?.length) { console.log("No recent articles to tag."); return; }
 
-  console.log(`Tagging ${articles.length} articles published in last ${LOOKBACK_HOURS}h\n`);
+  console.log(`Tagging ${articles.length} articles from last ${LOOKBACK_HOURS}h`);
+  console.log(`Thresholds: overlap>=${MIN_OVERLAP}, score>=${MIN_SCORE}, proper nouns>=${MIN_PROPER_NOUNS}\n`);
 
   let totalTags = 0;
+  let skipped = 0;
 
   for (const article of articles) {
-    const text = `${article.title} ${article.summary || ""}`;
-    const artWords = tokenize(text);
-    if (artWords.size < 3) continue;
+    // Use title only — summary adds noise and dilutes score by inflating word count
+    const originalText = article.title;
+    const artWords = tokenize(originalText);
+    const artProperNouns = extractProperNouns(originalText);
 
-    // Score all markets
+    if (artWords.size < 3) { skipped++; continue; }
+
     const scored = marketTokens
-      .map((m) => ({ ...m, s: score(artWords, m.words) }))
-      .filter((m) => m.s >= 0.30)
+      .map((m) => {
+        const { score, overlap, properNounCount } = matchScore(artWords, m.words, artProperNouns);
+        return { ...m, s: score, overlap, properNounCount };
+      })
+      .filter((m) => m.overlap >= MIN_OVERLAP && m.s >= MIN_SCORE && m.properNounCount >= MIN_PROPER_NOUNS)
       .sort((a, b) => b.s - a.s)
       .slice(0, MAX_TAGS_PER_ARTICLE);
 
-    // Relax threshold if nothing matched
-    const finalMatches = scored.length > 0
-      ? scored
-      : marketTokens
-          .map((m) => ({ ...m, s: score(artWords, m.words) }))
-          .filter((m) => m.s >= 0.15)
-          .sort((a, b) => b.s - a.s)
-          .slice(0, 2);
+    if (scored.length === 0) { skipped++; continue; }
 
-    if (finalMatches.length === 0) continue;
-
-    const tags = finalMatches.map((m) => ({
+    const tags = scored.map((m) => ({
       article_id: article.id,
       market_id: m.id,
       market_slug: m.slug,
@@ -140,11 +165,26 @@ async function main() {
       console.warn(`  Article ${article.id}: upsert error`, error.message);
     } else {
       totalTags += tags.length;
-      console.log(`  [${article.id}] ${article.title.slice(0, 60)} → ${tags.length} markets`);
+      console.log(`  [${article.id}] ${article.title.slice(0, 65)} → ${tags.length} market(s)`);
+      tags.forEach((t) => console.log(`         ↳ ${t.question?.slice(0, 70)}`));
     }
   }
 
-  console.log(`\nDone. Inserted ${totalTags} tags for ${articles.length} articles.`);
+  console.log(`\nDone. ${totalTags} tags inserted, ${skipped} articles skipped (no quality match).`);
+
+  // Sample output
+  const { data: sample } = await sb
+    .from("news_market_tags")
+    .select("article_id, question, score, news_articles(title)")
+    .order("score", { ascending: false })
+    .limit(5);
+
+  if (sample?.length) {
+    console.log("\nTop 5 tags by score:");
+    sample.forEach((t: any) =>
+      console.log(`  score=${t.score}  "${(t.news_articles as any)?.title?.slice(0, 50)}" → "${t.question?.slice(0, 60)}"`)
+    );
+  }
 }
 
 main().catch(console.error);
