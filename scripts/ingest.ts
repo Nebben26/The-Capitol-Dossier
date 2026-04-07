@@ -470,9 +470,9 @@ async function ingestWhaleLeaderboard() {
       if (res.ok) {
         const positions = await res.json();
         if (Array.isArray(positions) && positions.length > 0) {
-          const uniqueMarkets = new Set(positions.map((p: any) => p.market?.slug || p.asset?.condition_id || ""));
+          const uniqueMarkets = new Set(positions.map((p: any) => p.eventSlug || p.slug || p.conditionId || "unknown"));
           whaleRows[i].positions_count = positions.length;
-          whaleRows[i].markets_traded = uniqueMarkets.size;
+          whaleRows[i].markets_traded = Math.max(uniqueMarkets.size, 1);
           console.log(`    ${whaleRows[i].display_name}: ${positions.length} positions, ${uniqueMarkets.size} markets`);
         }
       }

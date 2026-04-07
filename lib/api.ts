@@ -134,7 +134,7 @@ function dbWhaleToFrontend(row: any, idx: number): Whale {
     verified: rank <= 10,
     smart: pnlNum > 500_000,
     brier: Math.round(realBrier * 100) / 100,
-    activeMarkets: row.markets_traded || row.positions_count || 0,
+    activeMarkets: (row.markets_traded > 1 ? row.markets_traded : null) || row.positions_count || 0,
     change24h: Math.round((Math.random() - 0.3) * 6 * 10) / 10,
     spark: sparkGen(Math.max(5, pnlNum / 50000), pnlNum > 0 ? 3 : -1),
     calibration: calibGen(),
@@ -184,31 +184,33 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
   }
 
   try {
-    // Paginate past Supabase's 1000-row default limit
-    // Order by id for deterministic pagination, re-sort by volume in JS after
-    const allData: any[] = [];
-    for (let from = 0; ; from += 1000) {
-      const { data: page, error: pageErr } = await supabase
+    // Get total count first to know how many pages we need
+    const { count, error: countErr } = await supabase
+      .from("markets")
+      .select("*", { count: "exact", head: true });
+    if (countErr) throw countErr;
+    if (!count || count === 0) return { data: mockMarkets, source: "mock" };
+
+    // Fetch all pages, ordering by id (deterministic, no nulls)
+    const allRows: any[] = [];
+    const PAGE_SIZE = 1000;
+    const numPages = Math.ceil(count / PAGE_SIZE);
+    for (let i = 0; i < numPages; i++) {
+      const from = i * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const { data, error } = await supabase
         .from("markets")
         .select("*")
         .order("id", { ascending: true })
-        .range(from, from + 999);
-      if (pageErr) {
-        console.error(`[getAllMarkets] page ${from} error:`, pageErr.message);
-        throw pageErr;
-      }
-      if (!page || page.length === 0) break;
-      allData.push(...page);
-      if (page.length < 1000) break; // last page
+        .range(from, to);
+      if (error) throw error;
+      if (data) allRows.push(...data);
     }
-    console.log(`[getAllMarkets] fetched ${allData.length} markets in ${Math.ceil(allData.length / 1000)} pages`);
-    // Sort by volume descending (what the old single query did)
-    allData.sort((a, b) => (b.volume || 0) - (a.volume || 0));
-    const data = allData;
 
-    if (!data || data.length === 0) return { data: mockMarkets, source: "mock" };
+    // Sort by volume in JS
+    allRows.sort((a, b) => (b.volume || 0) - (a.volume || 0));
 
-    const markets = data.map(dbMarketToFrontend);
+    const markets = allRows.map(dbMarketToFrontend);
 
     // Volume anomaly detection
     if (markets.length >= 5) {
@@ -222,7 +224,7 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
     setCache("all_markets", result);
     return result;
   } catch (err) {
-    console.error("[getAllMarkets] Supabase query failed:", err);
+    console.error("[getAllMarkets] failed:", err);
     return { data: mockMarkets, source: "mock" };
   }
 }

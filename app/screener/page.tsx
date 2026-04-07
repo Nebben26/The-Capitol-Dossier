@@ -352,44 +352,32 @@ export default function ScreenerPage() {
                 {filtered.slice(0, displayCount).map((m) => {
                   const spread = spreadMap[m.id] || 0;
                   return (
-                    <Tooltip key={m.id}>
-                      <TooltipTrigger>
-                        <TableRow className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
-                          <TableCell className="pl-4 py-2.5 max-w-[200px]">
-                            <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors line-clamp-1 truncate block">{m.question}</Link>
-                          </TableCell>
-                          <TableCell className="py-2.5 hidden sm:table-cell"><MiniSparkline data={m.spark} positive={m.change >= 0} /></TableCell>
-                          <TableCell className="py-2.5"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{m.price}¢</span></TableCell>
-                          <TableCell className="py-2.5">
-                            <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${m.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                              {m.change >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}{Math.abs(m.change)}%
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-2.5 hidden md:table-cell"><span className="font-mono text-[11px] text-[#8892b0] tabular-nums">{m.volume}</span></TableCell>
-                          <TableCell className="py-2.5 hidden lg:table-cell">
-                            {spread >= 10 ? (
-                              <span className="px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[9px] font-bold font-mono tabular-nums">{spread}pt</span>
-                            ) : spread > 0 ? (
-                              <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{spread}pt</span>
-                            ) : (
-                              <span className="text-[10px] text-[#8892b0]">—</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="py-2.5 hidden lg:table-cell"><span className="font-mono text-[10px] text-[#8892b0] tabular-nums">{m.liquidity}</span></TableCell>
-                          <TableCell className="py-2.5 hidden sm:table-cell"><ResBadge days={m.daysLeft} /></TableCell>
-                          <TableCell className="py-2.5 hidden md:table-cell"><span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{m.category}</span></TableCell>
-                          <TableCell className="pr-4 py-2.5 hidden lg:table-cell"><span className="text-[10px] text-[#8892b0]">{m.platform}</span></TableCell>
-                        </TableRow>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="bg-[#222638] border-[#2f374f] text-[#e2e8f0] p-3 max-w-xs">
-                        <p className="text-xs font-medium mb-1">{m.question}</p>
-                        <div className="flex justify-between text-[10px] text-[#8892b0]">
-                          <span>Bid: {Math.max(m.price - 2, 1)}¢</span>
-                          <span>Ask: {m.price + 2}¢</span>
-                          <span>{m.whaleCount} whales</span>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
+                    <TableRow key={m.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
+                      <TableCell className="pl-4 py-2.5 max-w-[200px]">
+                        <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors line-clamp-1 truncate block">{m.question}</Link>
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden sm:table-cell"><MiniSparkline data={m.spark} positive={m.change >= 0} /></TableCell>
+                      <TableCell className="py-2.5"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{m.price}¢</span></TableCell>
+                      <TableCell className="py-2.5">
+                        <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${m.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                          {m.change >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}{Math.abs(m.change)}%
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden md:table-cell"><span className="font-mono text-[11px] text-[#8892b0] tabular-nums">{m.volume}</span></TableCell>
+                      <TableCell className="py-2.5 hidden lg:table-cell">
+                        {spread >= 10 ? (
+                          <span className="px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[9px] font-bold font-mono tabular-nums">{spread}pt</span>
+                        ) : spread > 0 ? (
+                          <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{spread}pt</span>
+                        ) : (
+                          <span className="text-[10px] text-[#8892b0]">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden lg:table-cell"><span className="font-mono text-[10px] text-[#8892b0] tabular-nums">{m.liquidity}</span></TableCell>
+                      <TableCell className="py-2.5 hidden sm:table-cell"><ResBadge days={m.daysLeft} /></TableCell>
+                      <TableCell className="py-2.5 hidden md:table-cell"><span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{m.category}</span></TableCell>
+                      <TableCell className="pr-4 py-2.5 hidden lg:table-cell"><span className="text-[10px] text-[#8892b0]">{m.platform}</span></TableCell>
+                    </TableRow>
                   );
                 })}
               </TableBody>

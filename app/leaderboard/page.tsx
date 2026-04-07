@@ -366,13 +366,13 @@ export default function LeaderboardPage() {
                   </TableHeader>
                   <TableBody>
                     {sorted.map((t) => (
-                      <Tooltip key={t.id}>
-                        <TooltipTrigger>
-                          <TableRow className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
-                            <TableCell className="pl-4 py-3">
-                              <RankBadge rank={t.rank} />
-                            </TableCell>
-                            <TableCell className="py-3">
+                      <TableRow key={t.id} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
+                        <TableCell className="pl-4 py-3">
+                          <RankBadge rank={t.rank} />
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <Tooltip>
+                            <TooltipTrigger>
                               <Link href={`/whales/${t.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors max-w-[140px]">
                                 <div className="size-7 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0">
                                   <span className="text-[9px] font-bold text-[#0f1119]">{t.name[0]}</span>
@@ -394,76 +394,76 @@ export default function LeaderboardPage() {
                                   </div>
                                 </div>
                               </Link>
-                            </TableCell>
-                            <TableCell className="py-3">
-                              <div>
-                                <span className={`font-mono text-sm font-bold ${t.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                                  {t.totalPnl}
-                                </span>
-                                <span className={`block text-[9px] font-mono ${t.change24h >= 0 ? "text-[#22c55e]/60" : "text-[#ef4444]/60"}`}>
-                                  {t.change24h >= 0 ? "+" : ""}{t.change24h}% 24h
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-3 hidden xl:table-cell">
-                              <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
-                            </TableCell>
-                            <TableCell className="py-3">
-                              <span className="font-mono text-xs font-semibold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
-                            </TableCell>
-                            <TableCell className="py-3 hidden xl:table-cell">
-                              <span className={`font-mono text-xs font-semibold ${t.brier > 0 ? (t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]") : "text-[#8892b0]"}`}>
-                                {t.brier > 0 ? t.brier.toFixed(2) : "—"}
-                              </span>
-                            </TableCell>
-                            <TableCell className="py-3 hidden xl:table-cell">
-                              <span className="font-mono text-xs text-[#8892b0]">{t.totalVolume}</span>
-                            </TableCell>
-                            <TableCell className="py-3 hidden xl:table-cell">
-                              <span className="font-mono text-xs text-[#8892b0]">{t.activeMarkets}</span>
-                            </TableCell>
-                            <TableCell className="py-3 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap" style={{ backgroundColor: `${t.bestCatColor}15`, color: t.bestCatColor }}>
-                                {t.bestCategory}
-                              </span>
-                            </TableCell>
-                            <TableCell className="pr-4 py-3 text-right">
-                              <Button
-                                variant={followedIds.has(t.id) ? "outline" : "default"}
-                                size="xs"
-                                onClick={(e) => { e.stopPropagation(); toggleFollow(t.id); }}
-                                className={followedIds.has(t.id) ? "border-[#57D7BA]/30 text-[#57D7BA] hover:bg-[#57D7BA]/10" : "bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80"}
-                              >
-                                <UserPlus className="size-3" />
-                                {followedIds.has(t.id) ? "Following" : "Follow"}
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        </TooltipTrigger>
-                        <TooltipContent side="left" className="bg-[#222638] border-[#2a2f45] text-[#e2e8f0] p-3 max-w-xs">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-semibold">{t.name}</span>
-                              <span className="text-[9px] text-[#8892b0]">#{t.rank}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <MiniCalibration data={t.calibration} />
-                              <div className="space-y-1.5 flex-1">
-                                <div className="text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Top Markets</div>
-                                {t.topMarkets.map((m, i) => (
-                                  <div key={i} className="flex items-center justify-between text-[10px]">
-                                    <span className="text-[#e2e8f0] truncate mr-2">{m.name}</span>
-                                    <span className="text-[#22c55e] font-mono font-semibold shrink-0">{m.pnl}</span>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="bg-[#222638] border-[#2a2f45] text-[#e2e8f0] p-3 max-w-xs">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs font-semibold">{t.name}</span>
+                                  <span className="text-[9px] text-[#8892b0]">#{t.rank}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <MiniCalibration data={t.calibration} />
+                                  <div className="space-y-1.5 flex-1">
+                                    <div className="text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Top Markets</div>
+                                    {t.topMarkets.map((m, i) => (
+                                      <div key={i} className="flex items-center justify-between text-[10px]">
+                                        <span className="text-[#e2e8f0] truncate mr-2">{m.name}</span>
+                                        <span className="text-[#22c55e] font-mono font-semibold shrink-0">{m.pnl}</span>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+                                <div className="text-[9px] text-[#8892b0] pt-1 border-t border-[#2a2f45]">
+                                  {t.totalTrades} trades{t.brier > 0 ? ` · Brier ${t.brier.toFixed(2)}` : ""} · {t.totalVolume} volume
+                                </div>
                               </div>
-                            </div>
-                            <div className="text-[9px] text-[#8892b0] pt-1 border-t border-[#2a2f45]">
-                              {t.totalTrades} trades{t.brier > 0 ? ` · Brier ${t.brier.toFixed(2)}` : ""} · {t.totalVolume} volume
-                            </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <div>
+                            <span className={`font-mono text-sm font-bold ${t.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                              {t.totalPnl}
+                            </span>
+                            <span className={`block text-[9px] font-mono ${t.change24h >= 0 ? "text-[#22c55e]/60" : "text-[#ef4444]/60"}`}>
+                              {t.change24h >= 0 ? "+" : ""}{t.change24h}% 24h
+                            </span>
                           </div>
-                        </TooltipContent>
-                      </Tooltip>
+                        </TableCell>
+                        <TableCell className="py-3 hidden xl:table-cell">
+                          <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <span className="font-mono text-xs font-semibold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
+                        </TableCell>
+                        <TableCell className="py-3 hidden xl:table-cell">
+                          <span className={`font-mono text-xs font-semibold ${t.brier > 0 ? (t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]") : "text-[#8892b0]"}`}>
+                            {t.brier > 0 ? t.brier.toFixed(2) : "—"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-3 hidden xl:table-cell">
+                          <span className="font-mono text-xs text-[#8892b0]">{t.totalVolume}</span>
+                        </TableCell>
+                        <TableCell className="py-3 hidden xl:table-cell">
+                          <span className="font-mono text-xs text-[#8892b0]">{t.activeMarkets}</span>
+                        </TableCell>
+                        <TableCell className="py-3 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold whitespace-nowrap" style={{ backgroundColor: `${t.bestCatColor}15`, color: t.bestCatColor }}>
+                            {t.bestCategory}
+                          </span>
+                        </TableCell>
+                        <TableCell className="pr-4 py-3 text-right">
+                          <Button
+                            variant={followedIds.has(t.id) ? "outline" : "default"}
+                            size="xs"
+                            onClick={(e) => { e.stopPropagation(); toggleFollow(t.id); }}
+                            className={followedIds.has(t.id) ? "border-[#57D7BA]/30 text-[#57D7BA] hover:bg-[#57D7BA]/10" : "bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80"}
+                          >
+                            <UserPlus className="size-3" />
+                            {followedIds.has(t.id) ? "Following" : "Follow"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>
