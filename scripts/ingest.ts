@@ -45,10 +45,11 @@ function safeParse<T>(json: string, fallback: T): T {
   try { return JSON.parse(json); } catch { return fallback; }
 }
 
-// ─── 1. FETCH POLYMARKET ─────────────────────────────────────────────
+// ─── 1. FETCH POLYMARKET EVENTS ──────────────────────────────────────
 interface PolyEvent {
   id: string; slug: string; title: string; description: string;
-  volume: number; liquidity: number; endDate: string; createdAt: string;
+  volume: number; liquidity: number; endDate: string; startDate?: string; createdAt: string;
+  category?: string; numTraders?: number;
   tags?: { label: string }[];
   markets: {
     id: string; question: string; slug: string; groupItemTitle?: string;
@@ -62,7 +63,7 @@ async function fetchPolymarketEvents(): Promise<PolyEvent[]> {
   const all: PolyEvent[] = [];
   for (let offset = 0; offset < 500; offset += 100) {
     const url = `${POLYMARKET_BASE}/events?active=true&closed=false&limit=100&offset=${offset}&order=volume&ascending=false`;
-    console.log(`  Polymarket page offset=${offset}...`);
+    console.log(`  Polymarket events offset=${offset}...`);
     const res = await fetch(url);
     if (!res.ok) { console.error(`  Polymarket API ${res.status}`); break; }
     const page: PolyEvent[] = await res.json();
@@ -72,28 +73,37 @@ async function fetchPolymarketEvents(): Promise<PolyEvent[]> {
   return all;
 }
 
-// ─── 2. FETCH KALSHI ─────────────────────────────────────────────────
-interface KalshiMarketRaw {
-  ticker: string; event_ticker: string; title?: string; subtitle?: string;
-  yes_sub_title: string; no_sub_title: string;
-  yes_bid: number; yes_ask: number; last_price: number; previous_yes_bid: number;
-  volume: number; volume_24h: number; open_interest: number; liquidity: number;
-  close_time: string; created_time: string; status: string;
+// ─── 2. FETCH KALSHI EVENTS ─────────────────────────────────────────
+interface KalshiEvent {
+  event_ticker: string; title: string; category: string; status: string;
+  sub_title?: string;
+  markets: {
+    ticker: string; title?: string; subtitle?: string;
+    yes_sub_title: string; no_sub_title: string;
+    yes_bid_dollars?: string; yes_ask_dollars?: string;
+    last_price_dollars?: string; previous_yes_bid_dollars?: string;
+    // Legacy numeric fields (some API versions)
+    yes_bid?: number; last_price?: number; previous_yes_bid?: number;
+    volume_fp?: string; volume?: number;
+    volume_24h_fp?: string; volume_24h?: number;
+    open_interest_fp?: string; liquidity_dollars?: string; liquidity?: number;
+    close_time: string; created_time: string; status: string;
+  }[];
 }
 
-async function fetchKalshiMarkets(): Promise<KalshiMarketRaw[]> {
-  const all: KalshiMarketRaw[] = [];
+async function fetchKalshiEvents(): Promise<KalshiEvent[]> {
+  const all: KalshiEvent[] = [];
   let cursor: string | undefined;
   for (let page = 0; page < 5; page++) {
-    const url = `${KALSHI_BASE}/markets?status=open&limit=200${cursor ? `&cursor=${cursor}` : ""}`;
-    console.log(`  Kalshi page ${page + 1}...`);
+    const url = `${KALSHI_BASE}/events?status=open&limit=200&with_nested_markets=true${cursor ? `&cursor=${cursor}` : ""}`;
+    console.log(`  Kalshi events page ${page + 1}...`);
     const res = await fetch(url);
     if (!res.ok) { console.error(`  Kalshi API ${res.status}`); break; }
     const data = await res.json();
-    const markets: KalshiMarketRaw[] = data.markets || [];
-    all.push(...markets);
+    const events: KalshiEvent[] = data.events || [];
+    all.push(...events);
     cursor = data.cursor;
-    if (!cursor || markets.length === 0) break;
+    if (!cursor || events.length === 0) break;
   }
   return all;
 }
@@ -156,9 +166,9 @@ async function ingestMarkets() {
   const polyEvents = await fetchPolymarketEvents();
   console.log(`  Got ${polyEvents.length} events`);
 
-  console.log("\n=== Fetching Kalshi markets ===");
-  const kalshiMarkets = await fetchKalshiMarkets();
-  console.log(`  Got ${kalshiMarkets.length} markets`);
+  console.log("\n=== Fetching Kalshi events ===");
+  const kalshiEvents = await fetchKalshiEvents();
+  console.log(`  Got ${kalshiEvents.length} events`);
 
   // Fetch existing prices to compute real change_24h
   console.log("  Loading existing prices for change computation...");
@@ -171,91 +181,148 @@ async function ingestMarkets() {
 
   const rows: any[] = [];
 
-  // Transform Polymarket
+  // Transform Polymarket — one row per EVENT (parent question), not per outcome
   for (const ev of polyEvents) {
     if (!ev.markets?.length) continue;
+    if ((ev.volume || 0) < 5000) continue; // skip low-volume noise
 
-    // For multi-outcome events (>2 markets), ingest each sub-market individually
-    // For binary events (1-2 markets), ingest the first market with the event title
-    const isBinary = ev.markets.length <= 2;
-    const marketsToProcess = isBinary ? [ev.markets[0]] : ev.markets;
+    const isBinary = ev.markets.length === 1;
+    let price = 50;
+    let tokenIds: string[] | null = null;
+    let allOutcomes: string[] = ["Yes", "No"];
+    let allPrices: number[] = [0.5, 0.5];
 
-    for (const m of marketsToProcess) {
-      // outcomePrices is a JSON string like '["0.68","0.32"]'
+    if (isBinary) {
+      const m = ev.markets[0];
       const rawPrices = safeParse<string[]>(m.outcomePrices || "[]", ["0.5", "0.5"]);
-      const prices = rawPrices.map((p: any) => parseFloat(String(p)) || 0);
-      const outcomes = safeParse<string[]>(m.outcomes || '["Yes","No"]', ["Yes", "No"]);
-      const tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
-      const yesPrice = prices[0] || 0;
-      const price = Math.round(yesPrice * 100);
-      if (price <= 1 || price >= 99) continue;
-
-      const question = isBinary ? (ev.title || m.question) : (m.groupItemTitle || m.question || ev.title);
-      const marketId = m.slug || `${ev.slug}-${m.id}`.slice(0, 100);
-      const oldPrice = oldPrices.get(marketId);
-      const change24h = oldPrice && oldPrice > 0 ? Math.round(((price - oldPrice) / oldPrice) * 1000) / 10 : 0;
-      const daysLeft = Math.max(0, Math.round((new Date(m.endDate || ev.endDate).getTime() - Date.now()) / 86400000));
-      rows.push({
-        id: marketId,
-        question,
-        slug: m.slug || ev.slug,
-        platform: "Polymarket",
-        category: guessCategory(question, ev.tags),
-        price,
-        previous_price: oldPrice ?? null,
-        change_24h: change24h,
-        volume: m.volume || ev.volume || 0,
-        volume_24h: m.volume24hr || 0,
-        liquidity: m.liquidity || 0,
-        traders: Math.floor((m.volume || 0) / 500) + 100,
-        end_date: m.endDate || ev.endDate || null,
-        days_left: daysLeft,
-        outcomes,
-        outcome_prices: prices,
-        clob_token_ids: tokenIds,
-        ticker: null,
-        url: `https://polymarket.com/event/${ev.slug}`,
-        description: ev.description || question,
-        resolved: m.closed,
-        resolution: null,
-      });
+      const parsed = rawPrices.map((p: any) => parseFloat(String(p)) || 0);
+      price = Math.round((parsed[0] || 0.5) * 100);
+      tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
+      allOutcomes = safeParse<string[]>(m.outcomes || '["Yes","No"]', ["Yes", "No"]);
+      allPrices = parsed;
+    } else {
+      // Multi-outcome: use the highest-priced outcome as representative
+      let maxPrice = 0;
+      allOutcomes = [];
+      allPrices = [];
+      for (const m of ev.markets) {
+        const rawPrices = safeParse<string[]>(m.outcomePrices || "[]", ["0"]);
+        const p = parseFloat(String(rawPrices[0])) || 0;
+        const label = m.groupItemTitle || m.question || "Option";
+        allOutcomes.push(label);
+        allPrices.push(p);
+        if (p > maxPrice) {
+          maxPrice = p;
+          tokenIds = m.clobTokenIds ? safeParse<string[]>(m.clobTokenIds, []) : null;
+        }
+      }
+      price = Math.round(maxPrice * 100);
     }
-  }
 
-  // Transform Kalshi
-  for (const km of kalshiMarkets) {
-    const price = Math.round((km.last_price || km.yes_bid || 0.5) * 100);
     if (price <= 1 || price >= 99) continue;
-    const kalshiId = km.ticker.toLowerCase();
-    const oldKalshiPrice = oldPrices.get(kalshiId);
-    // Use Supabase old price if available, otherwise Kalshi's previous_yes_bid
-    const prevPrice = oldKalshiPrice ?? Math.round((km.previous_yes_bid || km.last_price || 0.5) * 100);
-    const change = prevPrice > 0 ? Math.round(((price - prevPrice) / prevPrice) * 1000) / 10 : 0;
-    const title = km.title || km.subtitle || km.yes_sub_title || km.ticker;
-    const daysLeft = Math.max(0, Math.round((new Date(km.close_time).getTime() - Date.now()) / 86400000));
+
+    const eventId = ev.slug || ev.id;
+    const oldPrice = oldPrices.get(eventId);
+    const change24h = oldPrice && oldPrice > 0 ? Math.round(((price - oldPrice) / oldPrice) * 1000) / 10 : 0;
+    const daysLeft = Math.max(0, Math.round((new Date(ev.endDate).getTime() - Date.now()) / 86400000));
+    const traders = ev.numTraders || Math.floor((ev.volume || 0) / 500);
 
     rows.push({
-      id: km.ticker.toLowerCase(),
-      question: title,
-      slug: km.ticker.toLowerCase(),
-      platform: "Kalshi",
-      category: guessCategory(title),
+      id: eventId,
+      question: ev.title,
+      slug: ev.slug,
+      platform: "Polymarket",
+      category: ev.category || guessCategory(ev.title, ev.tags),
       price,
-      previous_price: prevPrice,
-      change_24h: change,
-      volume: km.volume || 0,
-      volume_24h: km.volume_24h || 0,
-      liquidity: km.liquidity || 0,
-      traders: Math.floor((km.volume || 0) / 200) + 50,
-      end_date: km.close_time || null,
+      previous_price: oldPrice ?? null,
+      change_24h: change24h,
+      volume: ev.volume || 0,
+      volume_24h: 0,
+      liquidity: ev.liquidity || 0,
+      traders,
+      end_date: ev.endDate || null,
       days_left: daysLeft,
-      outcomes: ["Yes", "No"],
-      outcome_prices: [km.last_price || 0.5, 1 - (km.last_price || 0.5)],
+      outcomes: allOutcomes,
+      outcome_prices: allPrices,
+      clob_token_ids: tokenIds,
+      ticker: null,
+      url: `https://polymarket.com/event/${ev.slug}`,
+      description: ev.description || ev.title,
+      resolved: false,
+      resolution: null,
+    });
+  }
+
+  // Transform Kalshi — one row per EVENT (parent question), not per market outcome
+  for (const kev of kalshiEvents) {
+    if (!kev.markets?.length) continue;
+
+    // Helper: parse Kalshi dollar strings like "0.0800" or fallback to numeric fields
+    const kPrice = (m: any) => parseFloat(m.last_price_dollars || "") || Number(m.last_price) || 0;
+    const kBid = (m: any) => parseFloat(m.yes_bid_dollars || "") || Number(m.yes_bid) || 0;
+    const kVol = (m: any) => parseFloat(m.volume_fp || "") || Number(m.volume) || 0;
+    const kLiq = (m: any) => parseFloat(m.liquidity_dollars || "") || Number(m.liquidity) || 0;
+
+    // Aggregate volume across all markets in this event
+    const totalVol = kev.markets.reduce((s, m) => s + kVol(m), 0);
+    const totalLiq = kev.markets.reduce((s, m) => s + kLiq(m), 0);
+    if (totalVol < 100) continue; // skip very low volume
+
+    const isBinary = kev.markets.length === 1;
+    let price = 50;
+    let bestTicker = kev.markets[0]?.ticker || kev.event_ticker;
+    let closeTime = kev.markets[0]?.close_time;
+
+    if (isBinary) {
+      const m = kev.markets[0];
+      price = Math.round((kPrice(m) || kBid(m) || 0.5) * 100);
+      bestTicker = m.ticker;
+      closeTime = m.close_time;
+    } else {
+      // Multi-outcome: find the highest-volume market
+      let maxVol = 0;
+      for (const m of kev.markets) {
+        const v = kVol(m);
+        if (v > maxVol) {
+          maxVol = v;
+          price = Math.round((kPrice(m) || kBid(m) || 0.5) * 100);
+          bestTicker = m.ticker;
+          closeTime = m.close_time;
+        }
+      }
+    }
+
+    if (price <= 1 || price >= 99) continue;
+
+    const kalshiId = `kalshi-${kev.event_ticker.toLowerCase()}`;
+    const oldKalshiPrice = oldPrices.get(kalshiId);
+    const prevPrice = oldKalshiPrice ?? price;
+    const change = prevPrice > 0 && prevPrice !== price ? Math.round(((price - prevPrice) / prevPrice) * 1000) / 10 : 0;
+    const title = kev.title || kev.event_ticker;
+    const daysLeft = closeTime ? Math.max(0, Math.round((new Date(closeTime).getTime() - Date.now()) / 86400000)) : 0;
+
+    rows.push({
+      id: kalshiId,
+      question: title,
+      slug: kev.event_ticker.toLowerCase(),
+      platform: "Kalshi",
+      category: kev.category || guessCategory(title),
+      price,
+      previous_price: oldKalshiPrice ?? null,
+      change_24h: change,
+      volume: totalVol,
+      volume_24h: 0,
+      liquidity: totalLiq,
+      traders: Math.floor(totalVol / 200),
+      end_date: closeTime || null,
+      days_left: daysLeft,
+      outcomes: kev.markets.map((m) => m.yes_sub_title || m.title || m.ticker),
+      outcome_prices: kev.markets.map((m) => kPrice(m)),
       clob_token_ids: null,
-      ticker: km.ticker,
-      url: `https://kalshi.com/markets/${km.ticker}`,
+      ticker: bestTicker,
+      url: `https://kalshi.com/markets/${bestTicker}`,
       description: `${title} — Resolves based on official outcomes.`,
-      resolved: km.status === "settled",
+      resolved: kev.status === "settled",
       resolution: null,
     });
   }

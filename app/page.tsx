@@ -79,7 +79,7 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
           <text x={x + width / 2} y={y + height / 2 - 6} textAnchor="middle" fill="#e2e8f0" fontSize={width > 120 ? 11 : 9} fontWeight={600}>{name}</text>
           <text x={x + width / 2} y={y + height / 2 + 10} textAnchor="middle" fill={color} fontSize={10} fontWeight={700}>{change >= 0 ? "+" : ""}{change.toFixed(1)}%</text>
           {width > 100 && height > 55 && (
-            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#8892b0" fontSize={8}>${(size / 100).toFixed(1)}M vol</text>
+            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#8892b0" fontSize={8}>${(size / 1000).toFixed(1)}M vol</text>
           )}
         </>
       )}

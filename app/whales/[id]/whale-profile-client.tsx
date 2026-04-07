@@ -74,38 +74,6 @@ import { markets, whaleById } from "@/lib/mockData";
 import { ShareCardButton } from "@/components/ui/share-card-button";
 import { WatchlistButton } from "@/components/ui/watchlist-button";
 
-// ─── SMART MONEY GAUGE ───────────────────────────────────────────────
-function SmartMoneyGauge({ value }: { value: number }) {
-  const angle = (value / 100) * 180 - 90;
-  const rad = (angle * Math.PI) / 180;
-  const nx = 100 + 60 * Math.cos(rad);
-  const ny = 90 + 60 * Math.sin(rad);
-  const tier = value >= 80 ? "Elite" : value >= 70 ? "Top Tier" : value >= 60 ? "Above Avg" : value >= 50 ? "Average" : "Below Avg";
-  const tierColor = value >= 70 ? "#57D7BA" : value >= 60 ? "#22c55e" : value >= 50 ? "#f59e0b" : "#ef4444";
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 110" className="w-32 h-auto">
-        <defs>
-          <linearGradient id="whaleGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ef4444" />
-            <stop offset="40%" stopColor="#f59e0b" />
-            <stop offset="70%" stopColor="#22c55e" />
-            <stop offset="100%" stopColor="#57D7BA" />
-          </linearGradient>
-        </defs>
-        <path d="M 25 90 A 75 75 0 0 1 175 90" fill="none" stroke="#2a2f45" strokeWidth="10" strokeLinecap="round" />
-        <path d="M 25 90 A 75 75 0 0 1 175 90" fill="none" stroke="url(#whaleGaugeGrad)" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${(value / 100) * 236} 236`} />
-        <line x1="100" y1="90" x2={nx} y2={ny} stroke="#57D7BA" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="100" cy="90" r="3.5" fill="#57D7BA" />
-        <text x="100" y="78" textAnchor="middle" fill="#e2e8f0" fontSize="20" fontWeight="700">{value}</text>
-      </svg>
-      <span className="text-xs font-bold mt-0.5" style={{ color: tierColor }}>{tier}</span>
-      <span className="text-[9px] text-[#8892b0] uppercase tracking-widest">Smart Money Score</span>
-    </div>
-  );
-}
-
 // ─── SORT HELPERS ────────────────────────────────────────────────────
 type HistSortKey = "size" | "pnl" | "date";
 type HistSortDir = "asc" | "desc";
@@ -228,7 +196,7 @@ export default function WhaleProfilePage() {
                   <span className="px-2 py-0.5 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-semibold">
                     Rank #{whale.rank}
                   </span>
-                  {whale.streak > 0 && (
+                  {whale.streak >= 5 && (
                     <span className="px-2 py-0.5 rounded-full bg-[#22c55e]/10 text-[#22c55e] text-[10px] font-semibold flex items-center gap-1">
                       <Flame className="size-2.5" />
                       {whale.streak}-trade win streak
@@ -248,11 +216,10 @@ export default function WhaleProfilePage() {
             </div>
           </div>
 
-          {/* Gauge + Key Stats */}
+          {/* Key Stats */}
           <Card className="bg-[#222638] border-[#2a2f45] lg:min-w-[260px] shrink-0">
             <CardContent className="p-5 flex flex-col items-center">
-              <SmartMoneyGauge value={whale.accuracy} />
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2 mt-4 pt-4 border-t border-[#2a2f45] w-full">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full">
                 <div className="text-center">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Accuracy</div>
                   <div className="text-lg font-bold font-mono text-[#57D7BA]">{whale.accuracy}%</div>

@@ -128,7 +128,7 @@ function dbWhaleToFrontend(row: any, idx: number): Whale {
     bestCatColor: CATEGORY_COLORS[bestCat] || "#57D7BA",
     worstCategory: "Sports",
     streak: pnlNum > 1_000_000 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 5),
-    bio: `Polymarket trader ranked #${rank} by P&L. ${row.markets_traded || 0} markets traded.`,
+    bio: `Polymarket trader ranked #${rank} by P&L.${row.positions_count > 0 ? ` ${row.positions_count} active positions.` : ""}`,
     verified: rank <= 10,
     smart: pnlNum > 500_000,
     brier: Math.round(estimatedBrier * 100) / 100,
