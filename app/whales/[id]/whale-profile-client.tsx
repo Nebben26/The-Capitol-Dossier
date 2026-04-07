@@ -86,6 +86,132 @@ function parseDollar(s: string): number {
   return num;
 }
 
+// ─── HOLDINGS TAB (real Supabase data) ───────────────────────────────
+function HoldingsTab({ whaleId }: { whaleId: string }) {
+  const [positions, setPositions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { getWhalePositions } = await import("@/lib/api");
+      const { data } = await getWhalePositions(whaleId);
+      setPositions(data);
+      setLoading(false);
+    })();
+  }, [whaleId]);
+
+  if (loading) return <div className="py-12 text-center text-sm text-[#8892b0]">Loading holdings...</div>;
+  if (positions.length === 0) return <div className="py-12 text-center text-sm text-[#8892b0]">No active positions found.</div>;
+
+  return (
+    <Card className="bg-[#222638] border-[#2a2f45]">
+      <CardContent className="px-0 pb-2">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-[#2a2f45] hover:bg-transparent">
+              <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">Market</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Outcome</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Shares</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Avg Price</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Value</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">P&L</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {positions.map((p, i) => (
+              <TableRow key={i} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                <TableCell className="pl-4 py-2 max-w-[200px]">
+                  <Link href={`/markets/${p.market_id}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors truncate block" title={p.market_id}>
+                    {p.market_id}
+                  </Link>
+                </TableCell>
+                <TableCell className="py-2">
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.outcome === "Yes" || p.outcome === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
+                    {p.outcome}
+                  </span>
+                </TableCell>
+                <TableCell className="py-2"><span className="font-mono text-xs text-[#8892b0]">{Math.round(p.size).toLocaleString()}</span></TableCell>
+                <TableCell className="py-2"><span className="font-mono text-xs text-[#8892b0]">{Math.round(p.avg_price * 100)}¢</span></TableCell>
+                <TableCell className="py-2"><span className="font-mono text-xs text-[#e2e8f0]">${Math.abs(p.current_value) >= 1000 ? `${(p.current_value / 1000).toFixed(1)}K` : p.current_value.toFixed(0)}</span></TableCell>
+                <TableCell className="pr-4 py-2">
+                  <span className={`font-mono text-xs font-semibold ${p.pnl >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                    {p.pnl >= 0 ? "+" : ""}{Math.abs(p.pnl) >= 1000 ? `$${(p.pnl / 1000).toFixed(1)}K` : `$${p.pnl.toFixed(0)}`}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── TRADES TAB (real Supabase data) ─────────────────────────────────
+function TradesTab({ whaleId }: { whaleId: string }) {
+  const [trades, setTrades] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { getWhaleTrades } = await import("@/lib/api");
+      const { data } = await getWhaleTrades(whaleId);
+      setTrades(data);
+      setLoading(false);
+    })();
+  }, [whaleId]);
+
+  if (loading) return <div className="py-12 text-center text-sm text-[#8892b0]">Loading trades...</div>;
+  if (trades.length === 0) return <div className="py-12 text-center text-sm text-[#8892b0]">No recent trades found.</div>;
+
+  const relTime = (ts: string) => {
+    const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  };
+
+  return (
+    <Card className="bg-[#222638] border-[#2a2f45]">
+      <CardContent className="px-0 pb-2">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-[#2a2f45] hover:bg-transparent">
+              <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">Time</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Side</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Market</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Outcome</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium">Size</TableHead>
+              <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">Price</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {trades.map((t, i) => (
+              <TableRow key={i} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                <TableCell className="pl-4 py-2"><span className="text-[10px] text-[#8892b0]">{relTime(t.timestamp)}</span></TableCell>
+                <TableCell className="py-2">
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${t.side === "BUY" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
+                    {t.side}
+                  </span>
+                </TableCell>
+                <TableCell className="py-2 max-w-[180px]">
+                  <Link href={`/markets/${t.market_id}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors truncate block" title={t.market_id}>
+                    {t.market_id}
+                  </Link>
+                </TableCell>
+                <TableCell className="py-2"><span className="text-[10px] text-[#8892b0]">{t.outcome}</span></TableCell>
+                <TableCell className="py-2"><span className="font-mono text-xs text-[#e2e8f0]">${t.size_usd >= 1000 ? `${(t.size_usd / 1000).toFixed(1)}K` : t.size_usd.toFixed(0)}</span></TableCell>
+                <TableCell className="pr-4 py-2"><span className="font-mono text-xs text-[#8892b0]">{Math.round(t.price * 100)}¢</span></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── MAIN PAGE ──────────────────────────────────────────────────────
 export default function WhaleProfilePage() {
   const params = useParams();
@@ -266,13 +392,13 @@ export default function WhaleProfilePage() {
         </div>
 
         {/* ─── TABS ────────────────────────────────────────────────── */}
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue="holdings">
           <div className="border-b border-[#2a2f45] -mx-4 px-4 overflow-x-auto scrollbar-none">
             <TabsList variant="line" className="bg-transparent gap-0">
               {[
-                { val: "overview", icon: Activity, label: "Overview" },
-                { val: "onchain", icon: Zap, label: "On-Chain" },
-                { val: "positions", icon: Wallet, label: "Current Positions" },
+                { val: "holdings", icon: Wallet, label: "Holdings" },
+                { val: "trades", icon: Zap, label: "Recent Trades" },
+                { val: "positions", icon: Activity, label: "Legacy Positions" },
                 { val: "history", icon: Clock, label: "Historical Trades" },
                 { val: "categories", icon: BarChart3, label: "Category Performance" },
                 { val: "calibration", icon: Crosshair, label: "Calibration" },
@@ -289,14 +415,14 @@ export default function WhaleProfilePage() {
             </TabsList>
           </div>
 
-          {/* ─── OVERVIEW TAB ──────────────────────────────────────── */}
-          <TabsContent value="overview" className="pt-5">
-            <div className="flex items-center justify-center py-16">
-              <p className="text-sm text-[#8892b0] text-center max-w-md">
-                Detailed performance analytics will populate as we accumulate trade history for this wallet.
-                Check the <span className="text-[#57D7BA]">On-Chain Positions</span> tab for current holdings.
-              </p>
-            </div>
+          {/* ─── HOLDINGS TAB (real Supabase data) ─────────────────── */}
+          <TabsContent value="holdings" className="pt-5">
+            <HoldingsTab whaleId={id} />
+          </TabsContent>
+
+          {/* ─── RECENT TRADES TAB (real Supabase data) ────────────── */}
+          <TabsContent value="trades" className="pt-5">
+            <TradesTab whaleId={id} />
           </TabsContent>
 
           {/* ─── ON-CHAIN POSITIONS TAB ──────────────────────────── */}

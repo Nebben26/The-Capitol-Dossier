@@ -354,10 +354,80 @@ export async function getWhaleById(address: string): Promise<ApiResult<Whale | u
 }
 
 /**
- * Get positions for a whale (currently mock — would need Supabase positions table).
+ * Get positions for a whale from whale_positions table.
  */
 export async function getOnChainPositions(whaleId: string): Promise<ApiResult<Position[]>> {
   return { data: mockPositions, source: "mock" };
+}
+
+/**
+ * Get whale holdings from Supabase whale_positions table.
+ */
+export async function getWhalePositions(whaleId: string): Promise<{
+  data: { market_id: string; outcome: string; size: number; avg_price: number; current_value: number; pnl: number }[];
+  source: DataSource;
+}> {
+  if (!isSupabaseConfigured()) return { data: [], source: "mock" };
+  try {
+    const { data, error } = await supabase
+      .from("whale_positions")
+      .select("market_id, outcome, size, avg_price, current_value, pnl")
+      .eq("whale_id", whaleId)
+      .order("current_value", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return { data: data || [], source: "live" };
+  } catch (err) {
+    console.error("[getWhalePositions]", err);
+    return { data: [], source: "mock" };
+  }
+}
+
+/**
+ * Get whale trade history from Supabase whale_trades table.
+ */
+export async function getWhaleTrades(whaleId: string): Promise<{
+  data: { market_id: string; side: string; outcome: string; size_usd: number; price: number; timestamp: string }[];
+  source: DataSource;
+}> {
+  if (!isSupabaseConfigured()) return { data: [], source: "mock" };
+  try {
+    const { data, error } = await supabase
+      .from("whale_trades")
+      .select("market_id, side, outcome, size_usd, price, timestamp")
+      .eq("wallet_address", whaleId)
+      .order("timestamp", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return { data: data || [], source: "live" };
+  } catch (err) {
+    console.error("[getWhaleTrades]", err);
+    return { data: [], source: "mock" };
+  }
+}
+
+/**
+ * Get spread history for a disagreement pair from disagreement_snapshots.
+ */
+export async function getSpreadHistory(polyId: string, kalshiId: string): Promise<{
+  data: { spread: number; captured_at: string }[];
+  source: DataSource;
+}> {
+  if (!isSupabaseConfigured()) return { data: [], source: "mock" };
+  try {
+    const { data, error } = await supabase
+      .from("disagreement_snapshots")
+      .select("spread, captured_at")
+      .eq("poly_market_id", polyId)
+      .eq("kalshi_market_id", kalshiId)
+      .order("captured_at", { ascending: true })
+      .limit(500);
+    if (error) throw error;
+    return { data: data || [], source: "live" };
+  } catch (err) {
+    console.error("[getSpreadHistory]", err);
+    return { data: [], source: "mock" };
+  }
 }
 
 /**

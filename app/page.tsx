@@ -69,16 +69,24 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
   const { x = 0, y = 0, width = 0, height = 0, name, change, size = 0 } = props;
   if (width < 50 || height < 30 || !name || size < 100 || change === undefined || change === null) return null;
   const color = change >= 0 ? "#22c55e" : "#ef4444";
-  const bgOpacity = Math.min(Math.abs(change) / 12, 0.85);
+  const bgOpacity = Math.max(0.15, Math.min(Math.abs(change) / 8, 0.85));
   return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={bgOpacity} stroke="#1a1e2e" strokeWidth={2} rx={4} />
+    <g className="cursor-pointer" style={{ filter: "brightness(1)" }}>
+      <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={bgOpacity} stroke="#1a1e2e" strokeWidth={2} rx={6} />
       {width > 70 && height > 40 && (
         <>
-          <text x={x + width / 2} y={y + height / 2 - 6} textAnchor="middle" fill="#e2e8f0" fontSize={width > 120 ? 11 : 9} fontWeight={600}>{name}</text>
-          <text x={x + width / 2} y={y + height / 2 + 10} textAnchor="middle" fill={color} fontSize={10} fontWeight={700}>{change >= 0 ? "+" : ""}{change.toFixed(1)}%</text>
-          {width > 100 && height > 55 && (
-            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#8892b0" fontSize={8}>${(size / 1000).toFixed(1)}M vol</text>
+          <text x={x + width / 2} y={y + height / 2 - (width > 100 && height > 55 ? 8 : 2)} textAnchor="middle" fill="#e2e8f0" fontSize={width > 140 ? 11 : 9} fontWeight={600}>
+            {name.length > Math.floor(width / 7) ? name.slice(0, Math.floor(width / 7) - 1) + "…" : name}
+          </text>
+          {width > 80 && height > 40 && (
+            <text x={x + width / 2} y={y + height / 2 + (width > 100 && height > 55 ? 8 : 12)} textAnchor="middle" fill={color} fontSize={12} fontWeight={700}>
+              {change >= 0 ? "+" : ""}{change.toFixed(1)}%
+            </text>
+          )}
+          {width > 110 && height > 60 && (
+            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#8892b0" fontSize={8}>
+              ${(size / 1000).toFixed(1)}M vol
+            </text>
           )}
         </>
       )}
@@ -382,7 +390,7 @@ export default function HomePage() {
                       <TableCell className="pl-4 py-2.5 max-w-[180px]">
                         <Tooltip>
                           <TooltipTrigger>
-                            <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors leading-tight line-clamp-1 text-left block truncate">
+                            <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors leading-tight text-left block truncate max-w-[220px]" title={m.q}>
                               {m.q}
                             </Link>
                           </TooltipTrigger>
@@ -515,7 +523,7 @@ export default function HomePage() {
           </div>
         </CardHeader>
         <CardContent className="pb-3">
-          <div className="h-64 sm:h-80 w-full">
+          <div className="h-64 sm:h-80 w-full rounded-lg border border-[#2f374f] overflow-hidden">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <Treemap data={treemapData.filter(t => t.name && t.size >= 100 && typeof t.change === 'number')} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
             </ResponsiveContainer>
