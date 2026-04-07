@@ -56,7 +56,6 @@ import {
   Star,
   UserPlus,
   BadgeCheck,
-  Brain,
   Flame,
 } from "lucide-react";
 import { LastUpdated } from "@/components/layout/LastUpdated";
@@ -253,7 +252,7 @@ export default function LeaderboardPage() {
                 <LastUpdated />
                 <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-semibold">
                   <Users className="size-3" />
-                  2,847 tracked
+                  {traders.length} tracked
                 </span>
               </div>
             </div>
@@ -305,14 +304,20 @@ export default function LeaderboardPage() {
               </div>
             </div>
 
-            {/* ─── SUMMARY CARDS ───────────────────────────────────── */}
+            {/* ─── SUMMARY CARDS (computed from real data) ──────────── */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "Total Volume", val: "$488M", icon: BarChart3, color: "#57D7BA", sub: "+12% this week" },
-                { label: "Avg Win Rate", val: "67%", icon: Target, color: "#22c55e", sub: "Top 15 traders" },
-                { label: "Best Brier Score", val: "0.10", icon: Brain, color: "#f59e0b", sub: "QuantWhale" },
-                { label: "Longest Streak", val: "14 wins", icon: Flame, color: "#ec4899", sub: "QuantWhale" },
-              ].map((s) => (
+              {(() => {
+                const totalVol = traders.reduce((s, w) => s + w.volumeNum, 0);
+                const avgWR = traders.length > 0 ? Math.round(traders.reduce((s, w) => s + w.winRate, 0) / traders.length) : 0;
+                const topWhale = traders[0];
+                const mostActive = [...traders].sort((a, b) => b.totalTrades - a.totalTrades)[0];
+                return [
+                  { label: "Total Volume", val: totalVol >= 1e9 ? `$${(totalVol / 1e9).toFixed(1)}B` : `$${(totalVol / 1e6).toFixed(0)}M`, icon: BarChart3, color: "#57D7BA", sub: `${traders.length} whales` },
+                  { label: "Avg Win Rate", val: `${avgWR}%`, icon: Target, color: "#22c55e", sub: `Top ${traders.length} traders` },
+                  { label: "Top P&L", val: topWhale?.totalPnl || "$0", icon: Trophy, color: "#f59e0b", sub: topWhale?.name || "—" },
+                  { label: "Most Active", val: `${mostActive?.totalTrades || 0} trades`, icon: Flame, color: "#ec4899", sub: mostActive?.name || "—" },
+                ];
+              })().map((s) => (
                 <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
                   <CardContent className="p-3 flex items-center gap-3">
                     <div className="size-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${s.color}15` }}>

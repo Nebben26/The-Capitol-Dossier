@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Send } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function XLogo({ className = "" }: { className?: string }) {
@@ -36,13 +36,8 @@ export function CopyAlertButton({
     });
   };
 
-  const handlePostX = () => {
-    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "width=550,height=420");
-  };
-
-  const handleTelegram = () => {
-    window.open(`https://t.me/share/url?text=${encodeURIComponent(text)}`, "_blank", "width=550,height=420");
-  };
+  const xHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  const tgHref = `https://t.me/share/url?text=${encodeURIComponent(text)}`;
 
   if (compact) {
     return (
@@ -50,12 +45,12 @@ export function CopyAlertButton({
         <button onClick={handleCopy} className="p-1 rounded hover:bg-[#57D7BA]/10 text-[#8892b0] hover:text-[#57D7BA] transition-colors" title="Copy text">
           {copied ? <Check className="size-3 text-[#22c55e]" /> : <Copy className="size-3" />}
         </button>
-        <button onClick={handleTelegram} className="p-1 rounded hover:bg-[#2AABEE]/10 text-[#8892b0] hover:text-[#2AABEE] transition-colors" title="Send to Telegram">
+        <a href={tgHref} target="_blank" rel="noopener noreferrer" className="p-1 rounded hover:bg-[#2AABEE]/10 text-[#8892b0] hover:text-[#2AABEE] transition-colors" title="Send to Telegram">
           <TelegramLogo className="size-3" />
-        </button>
-        <button onClick={handlePostX} className="p-1 rounded hover:bg-[#e2e8f0]/10 text-[#8892b0] hover:text-[#e2e8f0] transition-colors" title="Post to X">
+        </a>
+        <a href={xHref} target="_blank" rel="noopener noreferrer" className="p-1 rounded hover:bg-[#e2e8f0]/10 text-[#8892b0] hover:text-[#e2e8f0] transition-colors" title="Post to X">
           <XLogo className="size-3" />
-        </button>
+        </a>
       </div>
     );
   }
@@ -65,12 +60,12 @@ export function CopyAlertButton({
       <Button variant="ghost" size="icon-xs" onClick={handleCopy} className="text-[#8892b0] hover:text-[#57D7BA]" title="Copy">
         {copied ? <Check className="size-3 text-[#22c55e]" /> : <Copy className="size-3" />}
       </Button>
-      <Button variant="ghost" size="icon-xs" onClick={handleTelegram} className="text-[#8892b0] hover:text-[#2AABEE]" title="Telegram">
+      <a href={tgHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center size-7 rounded-md text-[#8892b0] hover:text-[#2AABEE] hover:bg-[#2AABEE]/10 transition-colors" title="Telegram">
         <TelegramLogo className="size-3" />
-      </Button>
-      <Button variant="ghost" size="icon-xs" onClick={handlePostX} className="text-[#8892b0] hover:text-[#e2e8f0]" title="Post to X">
+      </a>
+      <a href={xHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center size-7 rounded-md text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#e2e8f0]/10 transition-colors" title="Post to X">
         <XLogo className="size-3" />
-      </Button>
+      </a>
     </div>
   );
 }
