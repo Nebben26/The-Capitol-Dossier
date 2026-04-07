@@ -449,7 +449,7 @@ export default function AlertsPage() {
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
+          
         </div>
       </footer>
     </div>

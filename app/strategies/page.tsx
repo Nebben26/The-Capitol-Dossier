@@ -359,130 +359,17 @@ export default function StrategiesPage() {
                   </CardContent>
                 </Card>
 
-                {/* ─── BACKTEST RESULTS ──────────────────────────────── */}
+                {/* ─── BACKTEST RESULTS (coming soon) ──────────────────── */}
                 {backtestRun && (
-                  <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
-                    {/* Performance summary */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {[
-                        { label: "Total Return", val: "+28.4%", color: "#22c55e", icon: TrendingUp },
-                        { label: "CAGR", val: "28%", color: "#57D7BA", icon: LineChartIcon },
-                        { label: "Max Drawdown", val: "-18.6%", color: "#ef4444", icon: TrendingDown },
-                        { label: "Win Rate", val: "61%", color: "#f59e0b", icon: Target },
-                      ].map((s) => (
-                        <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
-                          <CardContent className="p-4 text-center">
-                            <s.icon className="size-5 mx-auto mb-1" style={{ color: s.color }} />
-                            <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.val}</div>
-                            <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mt-0.5">{s.label}</div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-
-                    {/* Additional stats */}
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                      {[
-                        { label: "Sharpe Ratio", val: "1.2" },
-                        { label: "Sortino Ratio", val: "1.6" },
-                        { label: "Avg Trade", val: "+$420" },
-                        { label: "Avg Hold Time", val: "12.4 days" },
-                        { label: "Total Trades", val: "34" },
-                      ].map((s) => (
-                        <div key={s.label} className="p-3 rounded-lg bg-[#222638] border border-[#2a2f45] text-center">
-                          <div className="text-sm font-bold font-mono text-[#e2e8f0]">{s.val}</div>
-                          <div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">{s.label}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Equity curve */}
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-sm flex items-center gap-2">
-                            <BarChart3 className="size-4 text-[#57D7BA]" />
-                            Equity Curve
-                          </CardTitle>
-                          <div className="flex items-center gap-3 text-[10px]">
-                            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-[#57D7BA]" />Strategy</span>
-                            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-[#8892b0]" />Buy & Hold</span>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-3">
-                        <div className="h-64 sm:h-80 w-full">
-                          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                            <AreaChart data={backtestEquity} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                              <defs>
-                                <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor="#57D7BA" stopOpacity={0.3} />
-                                  <stop offset="95%" stopColor="#57D7BA" stopOpacity={0} />
-                                </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                              <XAxis dataKey="day" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(day: number) => { const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const d = new Date(2025, 0, day); return `${months[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`; }} />
-                              <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v) => `$${(v / 1000).toFixed(1)}K`} />
-                              <Area type="monotone" dataKey="equity" stroke="#57D7BA" strokeWidth={2} fill="url(#equityGrad)" />
-                              <Area type="monotone" dataKey="benchmark" stroke="#8892b0" strokeWidth={1} strokeDasharray="4 4" fill="none" />
-                              <ReferenceLine y={10000} stroke="#2a2f45" strokeDasharray="3 3" />
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Trade history */}
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <Clock className="size-4 text-[#6366f1]" />
-                          Backtest Trade History
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="px-0 pb-2">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="border-[#2a2f45] hover:bg-transparent">
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">MARKET</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium">SIDE</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium">ENTRY</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium">EXIT</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium">P&L</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium">RETURN</TableHead>
-                              <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">DATE</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {backtestTrades.map((t) => (
-                              <TableRow key={t.id} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
-                                <TableCell className="pl-4 py-2.5">
-                                  <Link href={`/markets/${t.marketId}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors leading-snug line-clamp-1">
-                                    {t.market}
-                                  </Link>
-                                </TableCell>
-                                <TableCell className="py-2.5">
-                                  <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${t.side === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
-                                    {t.side === "YES" ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
-                                    {t.side}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="py-2.5"><span className="font-mono text-xs text-[#8892b0]">{t.entry}</span></TableCell>
-                                <TableCell className="py-2.5"><span className="font-mono text-xs text-[#8892b0]">{t.exit}</span></TableCell>
-                                <TableCell className="py-2.5">
-                                  <span className={`font-mono text-xs font-semibold ${t.pnl.startsWith("+") ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{t.pnl}</span>
-                                </TableCell>
-                                <TableCell className="py-2.5">
-                                  <span className={`font-mono text-xs font-semibold ${t.pnlPct.startsWith("+") ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{t.pnlPct}</span>
-                                </TableCell>
-                                <TableCell className="pr-4 py-2.5"><span className="text-[10px] text-[#8892b0]">{t.date}</span></TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <Card className="bg-[#222638] border-[#2a2f45]">
+                    <CardContent className="py-16 text-center">
+                      <TrendingUp className="size-12 text-[#2a2f45] mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Backtest not yet available</h3>
+                      <p className="text-sm text-[#8892b0] max-w-md mx-auto">
+                        We&apos;re building the backtesting engine to run against 36,000+ real historical price points. Coming soon.
+                      </p>
+                    </CardContent>
+                  </Card>
                 )}
 
                 {/* Empty state before running */}
@@ -506,7 +393,7 @@ export default function StrategiesPage() {
               <div className="flex items-center gap-3">
                 <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
                 <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-                <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
+                
               </div>
             </footer>
     </div>

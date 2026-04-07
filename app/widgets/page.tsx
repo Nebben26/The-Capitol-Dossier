@@ -208,10 +208,7 @@ export default function WidgetsPage() {
           <p className="text-sm text-[#8892b0] max-w-md mx-auto">
             Our Pro API gives you full programmatic access to build custom widgets, bots, and dashboards.
           </p>
-          <div className="flex items-center justify-center gap-3">
-            <Link href="/api-docs"><Button className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1.5">API Docs <ArrowRight className="size-4" /></Button></Link>
-            <Link href="/pricing"><Button variant="outline" className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA]">View Pricing</Button></Link>
-          </div>
+          <p className="text-xs text-[#8892b0]">API docs and pricing coming soon.</p>
         </CardContent>
       </Card>
 
@@ -220,7 +217,7 @@ export default function WidgetsPage() {
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
+          
         </div>
       </footer>
     </div>

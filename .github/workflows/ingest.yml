@@ -22,3 +22,15 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Trigger Netlify rebuild
+        if: success()
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -n "$NETLIFY_BUILD_HOOK" ]; then
+            curl -X POST -d '{}' "$NETLIFY_BUILD_HOOK"
+            echo "Netlify rebuild triggered"
+          else
+            echo "NETLIFY_BUILD_HOOK secret not set — skipping auto-deploy"
+          fi

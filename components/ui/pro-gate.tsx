@@ -23,7 +23,7 @@ export function TrialBanner() {
       <div className="flex items-center justify-center gap-2 px-4 py-2 bg-[#f59e0b]/10 border border-[#f59e0b]/20 rounded-lg text-xs">
         <Crown className="size-3.5 text-[#f59e0b]" />
         <span className="text-[#f59e0b] font-semibold">Pro Trial — {trialDaysLeft} days left</span>
-        <Link href="/pricing" className="text-[#57D7BA] hover:underline ml-2">Upgrade →</Link>
+        <span className="text-[#8892b0] ml-2">Pro coming soon</span>
       </div>
     );
   }
@@ -94,9 +94,7 @@ export function SidebarUpgradeCard() {
           <span className="text-xs font-semibold text-[#f59e0b]">Pro Trial</span>
         </div>
         <p className="text-[10px] text-[#8892b0] mb-2">{trialDaysLeft} days remaining</p>
-        <Link href="/pricing">
-          <Button className="w-full h-7 text-xs bg-[#f59e0b] text-[#0f1119] hover:bg-[#f59e0b]/80">Upgrade Now</Button>
-        </Link>
+        <Button disabled className="w-full h-7 text-xs bg-[#f59e0b]/50 text-[#0f1119] cursor-not-allowed">Pro Coming Soon</Button>
       </div>
     );
   }
