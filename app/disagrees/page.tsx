@@ -157,7 +157,7 @@ export default function DisagreesPage() {
             The Market Disagrees
           </h1>
           <p className="text-sm text-[#8892b0] mt-1">
-            Cross-platform price spreads ≥ 10pts — where Polymarket and Kalshi see the world differently
+            Cross-platform price spreads — where Polymarket and Kalshi see the world differently
           </p>
         </div>
         <div className="flex items-center gap-2">

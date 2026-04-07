@@ -10,5 +10,10 @@ async function main() {
   console.log("Polymarket:", poly);
   const { count: kalshi } = await sb.from("markets").select("*", { count: "exact", head: true }).eq("platform", "Kalshi");
   console.log("Kalshi:", kalshi);
+  const { count: disagrees } = await sb.from("disagreements").select("*", { count: "exact", head: true });
+  console.log("Disagreements:", disagrees);
+  // Sample disagreement spreads
+  const { data: dSample } = await sb.from("disagreements").select("spread").order("spread", { ascending: false }).limit(20);
+  if (dSample) console.log("Top spreads:", dSample.map((d: any) => d.spread).join(", "));
 }
 main().catch(console.error);

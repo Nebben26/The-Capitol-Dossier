@@ -185,22 +185,27 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
 
   try {
     // Paginate past Supabase's 1000-row default limit
+    // Order by id for deterministic pagination, re-sort by volume in JS after
     const allData: any[] = [];
     for (let from = 0; ; from += 1000) {
       const { data: page, error: pageErr } = await supabase
         .from("markets")
         .select("*")
-        .order("volume", { ascending: false })
+        .order("id", { ascending: true })
         .range(from, from + 999);
-      if (pageErr) throw pageErr;
+      if (pageErr) {
+        console.error(`[getAllMarkets] page ${from} error:`, pageErr.message);
+        throw pageErr;
+      }
       if (!page || page.length === 0) break;
       allData.push(...page);
       if (page.length < 1000) break; // last page
     }
+    console.log(`[getAllMarkets] fetched ${allData.length} markets in ${Math.ceil(allData.length / 1000)} pages`);
+    // Sort by volume descending (what the old single query did)
+    allData.sort((a, b) => (b.volume || 0) - (a.volume || 0));
     const data = allData;
-    const error = null;
 
-    if (error) throw error;
     if (!data || data.length === 0) return { data: mockMarkets, source: "mock" };
 
     const markets = data.map(dbMarketToFrontend);
@@ -646,7 +651,9 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
           d.kalshiVol = kalshiMarket.volume;
         }
       }
-    } catch { /* enrichment is best-effort */ }
+    } catch (enrichErr) {
+      console.error("[getDisagreements] enrichment failed (non-blocking):", enrichErr);
+    }
 
     const result: ApiResult<Disagreement[]> = { data: disagreements, source: "live" };
     setCache("disagreements", result);
