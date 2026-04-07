@@ -1,33 +1,11 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import MarketDetailPage from "./market-detail-client";
 
-export async function generateStaticParams() {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (url && key && !url.includes("your-project")) {
-      const sb = createClient(url, key);
-      const { data, error } = await sb
-        .from("markets")
-        .select("id")
-        .order("volume", { ascending: false })
-        .limit(1500);
-
-      if (!error && data && data.length > 0) {
-        console.log(`[generateStaticParams] Markets: ${data.length} pages from Supabase (zero mock)`);
-        return data.map((r: { id: string }) => ({ id: r.id }));
-      }
-    }
-  } catch (err) {
-    console.error("[generateStaticParams] Supabase fetch failed:", err);
-  }
-  // If Supabase fails, return empty — no mock slugs
-  return [];
-}
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
+  void id;
   return {
     title: `Market | Quiver Markets`,
     description: "Prediction market analytics and intelligence.",
