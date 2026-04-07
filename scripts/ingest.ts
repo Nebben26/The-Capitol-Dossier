@@ -28,17 +28,61 @@ const DATA_API_BASE = "https://data-api.polymarket.com";
 const CLOB_BASE = "https://clob.polymarket.com";
 
 // ─── HELPERS ─────────────────────────────────────────────────────────
+// Map Polymarket/Kalshi API categories to our display categories
+const API_CATEGORY_MAP: Record<string, string> = {
+  "politics": "Elections", "elections": "Elections",
+  "sports": "Sports", "soccer": "Sports", "f1": "Sports", "golf": "Sports",
+  "tennis": "Sports", "nba": "Sports", "nfl": "Sports", "mlb": "Sports",
+  "nhl": "Sports", "mma": "Sports", "boxing": "Sports", "cricket": "Sports",
+  "racing": "Sports", "esports": "Sports",
+  "crypto": "Crypto", "cryptocurrency": "Crypto",
+  "science": "Science", "technology": "Tech",
+  "world": "Geopolitics", "culture": "Culture",
+  "economics": "Economics", "finance": "Economics",
+};
+
+const SPORTS_KEYWORDS = [
+  "league", "championship", "cup", "playoff", "champion", "match", "game",
+  "tournament", "winner", "mvp", "finals", "bowl", "masters", "open",
+  "grand slam", "f1", "race", "premier league", "la liga", "champions league",
+  "nba", "nfl", "mlb", "nhl", "ufc", "fifa", "tennis", "golf", "soccer",
+  "basketball", "football", "baseball", "hockey", "boxing", "mma",
+  "division", "conference", "seeding", "draft", "win the",
+  "eurovision", "sport",
+];
+
 function guessCategory(title: string, tags?: { label: string }[]): string {
   const t = title.toLowerCase();
-  if (tags?.some((tag) => ["politics", "elections", "president", "senate", "congress"].includes(tag.label.toLowerCase()))) return "Elections";
-  if (t.includes("election") || t.includes("president") || t.includes("senate") || t.includes("governor") || t.includes("democrat") || t.includes("republican")) return "Elections";
+  // Check tags first — map known tag labels to categories
+  if (tags?.length) {
+    for (const tag of tags) {
+      const mapped = API_CATEGORY_MAP[tag.label.toLowerCase()];
+      if (mapped) return mapped;
+    }
+  }
+  // Elections
+  if (t.includes("election") || t.includes("president") || t.includes("senate") || t.includes("governor") || t.includes("democrat") || t.includes("republican") || t.includes("nominee")) return "Elections";
+  // Sports — broad keyword check
+  if (SPORTS_KEYWORDS.some((kw) => t.includes(kw))) return "Sports";
+  // Crypto
   if (t.includes("bitcoin") || t.includes("ethereum") || t.includes("crypto") || t.includes("btc") || t.includes("eth") || t.includes("solana")) return "Crypto";
-  if (t.includes("fed") || t.includes("recession") || t.includes("gdp") || t.includes("inflation") || t.includes("rate") || t.includes("stock") || t.includes("s&p") || t.includes("economy")) return "Economics";
-  if (t.includes("nba") || t.includes("nfl") || t.includes("ufc") || t.includes("world cup") || t.includes("super bowl") || t.includes("sports")) return "Sports";
+  // Economics
+  if (t.includes("fed") || t.includes("recession") || t.includes("gdp") || t.includes("inflation") || t.includes("rate cut") || t.includes("stock") || t.includes("s&p") || t.includes("economy") || t.includes("layoff") || t.includes("tariff")) return "Economics";
+  // Tech
   if (t.includes("ai") || t.includes("openai") || t.includes("apple") || t.includes("google") || t.includes("tech") || t.includes("nvidia")) return "Tech";
-  if (t.includes("china") || t.includes("russia") || t.includes("nato") || t.includes("war") || t.includes("tariff") || t.includes("eu")) return "Geopolitics";
-  if (t.includes("climate") || t.includes("temperature") || t.includes("pandemic") || t.includes("who")) return "Climate";
+  // Geopolitics
+  if (t.includes("china") || t.includes("russia") || t.includes("nato") || t.includes("war") || t.includes("iran") || t.includes("eu ") || t.includes("ceasefire") || t.includes("regime")) return "Geopolitics";
+  // Climate
+  if (t.includes("climate") || t.includes("temperature") || t.includes("pandemic")) return "Climate";
   return "Economics";
+}
+
+function mapApiCategory(apiCat: string | undefined, title: string, tags?: { label: string }[]): string {
+  if (apiCat) {
+    const mapped = API_CATEGORY_MAP[apiCat.toLowerCase()];
+    if (mapped) return mapped;
+  }
+  return guessCategory(title, tags);
 }
 
 function safeParse<T>(json: string, fallback: T): T {
@@ -232,7 +276,7 @@ async function ingestMarkets() {
       question: ev.title,
       slug: ev.slug,
       platform: "Polymarket",
-      category: ev.category || guessCategory(ev.title, ev.tags),
+      category: mapApiCategory(ev.category, ev.title, ev.tags),
       price,
       previous_price: oldPrice ?? null,
       change_24h: change24h,
@@ -306,7 +350,7 @@ async function ingestMarkets() {
       question: title,
       slug: kev.event_ticker.toLowerCase(),
       platform: "Kalshi",
-      category: kev.category || guessCategory(title),
+      category: mapApiCategory(kev.category, title),
       price,
       previous_price: oldKalshiPrice ?? null,
       change_24h: change,

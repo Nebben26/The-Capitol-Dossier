@@ -33,19 +33,18 @@ import {
 import {
   TrendingUp,
   BarChart3,
-  Zap,
   ChevronUp,
   ChevronDown,
   Flame,
-  Eye,
   ArrowUpRight,
   ArrowDownRight,
-  Wallet,
+  Trophy,
+  ExternalLink,
+  AlertTriangle,
+  GitCompareArrows,
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
-import { ExternalLink } from "lucide-react";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
-import { AlertTriangle, GitCompareArrows } from "lucide-react";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -437,39 +436,25 @@ export default function HomePage() {
           </Card>
         </div>
 
-        {/* ─── CENTER: BREAKING MARKETS ──────────────────────── */}
+        {/* ─── CENTER: HIGHEST VOLUME MARKETS ────────────────── */}
         <div className="lg:col-span-4">
           <Card className="bg-[#222638] border-[#2f374f]">
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Zap className="size-4 text-[#f59e0b]" />
-                  Someone Just Bet Big
-                </CardTitle>
-                <span className="text-[10px] text-[#8892b0] flex items-center gap-1">
-                  <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse" />
-                  Live
-                </span>
-              </div>
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <BarChart3 className="size-4 text-[#f59e0b]" />
+                Highest Volume Markets
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 pb-3">
               {filteredBreaking.map((m, i) => (
-                <Link key={m.id} href={`/markets/${m.id}`} className="group block animate-slide-up" style={{ animationDelay: `${i * 80}ms` }}>
-                  <div className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-[#57D7BA]/5 transition-all border border-transparent hover:border-[#57D7BA]/10">
+                <Link key={m.id} href={`/markets/${m.id}`} className="group block">
+                  <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#57D7BA]/5 transition-all border border-transparent hover:border-[#57D7BA]/10">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        {m.hot && <Flame className="size-3 text-[#f59e0b] shrink-0" />}
-                        <span className="text-[10px] text-[#8892b0]">{m.time}</span>
-                      </div>
                       <p className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors leading-snug">{m.title}</p>
                       <div className="flex items-center gap-3 mt-1.5">
                         <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{m.price}¢</span>
-                        <span className="text-[10px] text-[#8892b0]">Vol: ${m.vol}</span>
+                        <span className="text-[10px] text-[#8892b0]">${m.vol} traded</span>
                       </div>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-md bg-[#1a1e2e] border border-[#2f374f]">
-                      <Eye className="size-3 text-[#8892b0]" />
-                      <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{(parseFloat(m.vol) * 12.3).toFixed(0)}</span>
                     </div>
                   </div>
                 </Link>
@@ -478,43 +463,40 @@ export default function HomePage() {
           </Card>
         </div>
 
-        {/* ─── RIGHT: WHALE ACTIVITY ─────────────────────────── */}
+        {/* ─── RIGHT: TOP WHALES BY P&L ───────────────────── */}
         <div className="lg:col-span-3">
           <Card className="bg-[#222638] border-[#2f374f]">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <Wallet className="size-4 text-[#8b5cf6]" />
-                Whale Activity
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Trophy className="size-4 text-[#f59e0b]" />
+                  Top Whales by P&L
+                </CardTitle>
+                <Link href="/whales" className="text-[10px] text-[#57D7BA] hover:underline">View all →</Link>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2 pb-3">
               {filteredWhales.map((w, i) => (
-                <div key={`${w.id}-${i}`} className="p-2.5 rounded-lg border border-[#2f374f] hover:border-[#57D7BA]/20 transition-all animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <Link href={`/whales/${w.id}`} className="flex items-center gap-1.5 hover:text-[#57D7BA] transition-colors">
-                      <div className="size-5 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119]">#{w.rank}</div>
-                      <span className="text-xs font-medium text-[#e2e8f0]">{w.name}</span>
-                    </Link>
-                    <span className="text-[10px] text-[#8892b0]">{w.time}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${w.side === "long" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
-                      {w.side === "long" ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
-                      {w.pos}
-                    </span>
-                  </div>
-                  <Link href={`/markets/${w.marketId}`} className="text-[11px] text-[#8892b0] hover:text-[#57D7BA] transition-colors line-clamp-1">{w.market}</Link>
-                  <div className="flex items-center gap-1 mt-1.5">
-                    <div className="flex-1 h-1 rounded-full bg-[#1a1e2e] overflow-hidden">
-                      <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.acc}%` }} />
+                <Link key={`${w.id}-${i}`} href={`/whales/${w.id}`} className="group block">
+                  <div className="flex items-center gap-2.5 p-2.5 rounded-lg border border-[#2f374f] hover:border-[#57D7BA]/20 transition-all">
+                    <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119] shrink-0">#{w.rank}</div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors">{w.name}</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] font-mono font-semibold text-[#22c55e]">{w.pos}</span>
+                        <div className="flex items-center gap-1">
+                          <div className="w-10 h-1 rounded-full bg-[#1a1e2e] overflow-hidden">
+                            <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.acc}%` }} />
+                          </div>
+                          <span className="text-[9px] text-[#8892b0] font-mono tabular-nums">{w.acc}%</span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-[9px] text-[#8892b0] font-mono font-medium tabular-nums">{w.acc}%</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </CardContent>
           </Card>
-
         </div>
       </div>
 

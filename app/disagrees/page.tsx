@@ -69,7 +69,7 @@ function DisagreeCard({ d }: { d: Disagreement }) {
           </span>
           <span className="px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-semibold">{d.category}</span>
           <span className="flex items-center gap-0.5 text-[8px] text-[#8892b0]">
-            <Timer className="size-2.5" />{d.daysLeft}d
+            {d.daysLeft > 0 && <><Timer className="size-2.5" />{d.daysLeft}d</>}
           </span>
         </div>
         <Link href={`/markets/${d.marketId}`} className="group block">
@@ -294,7 +294,7 @@ export default function DisagreesPage() {
                       )}
                     </TableCell>
                     <TableCell className="py-2.5 hidden sm:table-cell">
-                      <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{d.daysLeft}d</span>
+                      <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{d.daysLeft > 0 ? `${d.daysLeft}d` : "—"}</span>
                     </TableCell>
                     <TableCell className="pr-4 py-2.5 text-right">
                       <Link href={`/markets/${d.marketId}`}>

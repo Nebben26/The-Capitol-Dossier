@@ -301,17 +301,21 @@ export function useHomepageData(autoRefreshMs = 45000) {
       cat: m.category,
     }));
 
-  // Build treemap from real market data, filtering out blank/zero entries
-  const liveTreemap = markets.length > 24
-    ? markets
-        .filter((m) => m.question && m.volNum > 0)
-        .slice(0, 20)
-        .map((m) => ({
-          name: m.question.length > 30 ? m.question.slice(0, 28) + "…" : m.question,
-          size: Math.round(m.volNum / 1000),
-          change: m.change,
-        }))
-    : treemapData;
+  // Build treemap from real market data — filter blanks, dedup by name
+  const liveTreemap = (() => {
+    if (markets.length <= 24) return treemapData;
+    const seen = new Set<string>();
+    return markets
+      .filter((m) => m.question && m.volNum > 0)
+      .slice(0, 30)
+      .reduce<{ name: string; size: number; change: number }[]>((acc, m) => {
+        const name = m.question.length > 30 ? m.question.slice(0, 28) + "…" : m.question;
+        if (seen.has(name) || acc.length >= 20) return acc;
+        seen.add(name);
+        acc.push({ name, size: Math.round(m.volNum / 1000), change: m.change });
+        return acc;
+      }, []);
+  })();
 
   // "Someone Just Bet Big" — derive from top markets by volume
   const liveBreaking = markets.length > 24

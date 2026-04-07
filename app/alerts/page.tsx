@@ -147,18 +147,7 @@ export default function AlertsPage() {
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNewAlertIdx((prev) => {
-        const nextIdx = prev % incomingAlerts.length;
-        const newAlert: WhaleAlert = { ...incomingAlerts[nextIdx], id: `wa-live-${Date.now()}`, isNew: true };
-        setAlerts((a) => [newAlert, ...a.map((x) => ({ ...x, isNew: false })).slice(0, 14)]);
-        setAlertCount((c) => c + 1);
-        return prev + 1;
-      });
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [incomingAlerts]);
+  // Alerts update when the data refreshes via the hook, not via fake injection
 
   const toggleFollow = (id: string) => {
     setFollowedWhales((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });

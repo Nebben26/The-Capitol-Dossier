@@ -67,7 +67,6 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const markets = liveMarkets.length > 24 ? liveMarkets : mockMarkets;
   const whales = liveWhales.length > 0 ? liveWhales : mockWhales;
   const [query, setQuery] = useState("");
-  const [autoPost, setAutoPost] = useState(false);
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -204,7 +203,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           LIVE
         </div>
         {source === "live" && (
-          <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-bold uppercase tracking-wider">
+          <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-bold uppercase tracking-wider" title="Data refreshes every 30 minutes via GitHub Actions cron">
             Live Data
           </span>
         )}
@@ -214,14 +213,6 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         <Link href="/disagrees" className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-[9px] font-bold hover:bg-[#f59e0b]/20 transition-colors">
           <span className="font-mono tabular-nums">{disagreements.length}</span> Disagrees
         </Link>
-        <button
-          onClick={() => setAutoPost(!autoPost)}
-          className={`hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold transition-all ${autoPost ? "bg-[#8b5cf6]/15 text-[#8b5cf6] border border-[#8b5cf6]/30" : "bg-[#222638] text-[#8892b0] border border-[#2f374f] hover:text-[#8b5cf6]"}`}
-          title="Auto-post alerts to Telegram/X"
-        >
-          <Send className="size-3" />
-          {autoPost ? "Auto-Post ON" : "Auto-Post"}
-        </button>
         <button
           onClick={() => {
             const topDisagree = disagreements[0];
@@ -237,23 +228,6 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           Share
         </button>
         <MiniPulseGauge />
-        <Button variant="ghost" size="icon" className="text-[#8892b0] hover:text-[#e2e8f0]">
-          <Bell className="size-4" />
-        </Button>
-        {user ? (
-          <div className="flex items-center gap-1.5">
-            <div className="size-7 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#6366f1] flex items-center justify-center" title={user.email || ""}>
-              <span className="text-[9px] font-bold text-[#0f1119]">{(user.email || "U")[0].toUpperCase()}</span>
-            </div>
-            <button onClick={() => signOut()} className="hidden sm:block text-[#8892b0] hover:text-[#ef4444] transition-colors" title="Sign out">
-              <LogOut className="size-3.5" />
-            </button>
-          </div>
-        ) : (
-          <Button onClick={() => setShowLogin(true)} size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 font-semibold gap-1 hidden sm:inline-flex">
-            <User className="size-3" /> Sign In
-          </Button>
-        )}
       </div>
     </header>
   );
