@@ -596,6 +596,123 @@ async function ingestDisagreements(markets: any[]) {
   }
 }
 
+// ─── 11. INGEST WHALE POSITIONS ──────────────────────────────────────
+async function ingestWhalePositions() {
+  console.log("\n=== Fetching whale positions ===");
+  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false }).limit(50);
+  if (!whales?.length) { console.log("  No whales to fetch positions for"); return; }
+
+  let total = 0;
+  for (let i = 0; i < whales.length; i++) {
+    const w = whales[i];
+    try {
+      const res = await fetch(`${DATA_API_BASE}/v1/positions?user=${w.address}`);
+      if (!res.ok) continue;
+      const positions = await res.json();
+      if (!Array.isArray(positions) || positions.length === 0) continue;
+
+      const rows = positions.slice(0, 100).map((p: any) => ({
+        whale_id: w.address,
+        market_id: p.eventSlug || p.conditionId || "unknown",
+        outcome: p.outcome || "YES",
+        size: p.size || 0,
+        avg_price: p.avgPrice || 0,
+        current_value: p.currentValue || 0,
+        pnl: p.cashPnl || 0,
+      }));
+
+      const { error } = await supabase.from("whale_positions").upsert(rows, { onConflict: "whale_id,market_id,outcome" });
+      if (error) console.error(`  ${w.display_name}: upsert error:`, error.message);
+      else total += rows.length;
+
+      if ((i + 1) % 10 === 0) console.log(`  Progress: ${i + 1}/${whales.length} whales, ${total} positions`);
+    } catch {
+      // skip this whale
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  console.log(`  Done: ${total} positions from ${whales.length} whales`);
+}
+
+// ─── 12. INGEST WHALE TRADES (from /v1/activity) ────────────────────
+async function ingestWhaleTradesV2() {
+  console.log("\n=== Fetching whale trade history ===");
+  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false }).limit(50);
+  if (!whales?.length) { console.log("  No whales to fetch trades for"); return; }
+
+  let total = 0;
+  for (let i = 0; i < whales.length; i++) {
+    const w = whales[i];
+    try {
+      const res = await fetch(`${DATA_API_BASE}/v1/activity?user=${w.address}&limit=50`);
+      if (!res.ok) continue;
+      const activities = await res.json();
+      if (!Array.isArray(activities) || activities.length === 0) continue;
+
+      // Filter for TRADE type only
+      const trades = activities.filter((a: any) => a.type === "TRADE");
+      if (trades.length === 0) continue;
+
+      const rows = trades.map((t: any) => ({
+        wallet_address: w.address,
+        whale_id: w.address,
+        market_id: t.eventSlug || t.slug || null,
+        tx_hash: t.transactionHash || null,
+        transaction_hash: t.transactionHash || null,
+        side: t.side || "BUY",
+        outcome: t.outcome || "YES",
+        size_usd: t.usdcSize || (t.size * t.price) || 0,
+        price: t.price || 0,
+        usd_value: t.usdcSize || (t.size * t.price) || 0,
+        timestamp: t.timestamp ? new Date(t.timestamp * 1000).toISOString() : new Date().toISOString(),
+      }));
+
+      // Use ignoreDuplicates to avoid overwriting historical trades
+      const { error } = await supabase.from("whale_trades").upsert(rows, {
+        onConflict: "tx_hash",
+        ignoreDuplicates: true,
+      });
+      if (error && !error.message.includes("duplicate")) {
+        console.error(`  ${w.display_name}: trade upsert error:`, error.message);
+      } else {
+        total += rows.length;
+      }
+
+      if ((i + 1) % 10 === 0) console.log(`  Progress: ${i + 1}/${whales.length} whales, ${total} trades`);
+    } catch {
+      // skip this whale
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  console.log(`  Done: ${total} trades from ${whales.length} whales`);
+}
+
+// ─── 13. SNAPSHOT DISAGREEMENTS ──────────────────────────────────────
+async function snapshotDisagreements() {
+  console.log("\n=== Snapshotting disagreements ===");
+  // Re-read from the table (may have just been upserted)
+  const { data: disagreements } = await supabase.from("disagreements").select("*").order("spread", { ascending: false });
+  if (!disagreements?.length) {
+    console.log("  No disagreements to snapshot — table may be empty");
+    return;
+  }
+
+  const snapshots = disagreements.map((d: any) => ({
+    poly_market_id: d.poly_market_id,
+    kalshi_market_id: d.kalshi_market_id,
+    question: d.question,
+    poly_price: d.poly_price,
+    kalshi_price: d.kalshi_price,
+    spread: d.spread,
+    poly_volume: null,
+    kalshi_volume: null,
+  }));
+
+  const { error } = await supabase.from("disagreement_snapshots").insert(snapshots);
+  if (error) console.error("  Snapshot insert error:", error.message);
+  else console.log(`  Inserted ${snapshots.length} disagreement snapshots`);
+}
+
 // ─── MAIN ────────────────────────────────────────────────────────────
 async function main() {
   console.log("╔══════════════════════════════════════════╗");
@@ -608,7 +725,10 @@ async function main() {
   await ingestPriceHistory(markets);
   await ingestWhaleLeaderboard();
   await ingestWhaleTrades();
+  await ingestWhalePositions();
+  await ingestWhaleTradesV2();
   await ingestDisagreements(markets);
+  await snapshotDisagreements();
 
   console.log("\n✓ Ingestion complete!");
 }
