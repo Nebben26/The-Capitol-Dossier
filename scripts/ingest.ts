@@ -611,15 +611,23 @@ async function ingestWhalePositions() {
       const positions = await res.json();
       if (!Array.isArray(positions) || positions.length === 0) continue;
 
-      const rows = positions.slice(0, 100).map((p: any) => ({
-        whale_id: w.address,
-        market_id: p.eventSlug || p.conditionId || "unknown",
-        outcome: p.outcome || "YES",
-        size: p.size || 0,
-        avg_price: p.avgPrice || 0,
-        current_value: p.currentValue || 0,
-        pnl: p.cashPnl || 0,
-      }));
+      // Deduplicate by (whale_id, market_id, outcome) before upserting
+      const seen = new Set<string>();
+      const rows = [];
+      for (const p of positions.slice(0, 100)) {
+        const key = `${w.address}|${p.eventSlug || p.conditionId || "unknown"}|${p.outcome || "YES"}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push({
+          whale_id: w.address,
+          market_id: p.eventSlug || p.conditionId || "unknown",
+          outcome: p.outcome || "YES",
+          size: p.size || 0,
+          avg_price: p.avgPrice || 0,
+          current_value: p.currentValue || 0,
+          pnl: p.cashPnl || 0,
+        });
+      }
 
       const { error } = await supabase.from("whale_positions").upsert(rows, { onConflict: "whale_id,market_id,outcome" });
       if (error) console.error(`  ${w.display_name}: upsert error:`, error.message);
@@ -654,22 +662,20 @@ async function ingestWhaleTradesV2() {
       if (trades.length === 0) continue;
 
       const rows = trades.map((t: any) => ({
+        id: t.transactionHash || `${w.address}-${t.timestamp}-${Math.random().toString(36).slice(2, 8)}`,
         wallet_address: w.address,
-        whale_id: w.address,
         market_id: t.eventSlug || t.slug || null,
-        tx_hash: t.transactionHash || null,
-        transaction_hash: t.transactionHash || null,
         side: t.side || "BUY",
         outcome: t.outcome || "YES",
         size_usd: t.usdcSize || (t.size * t.price) || 0,
         price: t.price || 0,
-        usd_value: t.usdcSize || (t.size * t.price) || 0,
         timestamp: t.timestamp ? new Date(t.timestamp * 1000).toISOString() : new Date().toISOString(),
+        transaction_hash: t.transactionHash || null,
       }));
 
-      // Use ignoreDuplicates to avoid overwriting historical trades
+      // Upsert on id (tx hash), ignore duplicates
       const { error } = await supabase.from("whale_trades").upsert(rows, {
-        onConflict: "tx_hash",
+        onConflict: "id",
         ignoreDuplicates: true,
       });
       if (error && !error.message.includes("duplicate")) {
