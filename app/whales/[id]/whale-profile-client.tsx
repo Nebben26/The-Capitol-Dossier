@@ -121,8 +121,8 @@ function HoldingsTab({ whaleId }: { whaleId: string }) {
             {positions.map((p, i) => (
               <TableRow key={i} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
                 <TableCell className="pl-4 py-2 max-w-[200px]">
-                  <Link href={`/markets/${p.market_id}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors truncate block" title={p.market_id}>
-                    {p.market_id}
+                  <Link href={`/markets/${p.market_id}`} className="text-xs font-medium hover:text-[#57D7BA] transition-colors truncate block" title={p.question || p.market_id}>
+                    {p.question || p.market_id}
                   </Link>
                 </TableCell>
                 <TableCell className="py-2">

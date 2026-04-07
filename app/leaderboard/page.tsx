@@ -161,8 +161,8 @@ function TraderCard({ t, followed, onFollow }: { t: Whale; followed: boolean; on
                 <span className="font-mono font-bold">{t.winRate}%</span>
               </div>
               <div>
-                <span className="text-[#8892b0] block">Accuracy</span>
-                <span className="font-mono font-bold text-[#57D7BA]">{t.accuracy}%</span>
+                <span className="text-[#8892b0] block">Volume</span>
+                <span className="font-mono font-bold text-[#57D7BA]">{t.totalVolume}</span>
               </div>
             </div>
             <div className="flex items-center justify-between mt-2">
@@ -315,7 +315,7 @@ export default function LeaderboardPage() {
                   { label: "Total Volume", val: totalVol >= 1e9 ? `$${(totalVol / 1e9).toFixed(1)}B` : `$${(totalVol / 1e6).toFixed(0)}M`, icon: BarChart3, color: "#57D7BA", sub: `${traders.length} whales` },
                   { label: "Avg Win Rate", val: `${avgWR}%`, icon: Target, color: "#22c55e", sub: `Top ${traders.length} traders` },
                   { label: "Top P&L", val: topWhale?.totalPnl || "$0", icon: Trophy, color: "#f59e0b", sub: topWhale?.name || "—" },
-                  { label: "Most Active", val: `${mostActive?.totalTrades || 0} trades`, icon: Flame, color: "#ec4899", sub: mostActive?.name || "—" },
+                  { label: "Most Positions", val: `${mostActive?.totalTrades || 0}`, icon: Flame, color: "#ec4899", sub: mostActive?.name || "—" },
                 ];
               })().map((s) => (
                 <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
@@ -349,9 +349,6 @@ export default function LeaderboardPage() {
                       <TableHead className="text-[10px] text-[#8892b0] font-medium hidden xl:table-cell">P&L TREND</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("winRate")}>
                         <span className="flex items-center gap-0.5">WIN% <SortIcon col="winRate" /></span>
-                      </TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("accuracy")}>
-                        <span className="flex items-center gap-0.5">ACC% <SortIcon col="accuracy" /></span>
                       </TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell" onClick={() => handleSort("brier")}>
                         <span className="flex items-center gap-0.5">BRIER <SortIcon col="brier" /></span>
@@ -412,14 +409,6 @@ export default function LeaderboardPage() {
                             </TableCell>
                             <TableCell className="py-3">
                               <span className="font-mono text-xs font-semibold">{t.winRate}%</span>
-                            </TableCell>
-                            <TableCell className="py-3">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden">
-                                  <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${t.accuracy}%` }} />
-                                </div>
-                                <span className="font-mono text-xs font-semibold text-[#57D7BA]">{t.accuracy}%</span>
-                              </div>
                             </TableCell>
                             <TableCell className="py-3 hidden xl:table-cell">
                               <span className={`font-mono text-xs font-semibold ${t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]"}`}>

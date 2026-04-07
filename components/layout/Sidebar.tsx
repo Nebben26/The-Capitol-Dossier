@@ -22,8 +22,7 @@ import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
-  { label: "Markets", icon: Target, href: "/markets" },
-  { label: "Screener", icon: BarChart3, href: "/screener" },
+  { label: "Markets", icon: Target, href: "/screener" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Insights", icon: Newspaper, href: "/insights" },
   { label: "Whales", icon: Users, href: "/whales" },

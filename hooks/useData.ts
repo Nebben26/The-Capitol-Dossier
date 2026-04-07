@@ -302,17 +302,18 @@ export function useHomepageData(autoRefreshMs = 45000) {
     }));
 
   // Build treemap from real market data — filter blanks, dedup by name
-  // Build treemap — strong filter: no blanks, no dupes, minimum volume
+  // Build treemap — show biggest MOVERS (by abs change), sized by volume
   const liveTreemap = (() => {
     if (markets.length <= 24) return treemapData;
     const seen = new Set<string>();
-    return markets
-      .filter((m) => m.question && m.question.trim().length > 3 && m.volNum > 1000)
+    return [...markets]
+      .filter((m) => m.question && m.question.trim().length > 3 && m.volNum > 1000 && Math.abs(m.change) >= 1)
+      .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
       .slice(0, 40)
       .reduce<{ name: string; size: number; change: number }[]>((acc, m) => {
         const name = m.question.length > 30 ? m.question.slice(0, 28) + "…" : m.question;
-        const size = Math.round(m.volNum / 1000);
-        if (seen.has(name) || acc.length >= 20 || size <= 0) return acc;
+        const size = Math.max(100, Math.round(m.volNum / 1000));
+        if (seen.has(name) || acc.length >= 20) return acc;
         seen.add(name);
         acc.push({ name, size, change: m.change });
         return acc;

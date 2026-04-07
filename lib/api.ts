@@ -122,7 +122,7 @@ function dbWhaleToFrontend(row: any, idx: number): Whale {
     volumeNum: volNum,
     positionsValue: fmtUsdPlain(pnlNum > 0 ? pnlNum * 0.6 : Math.abs(pnlNum) * 0.3),
     openPositions: row.positions_count || 0,
-    totalTrades: (row.markets_traded || 0) * 8 + (row.positions_count || 0),
+    totalTrades: row.positions_count || 0,
     memberSince: "2024",
     bestCategory: bestCat,
     bestCatColor: CATEGORY_COLORS[bestCat] || "#57D7BA",
@@ -364,19 +364,34 @@ export async function getOnChainPositions(whaleId: string): Promise<ApiResult<Po
  * Get whale holdings from Supabase whale_positions table.
  */
 export async function getWhalePositions(whaleId: string): Promise<{
-  data: { market_id: string; outcome: string; size: number; avg_price: number; current_value: number; pnl: number }[];
+  data: { market_id: string; question: string; outcome: string; size: number; avg_price: number; current_value: number; pnl: number }[];
   source: DataSource;
 }> {
   if (!isSupabaseConfigured()) return { data: [], source: "mock" };
   try {
-    const { data, error } = await supabase
+    const { data: positions, error } = await supabase
       .from("whale_positions")
       .select("market_id, outcome, size, avg_price, current_value, pnl")
       .eq("whale_id", whaleId)
       .order("current_value", { ascending: false })
       .limit(50);
     if (error) throw error;
-    return { data: data || [], source: "live" };
+    if (!positions?.length) return { data: [], source: "live" };
+
+    // Look up market questions for each position
+    const marketIds = [...new Set(positions.map((p: any) => p.market_id))];
+    const { data: markets } = await supabase
+      .from("markets")
+      .select("id, question")
+      .in("id", marketIds.slice(0, 100));
+    const questionMap = new Map((markets || []).map((m: any) => [m.id, m.question]));
+
+    const enriched = positions.map((p: any) => ({
+      ...p,
+      question: questionMap.get(p.market_id) || p.market_id,
+    }));
+
+    return { data: enriched, source: "live" };
   } catch (err) {
     console.error("[getWhalePositions]", err);
     return { data: [], source: "mock" };

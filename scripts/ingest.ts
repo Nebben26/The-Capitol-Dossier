@@ -105,9 +105,9 @@ interface PolyEvent {
 
 async function fetchPolymarketEvents(): Promise<PolyEvent[]> {
   const all: PolyEvent[] = [];
-  for (let offset = 0; offset < 500; offset += 100) {
+  for (let offset = 0; offset < 5000; offset += 100) {
     const url = `${POLYMARKET_BASE}/events?active=true&closed=false&limit=100&offset=${offset}&order=volume&ascending=false`;
-    console.log(`  Polymarket events offset=${offset}...`);
+    if (offset % 500 === 0) console.log(`  Polymarket events offset=${offset}...`);
     const res = await fetch(url);
     if (!res.ok) { console.error(`  Polymarket API ${res.status}`); break; }
     const page: PolyEvent[] = await res.json();
@@ -138,9 +138,9 @@ interface KalshiEvent {
 async function fetchKalshiEvents(): Promise<KalshiEvent[]> {
   const all: KalshiEvent[] = [];
   let cursor: string | undefined;
-  for (let page = 0; page < 5; page++) {
+  for (let page = 0; page < 25; page++) {
     const url = `${KALSHI_BASE}/events?status=open&limit=200&with_nested_markets=true${cursor ? `&cursor=${cursor}` : ""}`;
-    console.log(`  Kalshi events page ${page + 1}...`);
+    if (page % 5 === 0) console.log(`  Kalshi events page ${page + 1}...`);
     const res = await fetch(url);
     if (!res.ok) { console.error(`  Kalshi API ${res.status}`); break; }
     const data = await res.json();
@@ -167,7 +167,7 @@ interface LeaderboardEntry {
 async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
     console.log("  Fetching leaderboard from /v1/leaderboard...");
-    const res = await fetch(`${DATA_API_BASE}/v1/leaderboard`);
+    const res = await fetch(`${DATA_API_BASE}/v1/leaderboard?limit=500`);
     if (!res.ok) { console.error(`  Leaderboard API ${res.status}`); return []; }
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -435,7 +435,7 @@ async function ingestWhaleLeaderboard() {
 
   if (entries.length === 0) return;
 
-  const whaleRows = entries.slice(0, 100).map((e: any) => {
+  const whaleRows = entries.map((e: any) => {
     // Clean display name: strip trailing "-<digits>" timestamp artifacts, fallback to truncated wallet
     let name = e.userName || "";
     if (!name || /^0x[a-fA-F0-9]/.test(name)) {
@@ -599,7 +599,7 @@ async function ingestDisagreements(markets: any[]) {
 // ─── 11. INGEST WHALE POSITIONS ──────────────────────────────────────
 async function ingestWhalePositions() {
   console.log("\n=== Fetching whale positions ===");
-  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false }).limit(50);
+  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false });
   if (!whales?.length) { console.log("  No whales to fetch positions for"); return; }
 
   let total = 0;
@@ -645,7 +645,7 @@ async function ingestWhalePositions() {
 // ─── 12. INGEST WHALE TRADES (from /v1/activity) ────────────────────
 async function ingestWhaleTradesV2() {
   console.log("\n=== Fetching whale trade history ===");
-  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false }).limit(50);
+  const { data: whales } = await supabase.from("whales").select("address, display_name").order("total_pnl", { ascending: false });
   if (!whales?.length) { console.log("  No whales to fetch trades for"); return; }
 
   let total = 0;

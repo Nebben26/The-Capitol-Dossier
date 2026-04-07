@@ -190,7 +190,7 @@ export default function ScreenerPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
             <BarChart3 className="size-7 text-[#57D7BA]" />
-            Market Screener
+            Markets
           </h1>
           <p className="text-sm text-[#8892b0] mt-1">Advanced filtering across {markets.length} prediction markets</p>
         </div>

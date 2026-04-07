@@ -6,7 +6,14 @@
   NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
 
-# ─── Cache headers ────────────────────────────────────────────────────
+# Redirect /markets (exact) to /screener — old bookmarks still work
+# Must NOT use /markets/* which would break /markets/[id] detail pages
+[[redirects]]
+  from = "/markets"
+  to = "/screener"
+  status = 301
+  force = true
+
 [[headers]]
   for = "/_next/static/*"
   [headers.values]

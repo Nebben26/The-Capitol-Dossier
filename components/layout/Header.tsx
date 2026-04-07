@@ -30,10 +30,9 @@ function MiniPulseGauge() {
     return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
   }, [pulseMarkets]);
 
-  const angle = (value / 100) * 180 - 90;
-  const rad = (angle * Math.PI) / 180;
-  const nx = 50 + 30 * Math.cos(rad);
-  const ny = 46 + 30 * Math.sin(rad);
+  const rad = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const nx = 50 + 30 * Math.sin(rad);
+  const ny = 46 - 30 * Math.cos(rad);
   const color = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
 
   return (
@@ -186,7 +185,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             )}
             {hasResults && (
               <div className="px-3 py-2 border-t border-[#2f374f] text-center">
-                <Link href="/markets" onClick={() => { setOpen(false); setQuery(""); }} className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">Browse all markets →</Link>
+                <Link href="/screener" onClick={() => { setOpen(false); setQuery(""); }} className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">Browse all markets →</Link>
               </div>
             )}
           </div>

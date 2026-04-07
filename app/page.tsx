@@ -96,10 +96,10 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
 
 // ─── GAUGE COMPONENT ──────────────────────────────────────────────────
 function PulseGauge({ value, label }: { value: number; label: string }) {
-  const angle = (value / 100) * 180 - 90;
-  const rad = (angle * Math.PI) / 180;
-  const needleX = 100 + 65 * Math.cos(rad);
-  const needleY = 95 + 65 * Math.sin(rad);
+  // Half-circle: 0=left, 50=top, 100=right. SVG y-axis is inverted.
+  const rad = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const needleX = 100 + 65 * Math.sin(rad);
+  const needleY = 95 - 65 * Math.cos(rad);
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 200 115" className="w-48 h-auto">
