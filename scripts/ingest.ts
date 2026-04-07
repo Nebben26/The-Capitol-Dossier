@@ -576,6 +576,23 @@ async function ingestDisagreements(markets: any[]) {
 
     if (bestMatch) {
       const spread = Math.abs(pm.price - bestMatch.price);
+      const priceSum = pm.price + bestMatch.price;
+
+      // Filter 1C: Question length sanity — very different lengths = different questions
+      if (Math.abs((pm.question || "").length - (bestMatch.question || "").length) > 35) continue;
+
+      // Filter 1B: Inverse pricing detection — prices summing to ~100 are YES/NO mirrors
+      if (priceSum >= 92 && priceSum <= 108) {
+        console.log(`  SKIP inverse (sum=${priceSum}): "${pm.question}" ↔ "${bestMatch.question}"`);
+        continue;
+      }
+
+      // Filter 1A: Spread ceiling — real disagreements don't exceed 50pt
+      if (spread > 50) {
+        console.log(`  SKIP spread>${50} (${spread}pt): "${pm.question}" ↔ "${bestMatch.question}"`);
+        continue;
+      }
+
       console.log(`  Match (score=${bestScore.toFixed(2)}, overlap=${bestOverlap}, spread=${spread}): "${pm.question}" ↔ "${bestMatch.question}"`);
       if (spread >= 3) {
         rows.push({

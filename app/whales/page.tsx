@@ -89,8 +89,8 @@ function WhaleCard({ w }: { w: Whale }) {
           <PnlSparkline data={w.spark} positive={w.totalPnlNum >= 0} />
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
             <div><div className={`text-xs font-bold font-mono tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</div><div className="text-[8px] text-[#8892b0]">P&L</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.accuracy}%</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.winRate}%</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.accuracy > 0 ? `${w.accuracy}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
           </div>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#2f374f]">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}><Trophy className="size-2.5" />{w.bestCategory}</span>
@@ -221,12 +221,16 @@ export default function WhalesBrowsePage() {
                     <TableCell className="py-3"><span className={`font-mono text-sm font-bold tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</span></TableCell>
                     <TableCell className="py-3"><PnlSparkline data={w.spark} positive={w.totalPnlNum >= 0} /></TableCell>
                     <TableCell className="py-3">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.accuracy}%` }} /></div>
-                        <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.accuracy}%</span>
-                      </div>
+                      {w.accuracy > 0 ? (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.accuracy}%` }} /></div>
+                          <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.accuracy}%</span>
+                        </div>
+                      ) : (
+                        <span className="font-mono text-xs text-[#8892b0]">—</span>
+                      )}
                     </TableCell>
-                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.winRate}%</span></TableCell>
+                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</span></TableCell>
                     <TableCell className="py-3"><span className="font-mono text-xs text-[#8892b0] tabular-nums">{w.totalVolume}</span></TableCell>
                     <TableCell className="pr-4 py-3"><span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}>{w.bestCategory}</span></TableCell>
                   </TableRow>

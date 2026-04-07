@@ -130,6 +130,7 @@ export default function ScreenerPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [displayCount, setDisplayCount] = useState(60);
 
   // Advanced filters
   const [minPrice, setMinPrice] = useState("");
@@ -192,7 +193,7 @@ export default function ScreenerPage() {
             <BarChart3 className="size-7 text-[#57D7BA]" />
             Markets
           </h1>
-          <p className="text-sm text-[#8892b0] mt-1">Advanced filtering across {markets.length} prediction markets</p>
+          <p className="text-sm text-[#8892b0] mt-1">Advanced filtering across {markets.length.toLocaleString()} prediction markets</p>
         </div>
         <div className="flex items-center gap-2">
           <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
@@ -312,7 +313,7 @@ export default function ScreenerPage() {
       {/* Grid */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} />)}
+          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} />)}
         </div>
       )}
 
@@ -348,7 +349,7 @@ export default function ScreenerPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((m) => {
+                {filtered.slice(0, displayCount).map((m) => {
                   const spread = spreadMap[m.id] || 0;
                   return (
                     <Tooltip key={m.id}>
@@ -395,6 +396,17 @@ export default function ScreenerPage() {
             </Table>
           </CardContent>
         </Card>
+      )}
+
+      {displayCount < filtered.length && (
+        <div className="flex justify-center">
+          <Button
+            onClick={() => setDisplayCount((c) => c + 60)}
+            className="bg-[#222638] border border-[#2f374f] text-[#e2e8f0] hover:bg-[#57D7BA]/10 hover:border-[#57D7BA]/30 px-8"
+          >
+            Load more ({filtered.length - displayCount} remaining)
+          </Button>
+        </div>
       )}
 
       {filtered.length === 0 && (

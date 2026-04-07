@@ -37,16 +37,21 @@ async function main() {
     .select("*", { count: "exact", head: true });
   console.log(`Existing disagreements in DB: ${existingCount}\n`);
 
-  // 2. Load all markets from Supabase (up to 5000)
-  const { data: allMarkets, error: mkErr } = await supabase
-    .from("markets")
-    .select("id, question, platform, price, category, volume")
-    .limit(5000);
-  if (mkErr) {
-    console.error("Failed to load markets:", mkErr.message);
-    process.exit(1);
+  // 2. Load all markets from Supabase (paginated to bypass 1000-row limit)
+  const allMarkets: any[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error: mkErr } = await supabase
+      .from("markets")
+      .select("id, question, platform, price, category, volume")
+      .range(from, from + 999);
+    if (mkErr) {
+      console.error("Failed to load markets:", mkErr.message);
+      break;
+    }
+    if (!data || data.length === 0) break;
+    allMarkets.push(...data);
   }
-  console.log(`Total markets in DB: ${allMarkets!.length}`);
+  console.log(`Total markets in DB: ${allMarkets.length}`);
 
   const polyMarkets = allMarkets!.filter((m: any) => m.platform === "Polymarket");
   const kalshiMarkets = allMarkets!.filter((m: any) => {
@@ -87,6 +92,23 @@ async function main() {
 
     if (bestMatch) {
       const spread = Math.abs(pm.price - bestMatch.price);
+      const priceSum = pm.price + bestMatch.price;
+
+      // Filter 1C: Question length sanity
+      if (Math.abs((pm.question || "").length - (bestMatch.question || "").length) > 35) continue;
+
+      // Filter 1B: Inverse pricing detection
+      if (priceSum >= 92 && priceSum <= 108) {
+        console.log(`SKIP inverse (sum=${priceSum}): "${pm.question}" ↔ "${bestMatch.question}"\n`);
+        continue;
+      }
+
+      // Filter 1A: Spread ceiling
+      if (spread > 50) {
+        console.log(`SKIP spread>${50} (${spread}pt): "${pm.question}" ↔ "${bestMatch.question}"\n`);
+        continue;
+      }
+
       console.log(`MATCH (spread=${spread}pt, score=${bestScore.toFixed(2)}, overlap=${bestOverlap}): "${pm.question}" ↔ "${bestMatch.question}"`);
       console.log(`  Poly: ${pm.price}¢ | Kalshi: ${bestMatch.price}¢\n`);
       if (spread >= 3) {

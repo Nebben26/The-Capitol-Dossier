@@ -169,8 +169,8 @@ export default function DisagreesPage() {
         </div>
       </div>
 
-      {/* Explainer */}
-      <Card className="bg-[#222638] border-[#f59e0b]/20">
+      {/* Explainer — hide when few results */}
+      {disagreements.length >= 10 && <Card className="bg-[#222638] border-[#f59e0b]/20">
         <CardContent className="p-4 flex items-start gap-3">
           <AlertTriangle className="size-5 text-[#f59e0b] shrink-0 mt-0.5" />
           <div>
@@ -182,7 +182,7 @@ export default function DisagreesPage() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

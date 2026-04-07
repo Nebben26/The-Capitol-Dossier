@@ -158,7 +158,7 @@ function TraderCard({ t, followed, onFollow }: { t: Whale; followed: boolean; on
               </div>
               <div>
                 <span className="text-[#8892b0] block">Win Rate</span>
-                <span className="font-mono font-bold">{t.winRate}%</span>
+                <span className="font-mono font-bold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
               </div>
               <div>
                 <span className="text-[#8892b0] block">Volume</span>
@@ -308,7 +308,8 @@ export default function LeaderboardPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(() => {
                 const totalVol = traders.reduce((s, w) => s + w.volumeNum, 0);
-                const avgWR = traders.length > 0 ? Math.round(traders.reduce((s, w) => s + w.winRate, 0) / traders.length) : 0;
+                const tradersWithWR = traders.filter(w => w.winRate > 0);
+                const avgWR = tradersWithWR.length > 0 ? Math.round(tradersWithWR.reduce((s, w) => s + w.winRate, 0) / tradersWithWR.length) : 0;
                 const topWhale = traders[0];
                 const mostActive = [...traders].sort((a, b) => b.totalTrades - a.totalTrades)[0];
                 return [
@@ -408,11 +409,11 @@ export default function LeaderboardPage() {
                               <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
                             </TableCell>
                             <TableCell className="py-3">
-                              <span className="font-mono text-xs font-semibold">{t.winRate}%</span>
+                              <span className="font-mono text-xs font-semibold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
                             </TableCell>
                             <TableCell className="py-3 hidden xl:table-cell">
-                              <span className={`font-mono text-xs font-semibold ${t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]"}`}>
-                                {t.brier.toFixed(2)}
+                              <span className={`font-mono text-xs font-semibold ${t.brier > 0 ? (t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]") : "text-[#8892b0]"}`}>
+                                {t.brier > 0 ? t.brier.toFixed(2) : "—"}
                               </span>
                             </TableCell>
                             <TableCell className="py-3 hidden xl:table-cell">
@@ -458,7 +459,7 @@ export default function LeaderboardPage() {
                               </div>
                             </div>
                             <div className="text-[9px] text-[#8892b0] pt-1 border-t border-[#2a2f45]">
-                              {t.totalTrades} trades · Brier {t.brier.toFixed(2)} · {t.totalVolume} volume
+                              {t.totalTrades} trades{t.brier > 0 ? ` · Brier ${t.brier.toFixed(2)}` : ""} · {t.totalVolume} volume
                             </div>
                           </div>
                         </TooltipContent>

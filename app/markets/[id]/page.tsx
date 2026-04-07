@@ -12,7 +12,7 @@ export async function generateStaticParams() {
         .from("markets")
         .select("id")
         .order("volume", { ascending: false })
-        .limit(500);
+        .limit(1500);
 
       if (!error && data && data.length > 0) {
         console.log(`[generateStaticParams] Markets: ${data.length} pages from Supabase (zero mock)`);
