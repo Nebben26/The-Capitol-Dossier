@@ -3,6 +3,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Check, ExternalLink } from "lucide-react";
+import { WaitlistForm } from "@/components/ui/waitlist-form";
 
 const RESPONDS_TO = [
   "Feature requests and product feedback (we read every email)",
@@ -71,6 +72,14 @@ export default function ContactPage() {
               </li>
             ))}
           </ul>
+        </CardContent>
+      </Card>
+
+      {/* Waitlist */}
+      <Card className="bg-[#222638] border-[#2f374f]">
+        <CardContent className="p-5 space-y-4">
+          <h2 className="text-sm font-semibold text-[#e2e8f0]">Want to be first when Pro launches?</h2>
+          <WaitlistForm />
         </CardContent>
       </Card>
 

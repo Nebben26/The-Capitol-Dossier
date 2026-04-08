@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
@@ -50,9 +51,22 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-[#1a1e2e] text-[#e2e8f0]">
+        {/* Hidden static form required by Netlify bots to detect the dynamic waitlist form */}
+        <form name="pro-waitlist" data-netlify="true" hidden>
+          <input type="text" name="name" />
+          <input type="email" name="email" />
+        </form>
+
         <TooltipProvider>
           <AppShell>{children}</AppShell>
         </TooltipProvider>
+
+        {/* Cloudflare Web Analytics — privacy-first, no cookies */}
+        <Script
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          strategy="afterInteractive"
+          data-cf-beacon='{"token": "37b115799bea4e308abd23bafe3c2955"}'
+        />
       </body>
     </html>
   );

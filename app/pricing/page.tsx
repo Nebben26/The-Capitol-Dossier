@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check, X, Star, ChevronDown, ChevronUp, Zap, Code, Building2, Terminal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PRICING } from "@/lib/pricing";
+import { WaitlistForm } from "@/components/ui/waitlist-form";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -330,6 +331,16 @@ export default function PricingPage() {
               >
                 {tier.cta}
               </a>
+
+              {/* Pro tier — compact waitlist form as secondary CTA */}
+              {tier.id === "pro" && (
+                <div className="pt-3 border-t border-[#2f374f] space-y-2">
+                  <p className="text-[10px] text-[#8892b0] text-center">
+                    Or join the waitlist for $39/mo founder pricing.
+                  </p>
+                  <WaitlistForm compact />
+                </div>
+              )}
             </div>
           </div>
         ))}
