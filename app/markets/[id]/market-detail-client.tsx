@@ -156,7 +156,7 @@ export default function MarketDetailPage() {
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    if (!market?.id || market.id === id && market.question === "Loading...") return;
+    if (!market?.id || market.question === "Loading...") return;
     (async () => {
       try {
         const [whalesRes, disagreeRes, newsRes] = await Promise.all([
@@ -168,7 +168,6 @@ export default function MarketDetailPage() {
         const d = disagreeRes.data?.[0] || null;
         setMarketDisagreement(d);
         setMarketNews(newsRes.data || []);
-        // Fetch spread history if disagreement exists
         if (d?.poly_market_id) {
           const hist = await getSpreadHistory([d.poly_market_id]);
           setSpreadHistory(hist[d.poly_market_id] || []);
@@ -179,7 +178,7 @@ export default function MarketDetailPage() {
         setDataLoading(false);
       }
     })();
-  }, [market?.id]);
+  }, [market?.id, market.question]);
 
   if (notFound) {
     return (

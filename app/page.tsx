@@ -77,16 +77,16 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
       <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={bgOpacity} stroke="#1a1e2e" strokeWidth={2} rx={6} />
       {width > 70 && height > 40 && (
         <>
-          <text x={x + width / 2} y={y + height / 2 - (width > 100 && height > 55 ? 8 : 2)} textAnchor="middle" fill="#e2e8f0" fontSize={width > 140 ? 11 : 9} fontWeight={600}>
+          <text x={x + width / 2} y={y + height / 2 - (width > 100 && height > 55 ? 8 : 2)} textAnchor="middle" fill="#ffffff" fontSize={width > 140 ? 11 : 9} fontWeight={600} opacity={0.9}>
             {name.length > Math.floor(width / 7) ? name.slice(0, Math.floor(width / 7) - 1) + "…" : name}
           </text>
           {width > 80 && height > 40 && (
-            <text x={x + width / 2} y={y + height / 2 + (width > 100 && height > 55 ? 8 : 12)} textAnchor="middle" fill={color} fontSize={12} fontWeight={700}>
+            <text x={x + width / 2} y={y + height / 2 + (width > 100 && height > 55 ? 8 : 12)} textAnchor="middle" fill="#ffffff" fontSize={12} fontWeight={700} opacity={0.95}>
               {formatSignedPct(change)}
             </text>
           )}
           {width > 110 && height > 60 && (
-            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#8892b0" fontSize={8}>
+            <text x={x + width / 2} y={y + height / 2 + 24} textAnchor="middle" fill="#ffffff" fontSize={8} opacity={0.7}>
               ${(size / 1000).toFixed(1)}M vol
             </text>
           )}
