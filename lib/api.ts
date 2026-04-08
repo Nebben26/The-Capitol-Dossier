@@ -1384,9 +1384,11 @@ export async function getSignals(opts: GetSignalsOpts = {}): Promise<{
   if (!isSupabaseConfigured()) return { data: [], source: "mock" };
 
   try {
+    // Use SELECT * so missing optional columns (historical_accuracy_pct, historical_sample_size)
+    // don't cause the entire query to fail if the session31 migration hasn't been applied yet.
     let query = supabase
       .from("signals")
-      .select("signal_id, type, confidence, market_id, market_question, headline, detail, detected_at, stats, historical_accuracy_pct, historical_sample_size")
+      .select("*")
       .gte("confidence", minConfidence)
       .order("confidence", { ascending: false })
       .order("detected_at", { ascending: false })
@@ -1397,11 +1399,12 @@ export async function getSignals(opts: GetSignalsOpts = {}): Promise<{
     const { data, error } = await query;
 
     if (error) {
+      console.error("[getSignals] query failed:", error);
       // Table doesn't exist yet — graceful degradation
       if (error.message.includes("does not exist") || error.code === "42P01") {
         return { data: [], source: "mock" };
       }
-      throw error;
+      return { data: [], source: "mock" };
     }
 
     return { data: (data || []) as import("./signals").Signal[], source: "live" };
@@ -1514,13 +1517,17 @@ export async function getSystemStats(): Promise<{
   if (!isSupabaseConfigured()) return empty;
   try {
     const [markets, whales, disagreements, signals, latestSignalAt, latestIngestAt] = await Promise.all([
-      supabase.from("markets").select("id", { count: "exact", head: true }),
-      supabase.from("whales").select("id", { count: "exact", head: true }),
-      supabase.from("disagreements").select("id", { count: "exact", head: true }),
-      supabase.from("signals").select("signal_id", { count: "exact", head: true }),
+      supabase.from("markets").select("*", { count: "exact", head: true }),
+      supabase.from("whales").select("*", { count: "exact", head: true }),
+      supabase.from("disagreements").select("*", { count: "exact", head: true }),
+      supabase.from("signals").select("*", { count: "exact", head: true }),
       getLatestSignalTimestamp(),
       getLastIngestTimestamp(),
     ]);
+    if (markets.error) console.error("[getSystemStats] markets count failed:", markets.error);
+    if (whales.error) console.error("[getSystemStats] whales count failed:", whales.error);
+    if (disagreements.error) console.error("[getSystemStats] disagreements count failed:", disagreements.error);
+    if (signals.error) console.error("[getSystemStats] signals count failed:", signals.error);
     return {
       marketsCount: markets.count ?? 0,
       whalesCount: whales.count ?? 0,
@@ -1529,7 +1536,8 @@ export async function getSystemStats(): Promise<{
       latestSignalAt,
       latestIngestAt,
     };
-  } catch {
+  } catch (err) {
+    console.error("[getSystemStats] failed:", err);
     return empty;
   }
 }
