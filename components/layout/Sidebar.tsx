@@ -17,6 +17,7 @@ import {
   Newspaper,
   Code,
   BarChart3,
+  DollarSign,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Markets", icon: Target, href: "/screener" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Insights", icon: Newspaper, href: "/insights" },
+  { label: "Flow", icon: DollarSign, href: "/flow" },
   { label: "Whales", icon: Users, href: "/whales" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
   { label: "Strategies", icon: Zap, href: "/strategies" },

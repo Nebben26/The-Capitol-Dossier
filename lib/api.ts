@@ -704,3 +704,140 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
     return { data: [], source: "mock" };
   }
 }
+
+// ─── SMART MONEY FLOW ─────────────────────────────────────────────────────────
+
+export interface SmartMoneyFlowByCategory {
+  category: string;
+  netFlowUsd: number;      // yesValueUsd - noValueUsd
+  yesValueUsd: number;
+  noValueUsd: number;
+  positionCount: number;
+  uniqueWhales: number;
+  topMarkets: Array<{ id: string; question: string; flowUsd: number }>;
+}
+
+/**
+ * Aggregate whale positions by market category.
+ * Fields confirmed by schema inspection:
+ *   current_value (USD), outcome ("Yes"/"No"), whale_id, market_id
+ */
+export async function getSmartMoneyFlow(): Promise<{
+  data: SmartMoneyFlowByCategory[];
+  source: DataSource;
+}> {
+  const cacheKey = "smart_money_flow";
+  const cached = getCached<{ data: SmartMoneyFlowByCategory[]; source: DataSource }>(cacheKey, 300_000);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) return { data: [], source: "mock" };
+
+  try {
+    // 1. Paginate all whale_positions (count-free — no HEAD query)
+    const allPositions: any[] = [];
+    const PAGE_SIZE = 1000;
+    for (let page = 0; page < 20; page++) {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const { data, error } = await supabase
+        .from("whale_positions")
+        .select("whale_id, market_id, outcome, current_value")
+        .order("id", { ascending: true })
+        .range(from, to);
+      if (error) { if (page === 0) throw error; break; }
+      if (!data || data.length === 0) break;
+      allPositions.push(...data);
+      if (data.length < PAGE_SIZE) break;
+    }
+
+    if (allPositions.length === 0) return { data: [], source: "live" };
+
+    // 2. Collect unique market_ids and batch-fetch category+question
+    const marketIds = [...new Set(allPositions.map((p) => p.market_id).filter(Boolean))];
+    const marketMeta: Record<string, { category: string; question: string }> = {};
+    const CHUNK = 200;
+    for (let i = 0; i < marketIds.length; i += CHUNK) {
+      const slice = marketIds.slice(i, i + CHUNK);
+      const { data: mData, error: mErr } = await supabase
+        .from("markets")
+        .select("id, category, question")
+        .in("id", slice);
+      if (mErr) throw mErr;
+      for (const m of mData || []) {
+        marketMeta[m.id] = {
+          category: m.category || "Other",
+          question: m.question || m.id,
+        };
+      }
+    }
+
+    // 3. Aggregate by category
+    const byCategory: Record<string, {
+      yesValueUsd: number;
+      noValueUsd: number;
+      positionCount: number;
+      whaleSet: Set<string>;
+      marketFlows: Record<string, { question: string; flowUsd: number }>;
+    }> = {};
+
+    for (const pos of allPositions) {
+      const meta = marketMeta[pos.market_id];
+      if (!meta) continue;
+
+      const value = Number(pos.current_value ?? 0);
+      if (!value || isNaN(value) || value <= 0) continue;
+
+      // outcome is "Yes" or "No" (mixed case)
+      const isYes = String(pos.outcome || "").toLowerCase().startsWith("y");
+
+      const cat = meta.category;
+      if (!byCategory[cat]) {
+        byCategory[cat] = {
+          yesValueUsd: 0,
+          noValueUsd: 0,
+          positionCount: 0,
+          whaleSet: new Set(),
+          marketFlows: {},
+        };
+      }
+      const bucket = byCategory[cat];
+      if (isYes) bucket.yesValueUsd += value;
+      else bucket.noValueUsd += value;
+      bucket.positionCount += 1;
+      if (pos.whale_id) bucket.whaleSet.add(pos.whale_id);
+
+      if (!bucket.marketFlows[pos.market_id]) {
+        bucket.marketFlows[pos.market_id] = { question: meta.question, flowUsd: 0 };
+      }
+      bucket.marketFlows[pos.market_id].flowUsd += isYes ? value : -value;
+    }
+
+    // 4. Shape result
+    const result: SmartMoneyFlowByCategory[] = Object.entries(byCategory).map(([category, b]) => ({
+      category,
+      netFlowUsd: b.yesValueUsd - b.noValueUsd,
+      yesValueUsd: b.yesValueUsd,
+      noValueUsd: b.noValueUsd,
+      positionCount: b.positionCount,
+      uniqueWhales: b.whaleSet.size,
+      topMarkets: Object.entries(b.marketFlows)
+        .map(([id, m]) => ({ id, question: m.question, flowUsd: m.flowUsd }))
+        .sort((a, b) => Math.abs(b.flowUsd) - Math.abs(a.flowUsd))
+        .slice(0, 5),
+    }));
+
+    result.sort((a, b) => Math.abs(b.netFlowUsd) - Math.abs(a.netFlowUsd));
+
+    console.log(
+      `[getSmartMoneyFlow] ${result.length} categories, ${allPositions.length} positions, ` +
+      `${Object.keys(marketMeta).length}/${marketIds.length} markets matched`
+    );
+
+    const out = { data: result, source: "live" as DataSource };
+    setCache(cacheKey, out);
+    return out;
+  } catch (err) {
+    console.error("[getSmartMoneyFlow] failed:", err);
+    return { data: [], source: "mock" };
+  }
+}
