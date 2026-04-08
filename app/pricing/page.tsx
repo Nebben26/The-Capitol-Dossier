@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Check, X, Star, ChevronDown, ChevronUp, Zap, Code, Building2, Terminal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { PRICING } from "@/lib/pricing";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -124,7 +125,7 @@ export default function PricingPage() {
       badgeColor: "#8892b0",
       badgeBg: "#8892b018",
       icon: null,
-      price: "$0",
+      price: PRICING.free.priceLabel,
       period: "/month",
       annual: null,
       description: "Everything you need to scan the prediction market landscape",
@@ -151,9 +152,9 @@ export default function PricingPage() {
       badgeColor: "#57D7BA",
       badgeBg: "#57D7BA18",
       icon: <Star className="size-3 fill-[#57D7BA]" />,
-      price: "$60",
+      price: PRICING.pro.priceLabel,
       period: "/month",
-      annual: "or $600/year (save $120)",
+      annual: `or ${PRICING.pro.annualLabel}`,
       description: "For serious traders who want the full intelligence layer",
       featured: true,
       features: [
@@ -177,9 +178,9 @@ export default function PricingPage() {
       badgeColor: "#22d3ee",
       badgeBg: "#22d3ee18",
       icon: <Terminal className="size-3 text-[#22d3ee]" />,
-      price: "$150",
+      price: PRICING.starterApi.priceLabel,
       period: "/month",
-      annual: "or $1,500/year (save $300)",
+      annual: `or ${PRICING.starterApi.annualLabel}`,
       description: "Programmatic access for solo developers and small projects",
       featured: false,
       features: [
@@ -204,9 +205,9 @@ export default function PricingPage() {
       badgeColor: "#f59e0b",
       badgeBg: "#f59e0b18",
       icon: <Code className="size-3 text-[#f59e0b]" />,
-      price: "$500",
+      price: PRICING.quantApi.priceLabel,
       period: "/month",
-      annual: "or $5,000/year (save $1,000)",
+      annual: `or ${PRICING.quantApi.annualLabel}`,
       description: "Programmatic access for traders building their own systems",
       featured: false,
       features: [
@@ -231,9 +232,9 @@ export default function PricingPage() {
       badgeColor: "#8b5cf6",
       badgeBg: "#8b5cf618",
       icon: <Building2 className="size-3 text-[#8b5cf6]" />,
-      price: "$1,500",
+      price: PRICING.premium.priceLabel,
       period: "/month",
-      annual: "Custom billing available",
+      annual: PRICING.premium.annualLabel,
       description: "For hedge funds, market makers, and institutional traders",
       featured: false,
       features: [

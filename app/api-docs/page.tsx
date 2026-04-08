@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Footer } from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import {
   Lock,
   ArrowUpRight,
 } from "lucide-react";
+import { PRICING } from "@/lib/pricing";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -335,8 +337,8 @@ export default function ApiDocsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
-            tier: "Starter API",
-            price: "$150",
+            tier: PRICING.starterApi.name,
+            price: PRICING.starterApi.priceLabel,
             sub: "per month",
             color: "#22d3ee",
             limits: ["20 req/min", "1,000 req/day"],
@@ -345,8 +347,8 @@ export default function ApiDocsPage() {
             ctaLink: "/pricing",
           },
           {
-            tier: "Quant API",
-            price: "$500",
+            tier: PRICING.quantApi.name,
+            price: PRICING.quantApi.priceLabel,
             sub: "per month",
             color: "#f59e0b",
             limits: ["60 req/min", "5,000 req/day"],
@@ -356,8 +358,8 @@ export default function ApiDocsPage() {
             featured: true,
           },
           {
-            tier: "Premium",
-            price: "$1,500",
+            tier: PRICING.premium.name,
+            price: PRICING.premium.priceLabel,
             sub: "per month",
             color: "#8b5cf6",
             limits: ["600 req/min", "100,000 req/day"],
@@ -497,14 +499,7 @@ X-RateLimit-Tier: free`}
         </CardContent>
       </Card>
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice.</span>
-        <div className="flex items-center gap-3">
-          <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
-          <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

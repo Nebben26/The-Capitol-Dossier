@@ -1466,3 +1466,70 @@ export async function getCrossPlatformPrice(
     return null;
   }
 }
+
+// ─── TIMESTAMPS & SYSTEM STATS ───────────────────────────────────────────────
+
+/** Returns ISO timestamp of the most recently detected signal, or null if none */
+export async function getLatestSignalTimestamp(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data } = await supabase
+      .from("signals")
+      .select("detected_at")
+      .order("detected_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data?.detected_at || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Returns ISO timestamp of the most recently updated market row, or null if none */
+export async function getLastIngestTimestamp(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data } = await supabase
+      .from("markets")
+      .select("updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data?.updated_at || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Aggregate system stats for the /status page */
+export async function getSystemStats(): Promise<{
+  marketsCount: number;
+  whalesCount: number;
+  disagreementsCount: number;
+  signalsCount: number;
+  latestSignalAt: string | null;
+  latestIngestAt: string | null;
+}> {
+  const empty = { marketsCount: 0, whalesCount: 0, disagreementsCount: 0, signalsCount: 0, latestSignalAt: null, latestIngestAt: null };
+  if (!isSupabaseConfigured()) return empty;
+  try {
+    const [markets, whales, disagreements, signals, latestSignalAt, latestIngestAt] = await Promise.all([
+      supabase.from("markets").select("id", { count: "exact", head: true }),
+      supabase.from("whales").select("id", { count: "exact", head: true }),
+      supabase.from("disagreements").select("id", { count: "exact", head: true }),
+      supabase.from("signals").select("signal_id", { count: "exact", head: true }),
+      getLatestSignalTimestamp(),
+      getLastIngestTimestamp(),
+    ]);
+    return {
+      marketsCount: markets.count ?? 0,
+      whalesCount: whales.count ?? 0,
+      disagreementsCount: disagreements.count ?? 0,
+      signalsCount: signals.count ?? 0,
+      latestSignalAt,
+      latestIngestAt,
+    };
+  } catch {
+    return empty;
+  }
+}

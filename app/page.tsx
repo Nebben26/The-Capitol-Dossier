@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
+import { getLastIngestTimestamp } from "@/lib/api";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -137,6 +138,7 @@ export default function HomePage() {
   const [priceOffsets, setPriceOffsets] = useState<Record<string, number>>({});
   const [moversFallbackCategory, setMoversFallbackCategory] = useState<string | null>(null);
   const [isNarrow, setIsNarrow] = useState(false);
+  const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -159,6 +161,10 @@ export default function HomePage() {
   }, [rawDisagreements, allMarkets]);
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    getLastIngestTimestamp().then(setLastIngestAt);
+  }, []);
 
   useEffect(() => {
     const check = () => setIsNarrow(window.innerWidth < 640);
@@ -252,6 +258,21 @@ export default function HomePage() {
 
       {/* ─── DASHBOARD ANCHOR ────────────────────────────────── */}
       <div id="dashboard-content" />
+
+      {/* ─── INGEST FRESHNESS ────────────────────────────────── */}
+      {lastIngestAt && (() => {
+        const ageMs = Date.now() - new Date(lastIngestAt).getTime();
+        const ageStr = ageMs < 60_000 ? "just now"
+          : ageMs < 3_600_000 ? `${Math.floor(ageMs / 60_000)}m ago`
+          : `${Math.floor(ageMs / 3_600_000)}h ago`;
+        const color = ageMs < 3_600_000 ? "#22c55e" : ageMs < 7_200_000 ? "#f59e0b" : "#ef4444";
+        return (
+          <div className="flex items-center gap-1.5 text-[10px] font-mono tabular-nums" style={{ color }}>
+            <span className="size-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} />
+            Live data — last ingested {ageStr}
+          </div>
+        );
+      })()}
 
       {/* ─── MORNING BRIEF ───────────────────────────────────── */}
       <MorningBriefCard />

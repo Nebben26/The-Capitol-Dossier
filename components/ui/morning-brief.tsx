@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRef } from "react";
 import {
   Sunrise,
   TrendingUp,
@@ -12,6 +13,8 @@ import {
   Calendar,
   RefreshCw,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { getMorningBrief, type MorningBrief } from "@/lib/api";
 import { formatSignedPct, formatUsd as fmtUsdLib } from "@/lib/format";
@@ -58,6 +61,11 @@ export function MorningBriefCard() {
   const [brief, setBrief] = useState<MorningBrief | null>(null);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "right" ? 180 : -180, behavior: "smooth" });
+  };
 
   // Read collapsed state from localStorage after mount (avoids hydration mismatch)
   useEffect(() => {
@@ -121,7 +129,29 @@ export function MorningBriefCard() {
               Loading brief…
             </div>
           ) : (
-            <div className="flex flex-wrap items-center gap-2 pb-1">
+            <div className="relative">
+              {/* Scroll buttons */}
+              <button
+                onClick={() => scroll("left")}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#1a1e2e] border border-[#2f374f] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="size-3" />
+              </button>
+              {/* Right gradient fade */}
+              <div className="absolute right-5 top-0 bottom-0 w-12 bg-gradient-to-l from-[#222638] to-transparent pointer-events-none z-10" />
+              <button
+                onClick={() => scroll("right")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#1a1e2e] border border-[#2f374f] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="size-3" />
+              </button>
+              {/* Scrollable chip row */}
+              <div
+                ref={scrollRef}
+                className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 px-6"
+              >
               {/* New spreads */}
               <Chip
                 icon={GitCompareArrows}
@@ -180,6 +210,7 @@ export function MorningBriefCard() {
                 color="#6366f1"
                 href="/screener"
               />
+              </div>
             </div>
           )}
         </div>

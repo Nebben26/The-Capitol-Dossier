@@ -23,13 +23,16 @@ import {
   AlertCircle,
   ArrowUpRight,
   ArrowDownRight,
+  Clock,
 } from "lucide-react";
+import { formatUsd } from "@/lib/format";
 import { useAlertData } from "@/hooks/useData";
 import { getSignals } from "@/lib/api";
 import type { Signal, SignalType } from "@/lib/signals";
 import { supabase } from "@/lib/supabase";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
+import { Footer } from "@/components/layout/Footer";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 import { TrialBanner } from "@/components/ui/pro-gate";
 
@@ -104,6 +107,10 @@ function SignalCard({ signal }: { signal: Signal }) {
     ageMs < 60_000 ? "just now"
     : ageMs < 3_600_000 ? `${Math.floor(ageMs / 60_000)}m ago`
     : `${Math.floor(ageMs / 3_600_000)}h ago`;
+  const ageColor =
+    ageMs < 30 * 60_000 ? "#22c55e"
+    : ageMs < 2 * 3_600_000 ? "#f59e0b"
+    : "#8892b0";
 
   return (
     <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/20 transition-all">
@@ -148,7 +155,13 @@ function SignalCard({ signal }: { signal: Signal }) {
                   )}
                 </span>
               )}
-              <span className="text-[9px] text-[#8892b0] ml-auto">{ageStr}</span>
+              <span
+                className="text-[9px] font-mono tabular-nums ml-auto flex items-center gap-0.5"
+                style={{ color: ageColor }}
+              >
+                <Clock className="size-2.5 shrink-0" />
+                {ageStr}
+              </span>
             </div>
 
             {/* Headline */}
@@ -183,10 +196,7 @@ function SignalCard({ signal }: { signal: Signal }) {
               )}
               {typeof totalUsd === "number" && totalUsd > 0 && (
                 <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">
-                  {totalUsd >= 1_000_000
-                    ? `$${(totalUsd / 1_000_000).toFixed(1)}M`
-                    : `$${(totalUsd / 1_000).toFixed(0)}K`}{" "}
-                  exposure
+                  {formatUsd(totalUsd)} exposure
                 </span>
               )}
               {typeof stats.whale_count === "number" && (
@@ -295,6 +305,20 @@ export default function AlertsPage() {
       ? signals
       : signals.filter((s) => s.type === activeFilter);
 
+  // Derive freshness from loaded signals
+  const latestSignalAt = signals.length > 0
+    ? signals.reduce((latest, s) => s.detected_at > latest ? s.detected_at : latest, signals[0].detected_at)
+    : null;
+  const signalFreshnessMs = latestSignalAt ? Date.now() - new Date(latestSignalAt).getTime() : null;
+  const signalFreshnessStr = signalFreshnessMs == null ? null
+    : signalFreshnessMs < 60_000 ? "just now"
+    : signalFreshnessMs < 3_600_000 ? `${Math.floor(signalFreshnessMs / 60_000)}m ago`
+    : `${Math.floor(signalFreshnessMs / 3_600_000)}h ago`;
+  const signalFreshnessColor = signalFreshnessMs == null ? "#8892b0"
+    : signalFreshnessMs < 30 * 60_000 ? "#22c55e"
+    : signalFreshnessMs < 2 * 3_600_000 ? "#f59e0b"
+    : "#ef4444";
+
   // Summary counts
   const typeCount = (t: SignalType) => signals.filter((s) => s.type === t).length;
 
@@ -327,6 +351,15 @@ export default function AlertsPage() {
             error={error}
             onRetry={retry}
           />
+          {signalFreshnessStr && (
+            <span
+              className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#222638] border border-[#2f374f] text-[10px] font-mono tabular-nums"
+              style={{ color: signalFreshnessColor }}
+            >
+              <Clock className="size-3 shrink-0" />
+              Signals computed {signalFreshnessStr}
+            </span>
+          )}
         </div>
       </div>
 
@@ -435,19 +468,7 @@ export default function AlertsPage() {
        *
        * ════════════════════════════════════════════════════════════════════ */}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>
-          © 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.
-        </span>
-        <div className="flex items-center gap-3">
-          <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">
-            Terms
-          </Link>
-          <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">
-            Privacy
-          </Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
