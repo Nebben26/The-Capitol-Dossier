@@ -184,33 +184,40 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
   }
 
   try {
-    // Get total count first to know how many pages we need
-    const { count, error: countErr } = await supabase
-      .from("markets")
-      .select("*", { count: "exact", head: true });
-    if (countErr) throw countErr;
-    if (!count || count === 0) return { data: mockMarkets, source: "mock" };
-
-    // Fetch all pages, ordering by id (deterministic, no nulls)
+    // Paginate until empty — NO HEAD count query (Supabase returns 503 on HEAD count)
     const allRows: any[] = [];
     const PAGE_SIZE = 1000;
-    const numPages = Math.ceil(count / PAGE_SIZE);
-    for (let i = 0; i < numPages; i++) {
-      const from = i * PAGE_SIZE;
+    const MAX_PAGES = 20; // safety ceiling — 20,000 markets max
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const from = page * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       const { data, error } = await supabase
         .from("markets")
         .select("*")
         .order("id", { ascending: true })
         .range(from, to);
-      if (error) throw error;
-      if (data) allRows.push(...data);
+
+      if (error) {
+        console.error(`[getAllMarkets] page ${page} error:`, error.message);
+        if (page === 0) throw error; // first page fail → fall back to mock
+        break; // partial load is better than nothing
+      }
+      if (!data || data.length === 0) break;
+      allRows.push(...data);
+      if (data.length < PAGE_SIZE) break; // last page — no need to fetch further
     }
 
-    // Sort by volume in JS
+    if (allRows.length === 0) {
+      console.error("[getAllMarkets] returned 0 rows — falling back to mock");
+      return { data: mockMarkets, source: "mock" };
+    }
+
+    // Sort by volume descending in JS
     allRows.sort((a, b) => (b.volume || 0) - (a.volume || 0));
 
     const markets = allRows.map(dbMarketToFrontend);
+    console.log(`[getAllMarkets] success: ${markets.length} markets loaded`);
 
     // Volume anomaly detection
     if (markets.length >= 5) {

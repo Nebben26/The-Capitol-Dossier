@@ -193,7 +193,13 @@ export default function ScreenerPage() {
             <BarChart3 className="size-7 text-[#57D7BA]" />
             Markets
           </h1>
-          <p className="text-sm text-[#8892b0] mt-1">Advanced filtering across {markets.length.toLocaleString()} prediction markets</p>
+          <p className="text-sm text-[#8892b0] mt-1 flex items-center gap-2">
+            Advanced filtering across {markets.length.toLocaleString()} prediction markets
+            {source === "live"
+              ? <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20">LIVE</span>
+              : <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20">MOCK</span>
+            }
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
