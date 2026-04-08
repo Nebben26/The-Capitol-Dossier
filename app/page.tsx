@@ -598,6 +598,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3 flex-wrap">
             <Link href="/about" className="hover:text-[#57D7BA] transition-colors">About</Link>
             <Link href="/roadmap" className="hover:text-[#57D7BA] transition-colors">Roadmap</Link>
+            <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
             <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
             <a href="https://twitter.com/quivermarkets" target="_blank" rel="noopener noreferrer" className="hover:text-[#57D7BA] transition-colors">Twitter</a>
             <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
