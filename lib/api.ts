@@ -1187,3 +1187,53 @@ export async function getMarketThesis(marketId: string): Promise<MarketThesis | 
     return null;
   }
 }
+
+// ─── SIGNALS ─────────────────────────────────────────────────────────────────
+
+export type { Signal, SignalType } from "./signals";
+
+export interface GetSignalsOpts {
+  type?: import("./signals").SignalType;
+  minConfidence?: number;
+  limit?: number;
+}
+
+/**
+ * Fetch pre-computed signals from Supabase, sorted by confidence desc.
+ * Falls back to [] if the table doesn't exist yet.
+ */
+export async function getSignals(opts: GetSignalsOpts = {}): Promise<{
+  data: import("./signals").Signal[];
+  source: DataSource;
+}> {
+  const { type, minConfidence = 1, limit = 50 } = opts;
+
+  if (!isSupabaseConfigured()) return { data: [], source: "mock" };
+
+  try {
+    let query = supabase
+      .from("signals")
+      .select("*")
+      .gte("confidence", minConfidence)
+      .order("confidence", { ascending: false })
+      .order("detected_at", { ascending: false })
+      .limit(limit);
+
+    if (type) query = query.eq("type", type);
+
+    const { data, error } = await query;
+
+    if (error) {
+      // Table doesn't exist yet — graceful degradation
+      if (error.message.includes("does not exist") || error.code === "42P01") {
+        return { data: [], source: "mock" };
+      }
+      throw error;
+    }
+
+    return { data: (data || []) as import("./signals").Signal[], source: "live" };
+  } catch (err) {
+    console.error("[getSignals] failed:", err);
+    return { data: [], source: "mock" };
+  }
+}
