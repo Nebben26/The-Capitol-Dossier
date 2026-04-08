@@ -79,7 +79,7 @@ export default function ContactPage() {
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardContent className="p-5 space-y-4">
           <h2 className="text-sm font-semibold text-[#e2e8f0]">Want to be first when Pro launches?</h2>
-          <WaitlistForm />
+          <WaitlistForm source="contact" />
         </CardContent>
       </Card>
 

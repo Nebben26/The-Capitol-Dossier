@@ -338,7 +338,7 @@ export default function PricingPage() {
                   <p className="text-[10px] text-[#8892b0] text-center">
                     Or join the waitlist for $39/mo founder pricing.
                   </p>
-                  <WaitlistForm compact />
+                  <WaitlistForm compact source="pricing-pro-tier" />
                 </div>
               )}
             </div>

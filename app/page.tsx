@@ -264,7 +264,7 @@ export default function HomePage() {
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardContent className="p-5">
           <p className="text-xs font-semibold text-[#57D7BA] uppercase tracking-widest mb-3">Be first when Pro launches</p>
-          <WaitlistForm />
+          <WaitlistForm source="homepage" />
         </CardContent>
       </Card>
 
