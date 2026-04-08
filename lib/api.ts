@@ -448,9 +448,41 @@ export async function getWhaleTrades(whaleId: string): Promise<{
 }
 
 /**
- * Get spread history for a disagreement pair from disagreement_snapshots.
+ * Batch-fetch spread history for multiple disagreements keyed by poly_market_id.
+ * Returns a map: poly_market_id → [{t (ms), spread}] sorted ascending.
  */
-export async function getSpreadHistory(polyId: string, kalshiId: string): Promise<{
+export async function getSpreadHistory(
+  polyMarketIds: string[]
+): Promise<Record<string, Array<{ t: number; spread: number }>>> {
+  if (!isSupabaseConfigured() || polyMarketIds.length === 0) return {};
+  try {
+    const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from("disagreement_snapshots")
+      .select("poly_market_id, spread, captured_at")
+      .in("poly_market_id", polyMarketIds)
+      .gte("captured_at", since)
+      .order("captured_at", { ascending: true });
+    if (error) throw error;
+    const byId: Record<string, Array<{ t: number; spread: number }>> = {};
+    for (const row of data || []) {
+      if (!byId[row.poly_market_id]) byId[row.poly_market_id] = [];
+      byId[row.poly_market_id].push({
+        t: new Date(row.captured_at).getTime(),
+        spread: Number(row.spread),
+      });
+    }
+    return byId;
+  } catch (err) {
+    console.error("[getSpreadHistory] failed:", err);
+    return {};
+  }
+}
+
+/**
+ * @deprecated Use getSpreadHistory(polyMarketIds[]) instead.
+ */
+async function _getSpreadHistoryPair(polyId: string, kalshiId: string): Promise<{
   data: { spread: number; captured_at: string }[];
   source: DataSource;
 }> {

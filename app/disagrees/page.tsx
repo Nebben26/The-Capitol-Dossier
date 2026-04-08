@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -31,8 +31,10 @@ import {
   List,
 } from "lucide-react";
 import { useDisagreements } from "@/hooks/useData";
+import { getSpreadHistory } from "@/lib/api";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
+import { Sparkline } from "@/components/ui/sparkline";
 import type { Disagreement } from "@/lib/mockData";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
@@ -59,7 +61,7 @@ function SpreadBadge({ spread }: { spread: number }) {
   );
 }
 
-function DisagreeCard({ d }: { d: Disagreement }) {
+function DisagreeCard({ d, history }: { d: Disagreement; history: Array<{ t: number; spread: number }> }) {
   return (
     <Card className="bg-[#222638] border-[#2f374f] hover:border-[#f59e0b]/30 transition-all h-full">
       <CardContent className="p-4">
@@ -83,11 +85,14 @@ function DisagreeCard({ d }: { d: Disagreement }) {
             <div className="font-mono text-lg font-bold tabular-nums text-[#e2e8f0]">{d.polyPrice}¢</div>
             <div className="text-[8px] text-[#8892b0] mt-0.5">{d.polyVol}</div>
           </div>
-          <div className="shrink-0 flex flex-col items-center">
+          <div className="shrink-0 flex flex-col items-center gap-0.5">
             <div className="px-2.5 py-1.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-sm font-bold font-mono tabular-nums border border-[#f59e0b]/20">
               {d.spread}pt
             </div>
-            <span className="text-[7px] text-[#8892b0] mt-0.5">spread</span>
+            <span className="text-[7px] text-[#8892b0]">spread</span>
+            <div className="mt-1">
+              <Sparkline data={history} width={80} height={24} strokeColor="#f59e0b" />
+            </div>
           </div>
           <div className="flex-1 text-center p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
             <div className="text-[9px] text-[#8892b0] mb-0.5">Kalshi</div>
@@ -123,6 +128,13 @@ export default function DisagreesPage() {
   const [sortBy, setSortBy] = useState<SortKey>("spread");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [historyMap, setHistoryMap] = useState<Record<string, Array<{ t: number; spread: number }>>>({});
+
+  useEffect(() => {
+    if (!disagreements.length) return;
+    const ids = disagreements.map((d) => d.marketId).filter(Boolean);
+    getSpreadHistory(ids).then(setHistoryMap).catch(() => {/* non-blocking */});
+  }, [disagreements]);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -228,7 +240,7 @@ export default function DisagreesPage() {
       {/* Grid view */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((d) => <DisagreeCard key={d.id} d={d} />)}
+          {filtered.map((d) => <DisagreeCard key={d.id} d={d} history={historyMap[d.marketId] || []} />)}
         </div>
       )}
 
