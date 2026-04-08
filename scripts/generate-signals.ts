@@ -50,7 +50,7 @@ async function main() {
   console.log("Running signal detectors...");
   let signals;
   try {
-    signals = await detectAllSignals();
+    signals = await detectAllSignals(supabase);
   } catch (err) {
     console.error("❌ detectAllSignals failed:", err);
     process.exit(1);

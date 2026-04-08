@@ -3,7 +3,8 @@
  * Analyzes whale_positions data to produce typed Signal objects.
  */
 
-import { supabase } from "./supabase";
+import { supabase as defaultSupabase } from "./supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -362,8 +363,10 @@ export function detectWhaleDivergence(
 
 /**
  * Pull all data from Supabase, run all 4 detectors, dedup, sort, return top 50.
+ * Pass a custom `client` (e.g. service-role key) for scripts; defaults to anon client.
  */
-export async function detectAllSignals(): Promise<Signal[]> {
+export async function detectAllSignals(client?: SupabaseClient): Promise<Signal[]> {
+  const supabase = client ?? defaultSupabase;
   // 1. Fetch all whale positions (paginated)
   const allPositions: RawPosition[] = [];
   const PAGE_SIZE = 1000;
