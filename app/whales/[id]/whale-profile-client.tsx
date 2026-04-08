@@ -73,6 +73,7 @@ import { useWhaleProfile } from "@/hooks/useData";
 import { markets, whaleById } from "@/lib/mockData";
 import { ShareCardButton } from "@/components/ui/share-card-button";
 import { WatchlistButton } from "@/components/ui/watchlist-button";
+import { getWhaleAccuracy, type WhaleAccuracyProfile } from "@/lib/api";
 
 // ─── SORT HELPERS ────────────────────────────────────────────────────
 type HistSortKey = "size" | "pnl" | "date";
@@ -231,6 +232,14 @@ export default function WhaleProfilePage() {
   const [loading, setLoading] = useState(true);
   const [histSort, setHistSort] = useState<HistSortKey>("pnl");
   const [histDir, setHistDir] = useState<HistSortDir>("desc");
+  const [accuracyProfile, setAccuracyProfile] = useState<WhaleAccuracyProfile | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    getWhaleAccuracy(id).then((res) => {
+      if (res.data) setAccuracyProfile(res.data);
+    });
+  }, [id]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1200);
@@ -390,6 +399,50 @@ export default function WhaleProfilePage() {
             </Card>
           ))}
         </div>
+
+        {/* ─── ACCURACY BY CATEGORY ───────────────────────────────── */}
+        {accuracyProfile && accuracyProfile.totalResolved >= 3 && (
+          <Card className="bg-[#222638] border-[#2a2f45]">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <div className="text-sm font-semibold text-[#e2e8f0]">Accuracy by Category</div>
+                  <div className="text-[11px] text-[#8892b0] mt-0.5">
+                    Based on {accuracyProfile.totalResolved} resolved positions
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl font-mono font-bold" style={{ color: accuracyProfile.overallAccuracy >= 55 ? "#22c55e" : accuracyProfile.overallAccuracy >= 45 ? "#f59e0b" : "#ef4444" }}>
+                    {accuracyProfile.overallAccuracy}%
+                  </div>
+                  <div className="text-[10px] text-[#8892b0]">Overall</div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {accuracyProfile.byCategory.map((cat) => (
+                  <div key={cat.category} className="flex items-center gap-3">
+                    <div className="w-20 text-[11px] text-[#8892b0] truncate shrink-0">{cat.category}</div>
+                    <div className="flex-1 h-2 bg-[#1a1e2e] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${cat.accuracy}%`,
+                          backgroundColor: cat.accuracy >= 55 ? "#22c55e" : cat.accuracy >= 45 ? "#f59e0b" : "#ef4444",
+                        }}
+                      />
+                    </div>
+                    <div className="text-[11px] font-mono w-10 text-right tabular-nums" style={{ color: cat.accuracy >= 55 ? "#22c55e" : cat.accuracy >= 45 ? "#f59e0b" : "#ef4444" }}>
+                      {cat.accuracy}%
+                    </div>
+                    <div className="text-[10px] text-[#8892b0] w-12 text-right tabular-nums shrink-0">
+                      {cat.wins}W/{cat.losses}L
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* ─── TABS ────────────────────────────────────────────────── */}
         <Tabs defaultValue="holdings">

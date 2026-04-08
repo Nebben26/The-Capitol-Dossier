@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { useWhales } from "@/hooks/useData";
 import type { Whale } from "@/lib/mockData";
+import { getAllWhaleAccuracies } from "@/lib/api";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { MarketsBrowseSkeleton } from "@/components/ui/skeleton-loaders";
 
@@ -68,7 +69,11 @@ function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; po
   );
 }
 
-function WhaleCard({ w }: { w: Whale }) {
+function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: number; total: number } }) {
+  const displayAccuracy = liveAccuracy && liveAccuracy.total >= 3
+    ? `${liveAccuracy.accuracy}%`
+    : w.accuracy > 0 ? `${w.accuracy}%` : "—";
+
   return (
     <Link href={`/whales/${w.id}`} className="block group">
       <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/20 transition-all h-full">
@@ -89,7 +94,7 @@ function WhaleCard({ w }: { w: Whale }) {
           <PnlSparkline data={w.spark} positive={w.totalPnlNum >= 0} />
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
             <div><div className={`text-xs font-bold font-mono tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</div><div className="text-[8px] text-[#8892b0]">P&L</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.accuracy > 0 ? `${w.accuracy}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{displayAccuracy}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
           </div>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#2f374f]">
@@ -110,8 +115,15 @@ export default function WhalesBrowsePage() {
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [loading, setLoading] = useState(true);
+  const [accuracyMap, setAccuracyMap] = useState<Record<string, { accuracy: number; total: number }>>({});
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    getAllWhaleAccuracies().then((res) => {
+      if (Object.keys(res.data).length > 0) setAccuracyMap(res.data);
+    });
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -184,7 +196,7 @@ export default function WhalesBrowsePage() {
       {/* Grid view */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.map((w) => <WhaleCard key={w.id} w={w} />)}
+          {filtered.map((w) => <WhaleCard key={w.id} w={w} liveAccuracy={accuracyMap[w.id]} />)}
         </div>
       )}
 
@@ -221,14 +233,18 @@ export default function WhalesBrowsePage() {
                     <TableCell className="py-3"><span className={`font-mono text-sm font-bold tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</span></TableCell>
                     <TableCell className="py-3"><PnlSparkline data={w.spark} positive={w.totalPnlNum >= 0} /></TableCell>
                     <TableCell className="py-3">
-                      {w.accuracy > 0 ? (
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.accuracy}%` }} /></div>
-                          <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.accuracy}%</span>
-                        </div>
-                      ) : (
-                        <span className="font-mono text-xs text-[#8892b0]">—</span>
-                      )}
+                      {(() => {
+                        const live = accuracyMap[w.id];
+                        const acc = live && live.total >= 3 ? live.accuracy : w.accuracy > 0 ? w.accuracy : null;
+                        return acc !== null ? (
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${acc}%` }} /></div>
+                            <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{acc}%</span>
+                          </div>
+                        ) : (
+                          <span className="font-mono text-xs text-[#8892b0]">—</span>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</span></TableCell>
                     <TableCell className="py-3"><span className="font-mono text-xs text-[#8892b0] tabular-nums">{w.totalVolume}</span></TableCell>

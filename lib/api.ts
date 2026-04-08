@@ -841,3 +841,155 @@ export async function getSmartMoneyFlow(): Promise<{
     return { data: [], source: "mock" };
   }
 }
+
+// ─── WHALE ACCURACY ──────────────────────────────────────────────────────────
+
+export interface WhaleCategoryAccuracy {
+  category: string;
+  wins: number;
+  losses: number;
+  accuracy: number; // 0-100
+  total: number;
+}
+
+export interface WhaleAccuracyProfile {
+  overallAccuracy: number;
+  totalResolved: number;
+  byCategory: WhaleCategoryAccuracy[];
+}
+
+export async function getWhaleAccuracy(
+  whaleId: string
+): Promise<{ data: WhaleAccuracyProfile | null; source: DataSource }> {
+  const cacheKey = `whale_accuracy_${whaleId}`;
+  const cached = getCached<{ data: WhaleAccuracyProfile | null; source: DataSource }>(cacheKey, WHALE_CACHE_TTL);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) return { data: null, source: "mock" };
+
+  try {
+    // 1. Fetch all positions for this whale with non-zero pnl
+    const { data: positions, error } = await supabase
+      .from("whale_positions")
+      .select("market_id, outcome, pnl")
+      .eq("whale_id", whaleId)
+      .neq("pnl", 0);
+
+    if (error) throw error;
+    if (!positions || positions.length === 0) {
+      const out = { data: null, source: "live" as DataSource };
+      setCache(cacheKey, out);
+      return out;
+    }
+
+    // 2. Batch-fetch categories for all market IDs
+    const marketIds = [...new Set(positions.map((p: any) => p.market_id).filter(Boolean))];
+    const marketMeta: Record<string, string> = {};
+    const CHUNK = 200;
+    for (let i = 0; i < marketIds.length; i += CHUNK) {
+      const chunk = marketIds.slice(i, i + CHUNK);
+      const { data: mrows, error: merr } = await supabase
+        .from("markets")
+        .select("id, category")
+        .in("id", chunk);
+      if (!merr && mrows) {
+        for (const m of mrows) {
+          if (m.category) marketMeta[m.id] = m.category;
+        }
+      }
+    }
+
+    // 3. Aggregate wins/losses per category
+    const byCat: Record<string, { wins: number; losses: number }> = {};
+    let totalWins = 0;
+    let totalLosses = 0;
+
+    for (const pos of positions) {
+      const pnl = Number(pos.pnl);
+      if (pnl === 0) continue;
+      const isWin = pnl > 0;
+      const cat = marketMeta[pos.market_id] || "Other";
+
+      if (!byCat[cat]) byCat[cat] = { wins: 0, losses: 0 };
+      if (isWin) { byCat[cat].wins += 1; totalWins += 1; }
+      else { byCat[cat].losses += 1; totalLosses += 1; }
+    }
+
+    const totalResolved = totalWins + totalLosses;
+    const overallAccuracy = totalResolved > 0 ? Math.round((totalWins / totalResolved) * 100) : 0;
+
+    const byCategory: WhaleCategoryAccuracy[] = Object.entries(byCat)
+      .map(([category, { wins, losses }]) => {
+        const total = wins + losses;
+        return { category, wins, losses, total, accuracy: total > 0 ? Math.round((wins / total) * 100) : 0 };
+      })
+      .filter((c) => c.total >= 2)
+      .sort((a, b) => b.total - a.total);
+
+    const profile: WhaleAccuracyProfile = { overallAccuracy, totalResolved, byCategory };
+    const out = { data: profile, source: "live" as DataSource };
+    setCache(cacheKey, out);
+    return out;
+  } catch (err) {
+    console.error(`[getWhaleAccuracy] failed for ${whaleId}:`, err);
+    return { data: null, source: "mock" };
+  }
+}
+
+export async function getAllWhaleAccuracies(): Promise<{
+  data: Record<string, { accuracy: number; total: number }>;
+  source: DataSource;
+}> {
+  const cacheKey = "all_whale_accuracies";
+  const cached = getCached<{ data: Record<string, { accuracy: number; total: number }>; source: DataSource }>(
+    cacheKey, WHALE_CACHE_TTL
+  );
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) return { data: {}, source: "mock" };
+
+  try {
+    // Paginate all positions with non-zero pnl
+    const allPositions: Array<{ whale_id: string; pnl: number }> = [];
+    const PAGE_SIZE = 1000;
+    const MAX_PAGES = 20;
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const { data, error } = await supabase
+        .from("whale_positions")
+        .select("whale_id, pnl")
+        .neq("pnl", 0)
+        .range(from, to);
+      if (error) { if (page === 0) throw error; break; }
+      if (!data || data.length === 0) break;
+      allPositions.push(...data);
+      if (data.length < PAGE_SIZE) break;
+    }
+
+    // Aggregate per whale
+    const byWhale: Record<string, { wins: number; losses: number }> = {};
+    for (const pos of allPositions) {
+      if (!pos.whale_id) continue;
+      const pnl = Number(pos.pnl);
+      if (pnl === 0) continue;
+      if (!byWhale[pos.whale_id]) byWhale[pos.whale_id] = { wins: 0, losses: 0 };
+      if (pnl > 0) byWhale[pos.whale_id].wins += 1;
+      else byWhale[pos.whale_id].losses += 1;
+    }
+
+    const result: Record<string, { accuracy: number; total: number }> = {};
+    for (const [whaleId, { wins, losses }] of Object.entries(byWhale)) {
+      const total = wins + losses;
+      result[whaleId] = { accuracy: total > 0 ? Math.round((wins / total) * 100) : 0, total };
+    }
+
+    console.log(`[getAllWhaleAccuracies] ${Object.keys(result).length} whales with resolved positions`);
+    const out = { data: result, source: "live" as DataSource };
+    setCache(cacheKey, out);
+    return out;
+  } catch (err) {
+    console.error("[getAllWhaleAccuracies] failed:", err);
+    return { data: {}, source: "mock" };
+  }
+}
