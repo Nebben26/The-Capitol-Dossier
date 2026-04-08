@@ -696,6 +696,22 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
       console.error("[getDisagreements] enrichment failed (non-blocking):", enrichErr);
     }
 
+    // Compute opportunity score: spread × min(polyVol, kalshiVol) / 1000
+    function parseVolStr(v: string): number {
+      const n = parseFloat(v.replace(/[$KM,]/g, ""));
+      if (isNaN(n)) return 0;
+      if (v.includes("M")) return n * 1_000_000;
+      if (v.includes("K")) return n * 1_000;
+      return n;
+    }
+    for (const d of disagreements) {
+      const pv = parseVolStr(d.polyVol);
+      const kv = parseVolStr(d.kalshiVol);
+      d.opportunityScore = pv > 0 && kv > 0
+        ? Math.round(d.spread * Math.min(pv, kv) / 1000)
+        : 0;
+    }
+
     const result: ApiResult<Disagreement[]> = { data: disagreements, source: "live" };
     setCache("disagreements", result);
     return result;

@@ -558,6 +558,7 @@ export interface Disagreement {
   direction: "poly-higher" | "kalshi-higher";
   spreadTrend?: "converging" | "diverging" | "stable";
   convergenceRate?: number;
+  opportunityScore?: number;
 }
 
 export const disagreements: Disagreement[] = [

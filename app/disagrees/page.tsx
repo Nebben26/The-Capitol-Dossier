@@ -39,7 +39,7 @@ import type { Disagreement } from "@/lib/mockData";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
-type SortKey = "spread" | "polyVol" | "daysLeft";
+type SortKey = "opportunity" | "spread" | "polyVol" | "daysLeft";
 type SortDir = "asc" | "desc";
 type ViewMode = "grid" | "table";
 
@@ -70,6 +70,11 @@ function DisagreeCard({ d, history }: { d: Disagreement; history: Array<{ t: num
             <AlertTriangle className="size-2.5" /> ARBITRAGE
           </span>
           <span className="px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-semibold">{d.category}</span>
+          {(d.opportunityScore ?? 0) > 0 && (
+            <span className="px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-bold font-mono tabular-nums border border-[#57D7BA]/20">
+              Score: {d.opportunityScore}
+            </span>
+          )}
           <span className="flex items-center gap-0.5 text-[8px] text-[#8892b0]">
             {d.daysLeft > 0 && <><Timer className="size-2.5" />{d.daysLeft}d</>}
           </span>
@@ -125,7 +130,7 @@ export default function DisagreesPage() {
   const { disagreements, refreshing, lastFetched, error, retry } = useDisagreements();
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
-  const [sortBy, setSortBy] = useState<SortKey>("spread");
+  const [sortBy, setSortBy] = useState<SortKey>("opportunity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [historyMap, setHistoryMap] = useState<Record<string, Array<{ t: number; spread: number }>>>({});
@@ -147,7 +152,8 @@ export default function DisagreesPage() {
     if (searchQuery) result = result.filter((d) => d.question.toLowerCase().includes(searchQuery.toLowerCase()));
     return [...result].sort((a, b) => {
       let av: number, bv: number;
-      if (sortBy === "spread") { av = a.spread; bv = b.spread; }
+      if (sortBy === "opportunity") { av = a.opportunityScore ?? 0; bv = b.opportunityScore ?? 0; }
+      else if (sortBy === "spread") { av = a.spread; bv = b.spread; }
       else if (sortBy === "polyVol") { av = parseVol(a.polyVol); bv = parseVol(b.polyVol); }
       else { av = a.daysLeft; bv = b.daysLeft; }
       return sortDir === "desc" ? bv - av : av - bv;
@@ -254,6 +260,9 @@ export default function DisagreesPage() {
                   <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">MARKET</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium">POLY</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium">KALSHI</TableHead>
+                  <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("opportunity")}>
+                    <span className="flex items-center gap-0.5">SCORE <SortIcon col="opportunity" /></span>
+                  </TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("spread")}>
                     <span className="flex items-center gap-0.5">SPREAD <SortIcon col="spread" /></span>
                   </TableHead>
@@ -281,6 +290,12 @@ export default function DisagreesPage() {
                     </TableCell>
                     <TableCell className="py-2.5">
                       <span className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{d.kalshiPrice}¢</span>
+                    </TableCell>
+                    <TableCell className="py-2.5">
+                      {(d.opportunityScore ?? 0) > 0
+                        ? <span className="font-mono text-xs font-bold tabular-nums text-[#57D7BA]">{d.opportunityScore}</span>
+                        : <span className="text-[#8892b0] text-xs">—</span>
+                      }
                     </TableCell>
                     <TableCell className="py-2.5">
                       <SpreadBadge spread={d.spread} />
