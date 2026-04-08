@@ -160,6 +160,11 @@ export default function MarketDetailPage() {
   const [crossPlatformPrice, setCrossPlatformPrice] = useState<number | null>(null);
   const [crossPlatformLabel, setCrossPlatformLabel] = useState<string>("Counterpart");
 
+  // Auto-switch to candle mode when real candlestick data is available
+  useEffect(() => {
+    if (candles.length > 0) setChartMode("candle");
+  }, [candles.length]);
+
   useEffect(() => {
     if (!market?.id || market.question === "Loading...") return;
     (async () => {

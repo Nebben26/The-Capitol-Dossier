@@ -240,32 +240,47 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
  * Get a single market by ID with price history.
  */
 export async function getMarketDetail(id: string): Promise<ApiResult<Market | undefined>> {
+  if (!isSupabaseConfigured()) {
+    const market = mockMarkets.find((m) => m.id === id);
+    return { data: market, source: "mock" };
+  }
+
   try {
-    const { data: allMarkets, source } = await getAllMarkets();
-    const market = allMarkets.find((m) => m.id === id);
-    if (market && source === "live") {
-      // Fetch price history
-      try {
-        const { chartData } = await getMarketPriceHistory(market);
-        if (chartData.length > 0) {
-          market.priceHistory = chartData;
-          // Derive sparkline from price history
-          const step = chartData.length > 12 ? Math.ceil(chartData.length / 12) : 1;
-          const sampled = step > 1 ? chartData.filter((_: any, i: number) => i % step === 0).slice(-12) : chartData.slice(-12);
-          market.spark = sampled.map((pt: any, i: number) => ({ d: i, v: Math.max(1, pt.price) }));
-          // Derive change from history
-          if (chartData.length >= 2) {
-            const latest = chartData[chartData.length - 1].price;
-            const prev = chartData[Math.max(0, chartData.length - 24)].price;
-            if (prev > 0) market.change = Math.round(((latest - prev) / prev) * 1000) / 10;
-          }
+    // Query a single row directly — no pagination of all 6000+ markets
+    const { data: row, error } = await supabase
+      .from("markets")
+      .select("*")
+      .eq("id", id)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!row) return { data: undefined, source: "live" };
+
+    const market = dbMarketToFrontend(row);
+
+    // Fetch price history (best-effort)
+    try {
+      const { chartData } = await getMarketPriceHistory(market);
+      if (chartData.length > 0) {
+        market.priceHistory = chartData;
+        const step = chartData.length > 12 ? Math.ceil(chartData.length / 12) : 1;
+        const sampled = step > 1 ? chartData.filter((_: any, i: number) => i % step === 0).slice(-12) : chartData.slice(-12);
+        market.spark = sampled.map((pt: any, i: number) => ({ d: i, v: Math.max(1, pt.price) }));
+        if (chartData.length >= 2) {
+          const latest = chartData[chartData.length - 1].price;
+          const prev = chartData[Math.max(0, chartData.length - 24)].price;
+          if (prev > 0) market.change = Math.round(((latest - prev) / prev) * 1000) / 10;
         }
-      } catch { /* price history is best-effort */ }
-      return { data: market, source };
-    }
-    if (market) return { data: market, source };
-  } catch { /* fall through */ }
-  return { data: undefined, source: "mock" };
+      }
+    } catch { /* price history is best-effort */ }
+
+    return { data: market, source: "live" };
+  } catch (err) {
+    console.error("[getMarketDetail] failed:", err);
+    const market = mockMarkets.find((m) => m.id === id);
+    return { data: market, source: "mock" };
+  }
 }
 
 /**
