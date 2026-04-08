@@ -1188,6 +1188,129 @@ export async function getMarketThesis(marketId: string): Promise<MarketThesis | 
   }
 }
 
+// ─── COPY THE WHALES ─────────────────────────────────────────────────────────
+
+export interface CopyPortfolioPosition {
+  market_id: string;
+  market_question: string;
+  yes_value: number;
+  no_value: number;
+  total_value: number;
+  whale_count: number;
+  direction: "YES" | "NO";
+}
+
+export interface CopyPortfolioSummary {
+  selected_count: number;
+  combined_capital: number;
+  combined_pnl: number;
+  weighted_accuracy: number;
+  yes_total: number;
+  no_total: number;
+  top_plays: CopyPortfolioPosition[];
+}
+
+export async function getCopyPortfolio(whaleIds: string[]): Promise<CopyPortfolioSummary> {
+  const empty: CopyPortfolioSummary = {
+    selected_count: 0,
+    combined_capital: 0,
+    combined_pnl: 0,
+    weighted_accuracy: 0,
+    yes_total: 0,
+    no_total: 0,
+    top_plays: [],
+  };
+
+  if (!isSupabaseConfigured() || whaleIds.length === 0) return empty;
+
+  try {
+    // 1. Fetch all positions for these whales
+    const { data: positions, error: posErr } = await supabase
+      .from("whale_positions")
+      .select("whale_id, market_id, outcome, current_value, pnl")
+      .in("whale_id", whaleIds);
+
+    if (posErr) throw posErr;
+    if (!positions || positions.length === 0) return { ...empty, selected_count: whaleIds.length };
+
+    // 2. Fetch market questions
+    const marketIds = [...new Set(positions.map((p: any) => p.market_id).filter(Boolean))];
+    const marketMap = new Map<string, string>();
+    const CHUNK = 200;
+    for (let i = 0; i < marketIds.length; i += CHUNK) {
+      const { data: mRows } = await supabase
+        .from("markets")
+        .select("id, question")
+        .in("id", marketIds.slice(i, i + CHUNK));
+      for (const m of mRows || []) marketMap.set(m.id, m.question || m.id);
+    }
+
+    // 3. Aggregate positions
+    const byMarket = new Map<string, { yes: number; no: number; whales: Set<string> }>();
+    let combinedCapital = 0;
+    let combinedPnl = 0;
+    let yesTotal = 0;
+    let noTotal = 0;
+
+    for (const p of positions) {
+      const val = Number(p.current_value) || 0;
+      const pnl = Number(p.pnl) || 0;
+      const yes = String(p.outcome || "").toLowerCase().startsWith("y");
+
+      combinedCapital += val;
+      combinedPnl += pnl;
+      if (yes) yesTotal += val; else noTotal += val;
+
+      if (!byMarket.has(p.market_id)) byMarket.set(p.market_id, { yes: 0, no: 0, whales: new Set() });
+      const bucket = byMarket.get(p.market_id)!;
+      if (yes) bucket.yes += val; else bucket.no += val;
+      bucket.whales.add(p.whale_id);
+    }
+
+    // 4. Build top plays
+    const topPlays: CopyPortfolioPosition[] = [];
+    for (const [marketId, agg] of byMarket.entries()) {
+      const total = agg.yes + agg.no;
+      topPlays.push({
+        market_id: marketId,
+        market_question: marketMap.get(marketId) || marketId,
+        yes_value: agg.yes,
+        no_value: agg.no,
+        total_value: total,
+        whale_count: agg.whales.size,
+        direction: agg.yes >= agg.no ? "YES" : "NO",
+      });
+    }
+    topPlays.sort((a, b) => b.total_value - a.total_value);
+
+    // 5. Weighted accuracy from existing getAllWhaleAccuracies
+    const accuracyData = await getAllWhaleAccuracies();
+    let weightedSum = 0;
+    let weightedDenom = 0;
+    for (const wid of whaleIds) {
+      const acc = accuracyData.data[wid];
+      if (acc && acc.total >= 1) {
+        weightedSum += acc.accuracy * acc.total;
+        weightedDenom += acc.total;
+      }
+    }
+    const weighted_accuracy = weightedDenom > 0 ? Math.round(weightedSum / weightedDenom) : 0;
+
+    return {
+      selected_count: whaleIds.length,
+      combined_capital: combinedCapital,
+      combined_pnl: combinedPnl,
+      weighted_accuracy,
+      yes_total: yesTotal,
+      no_total: noTotal,
+      top_plays: topPlays.slice(0, 10),
+    };
+  } catch (err) {
+    console.error("[getCopyPortfolio] failed:", err);
+    return { ...empty, selected_count: whaleIds.length };
+  }
+}
+
 // ─── SIGNALS ─────────────────────────────────────────────────────────────────
 
 export type { Signal, SignalType } from "./signals";

@@ -35,6 +35,8 @@ import {
   List,
   Target,
   Users,
+  UserPlus,
+  ChevronRight,
 } from "lucide-react";
 import { useWhales } from "@/hooks/useData";
 import type { Whale } from "@/lib/mockData";
@@ -170,6 +172,22 @@ export default function WhalesBrowsePage() {
         </div>
         <LastUpdated />
       </div>
+
+      {/* Copy the Whales CTA */}
+      <Link href="/copy" className="block">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#57D7BA]/8 border border-[#57D7BA]/25 hover:border-[#57D7BA]/50 transition-all">
+          <div className="size-8 rounded-lg bg-[#57D7BA]/15 flex items-center justify-center shrink-0">
+            <UserPlus className="size-4 text-[#57D7BA]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="text-sm font-semibold text-[#e2e8f0]">
+              Want to track multiple whales at once?
+            </span>
+            <span className="text-sm text-[#57D7BA] font-semibold ml-2">→ Copy the Whales</span>
+          </div>
+          <ChevronRight className="size-4 text-[#57D7BA] shrink-0" />
+        </div>
+      </Link>
 
       {/* Search + filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
