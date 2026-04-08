@@ -1,0 +1,1213 @@
+[
+  {
+    "market": {
+      "id": "democratic-presidential-nominee-2028",
+      "question": "Democratic Presidential Nominee 2028",
+      "category": "Elections",
+      "price": 26,
+      "change_24h": 0,
+      "volume": 1001354615.8097378,
+      "end_date": "2028-11-07T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x2a2c53bd278c04da9962fcf96490e17f3dfb9bc1",
+        "outcome": "No",
+        "current_value": 3692500,
+        "pnl": 1192500
+      },
+      {
+        "whale_id": "0x2a2c53bd278c04da9962fcf96490e17f3dfb9bc1",
+        "outcome": "Yes",
+        "current_value": 1307500,
+        "pnl": -1192500
+      },
+      {
+        "whale_id": "0x93abbc022ce98d6f45d4444b594791cc4b7a9723",
+        "outcome": "Yes",
+        "current_value": 46500.6628,
+        "pnl": 2173.5686
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 13340.4963,
+        "pnl": 718.1894
+      },
+      {
+        "whale_id": "0x53e55bc7cb3d67ad177c023ce891ad076a9d6177",
+        "outcome": "Yes",
+        "current_value": 7590.0343,
+        "pnl": -4348.6432
+      },
+      {
+        "whale_id": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+        "outcome": "Yes",
+        "current_value": 6531.2204,
+        "pnl": -1872.3856
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "No",
+        "current_value": 5932.0064,
+        "pnl": 1932.002
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 2068,
+        "pnl": -1932
+      },
+      {
+        "whale_id": "0xee67f4f549180f564dd5910b1024b8c6729cef38",
+        "outcome": "Yes",
+        "current_value": 663.3666,
+        "pnl": 132.6732
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 125.8302,
+        "pnl": 16.3411
+      }
+    ],
+    "news": [],
+    "disagreement": {
+      "poly_price": 26,
+      "kalshi_price": 29,
+      "spread": 3,
+      "direction": "kalshi-higher"
+    }
+  },
+  {
+    "market": {
+      "id": "2026-fifa-world-cup-winner-595",
+      "question": "2026 FIFA World Cup Winner ",
+      "category": "Sports",
+      "price": 16,
+      "change_24h": 0,
+      "volume": 532322858.0207263,
+      "end_date": "2026-07-20T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xf5198df69e13937a40d1c76d6f72d9aa067d906b",
+        "outcome": "Yes",
+        "current_value": 17131.8784,
+        "pnl": 7244.2444
+      },
+      {
+        "whale_id": "0xee67f4f549180f564dd5910b1024b8c6729cef38",
+        "outcome": "Yes",
+        "current_value": 14047.1358,
+        "pnl": -871.3614
+      },
+      {
+        "whale_id": "0xd57d76c832674adddd39d9ae1d34cc98c69b80d0",
+        "outcome": "Yes",
+        "current_value": 6655.0486,
+        "pnl": -289.3499
+      },
+      {
+        "whale_id": "0xdf98df283195174d48a946a792d6065fccc00554",
+        "outcome": "Yes",
+        "current_value": 4682.7738,
+        "pnl": 232.6779
+      },
+      {
+        "whale_id": "0xd48a81db62f742c4e42d86dfc23a7ee345366e90",
+        "outcome": "Yes",
+        "current_value": 1988.0345,
+        "pnl": -11.9576
+      },
+      {
+        "whale_id": "0x230287e270f04ba48df3162c5f7de6bdb8a0d6d2",
+        "outcome": "Yes",
+        "current_value": 1927.1411,
+        "pnl": 55.1712
+      },
+      {
+        "whale_id": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+        "outcome": "Yes",
+        "current_value": 1272.0951,
+        "pnl": -197.2495
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 854,
+        "pnl": -1213.656
+      },
+      {
+        "whale_id": "0xe613b515bd46b1585a8b137a4d291d9b80bd540e",
+        "outcome": "Yes",
+        "current_value": 354.161,
+        "pnl": -880.586
+      },
+      {
+        "whale_id": "0xdd9ed02bb67b2ec504be24b98febd651fdac49b3",
+        "outcome": "Yes",
+        "current_value": 337.0037,
+        "pnl": -67.4007
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "republican-presidential-nominee-2028",
+      "question": "Republican Presidential Nominee 2028",
+      "category": "Elections",
+      "price": 49,
+      "change_24h": 0,
+      "volume": 529487891.13260174,
+      "end_date": "2028-11-07T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x94a428cfa4f84b264e01f70d93d02bc96cb36356",
+        "outcome": "Yes",
+        "current_value": 55409.0643,
+        "pnl": -16128.9548
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 36833.9059,
+        "pnl": -8218.4982
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "No",
+        "current_value": 8101.6076,
+        "pnl": -32.771
+      },
+      {
+        "whale_id": "0xc2e7800b5af46e6093872b177b7a5e7f0563be51",
+        "outcome": "Yes",
+        "current_value": 4475.7227,
+        "pnl": -5538.9555
+      },
+      {
+        "whale_id": "0xde7be6d489bce070a959e0cb813128ae659b5f4b",
+        "outcome": "Yes",
+        "current_value": 4203.9139,
+        "pnl": -87.4859
+      },
+      {
+        "whale_id": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+        "outcome": "Yes",
+        "current_value": 1698.7073,
+        "pnl": -31.5937
+      },
+      {
+        "whale_id": "0xcb3143ee858e14d0b3fe40ffeaea78416e646b02",
+        "outcome": "Yes",
+        "current_value": 1322.4185,
+        "pnl": 521.4397
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 209.7125,
+        "pnl": 88.5825
+      },
+      {
+        "whale_id": "0xd48a81db62f742c4e42d86dfc23a7ee345366e90",
+        "outcome": "Yes",
+        "current_value": 96.875,
+        "pnl": -3.125
+      }
+    ],
+    "news": [],
+    "disagreement": {
+      "poly_price": 49,
+      "kalshi_price": 26,
+      "spread": 23,
+      "direction": "poly-higher"
+    }
+  },
+  {
+    "market": {
+      "id": "presidential-election-winner-2028",
+      "question": "Presidential Election Winner 2028",
+      "category": "Elections",
+      "price": 18,
+      "change_24h": 0,
+      "volume": 500459686.4271014,
+      "end_date": "2028-11-07T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x8f69269039b9a401de28a38c2f1c3001364b7df1",
+        "outcome": "No",
+        "current_value": 106990,
+        "pnl": 41990
+      },
+      {
+        "whale_id": "0x8f69269039b9a401de28a38c2f1c3001364b7df1",
+        "outcome": "Yes",
+        "current_value": 23010,
+        "pnl": -41990
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 10254.2339,
+        "pnl": 1801.383
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 1076.2875,
+        "pnl": 875.5814
+      },
+      {
+        "whale_id": "0xee67f4f549180f564dd5910b1024b8c6729cef38",
+        "outcome": "Yes",
+        "current_value": 749.9994,
+        "pnl": 49.9999
+      },
+      {
+        "whale_id": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+        "outcome": "Yes",
+        "current_value": 240.8587,
+        "pnl": 18.5275
+      }
+    ],
+    "news": [],
+    "disagreement": {
+      "poly_price": 18,
+      "kalshi_price": 13,
+      "spread": 5,
+      "direction": "poly-higher"
+    }
+  },
+  {
+    "market": {
+      "id": "english-premier-league-winner",
+      "question": "English Premier League Winner ",
+      "category": "Sports",
+      "price": 86,
+      "change_24h": 0,
+      "volume": 314354882.8950088,
+      "end_date": "2026-05-27T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xea2b4224411e723499a803ce3f4758779fb31fc6",
+        "outcome": "Yes",
+        "current_value": 34977.0496,
+        "pnl": 8988.0789
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "No",
+        "current_value": 9243.054,
+        "pnl": -212.484
+      },
+      {
+        "whale_id": "0xd48a81db62f742c4e42d86dfc23a7ee345366e90",
+        "outcome": "Yes",
+        "current_value": 4103.3034,
+        "pnl": 703.3109
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "2026-nba-champion",
+      "question": "2026 NBA Champion",
+      "category": "Sports",
+      "price": 40,
+      "change_24h": 0,
+      "volume": 236079688.5645958,
+      "end_date": "2026-07-01T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+        "outcome": "Yes",
+        "current_value": 95250.8134,
+        "pnl": 4360.0758
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "Yes",
+        "current_value": 56545.6364,
+        "pnl": 1069.9293
+      },
+      {
+        "whale_id": "0xde7be6d489bce070a959e0cb813128ae659b5f4b",
+        "outcome": "Yes",
+        "current_value": 11748.3823,
+        "pnl": 1040.9958
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "No",
+        "current_value": 6391.6156,
+        "pnl": -169.1886
+      },
+      {
+        "whale_id": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+        "outcome": "Yes",
+        "current_value": 4567.5915,
+        "pnl": -842.545
+      },
+      {
+        "whale_id": "0xd57d76c832674adddd39d9ae1d34cc98c69b80d0",
+        "outcome": "Yes",
+        "current_value": 2509.1042,
+        "pnl": -13.0983
+      },
+      {
+        "whale_id": "0x93abbc022ce98d6f45d4444b594791cc4b7a9723",
+        "outcome": "Yes",
+        "current_value": 1210.5157,
+        "pnl": -3706.8684
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 38.3293,
+        "pnl": -11.6655
+      },
+      {
+        "whale_id": "0x230287e270f04ba48df3162c5f7de6bdb8a0d6d2",
+        "outcome": "Yes",
+        "current_value": 1.9899,
+        "pnl": -9.95
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 0,
+        "pnl": -445.7863
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "uefa-champions-league-winner",
+      "question": "UEFA Champions League Winner ",
+      "category": "Sports",
+      "price": 30,
+      "change_24h": 0,
+      "volume": 227559049.03641456,
+      "end_date": "2026-05-31T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xee67f4f549180f564dd5910b1024b8c6729cef38",
+        "outcome": "Yes",
+        "current_value": 72717.5191,
+        "pnl": 37893.2224
+      },
+      {
+        "whale_id": "0x85f031d069de300055900c4055c1baeb6bde3f67",
+        "outcome": "Yes",
+        "current_value": 37076.0367,
+        "pnl": 3835.452
+      },
+      {
+        "whale_id": "0xfea31bc088000ff909be1dfd8d0e3f2c7ef2d227",
+        "outcome": "Yes",
+        "current_value": 19098.5959,
+        "pnl": 1736.2359
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "No",
+        "current_value": 4629.6977,
+        "pnl": -159.6448
+      },
+      {
+        "whale_id": "0xea2b4224411e723499a803ce3f4758779fb31fc6",
+        "outcome": "Yes",
+        "current_value": 2200,
+        "pnl": -1799.9999
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "Yes",
+        "current_value": 2025.4226,
+        "pnl": -2610.8122
+      },
+      {
+        "whale_id": "0xf5198df69e13937a40d1c76d6f72d9aa067d906b",
+        "outcome": "No",
+        "current_value": 119.1209,
+        "pnl": 9.5843
+      },
+      {
+        "whale_id": "0xe613b515bd46b1585a8b137a4d291d9b80bd540e",
+        "outcome": "Yes",
+        "current_value": 21.928,
+        "pnl": -349.7077
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 12,
+        "pnl": -191.376
+      },
+      {
+        "whale_id": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+        "outcome": "Yes",
+        "current_value": 2.006,
+        "pnl": 1.9257
+      }
+    ],
+    "news": [],
+    "disagreement": {
+      "poly_price": 30,
+      "kalshi_price": 5,
+      "spread": 25,
+      "direction": "poly-higher"
+    }
+  },
+  {
+    "market": {
+      "id": "us-x-iran-ceasefire-by",
+      "question": "US x Iran ceasefire by...?",
+      "category": "Elections",
+      "price": 87,
+      "change_24h": 10.1,
+      "volume": 119374348.6606273,
+      "end_date": null
+    },
+    "whales": [
+      {
+        "whale_id": "0xcf6087abd66e16b59a122d45bfcdc05d4b7247ce",
+        "outcome": "Yes",
+        "current_value": 495140.1489,
+        "pnl": 73459.0223
+      },
+      {
+        "whale_id": "0xd7375270e4769d3cc31885773070a5f12d5bbe95",
+        "outcome": "Yes",
+        "current_value": 473484.5413,
+        "pnl": 460284.2793
+      },
+      {
+        "whale_id": "0xf0d9af9effd0b4a039899901ba19a05ea1a3e4ee",
+        "outcome": "Yes",
+        "current_value": 363436.573,
+        "pnl": 258922.1547
+      },
+      {
+        "whale_id": "0xd5196bdf50199e195c58a6aff2114cc0e455932c",
+        "outcome": "Yes",
+        "current_value": 352532.9646,
+        "pnl": 345702.0384
+      },
+      {
+        "whale_id": "0xffa6b3c90514d7b861c87d7e51cc35fff34530fe",
+        "outcome": "Yes",
+        "current_value": 233529.0084,
+        "pnl": 193529.0774
+      },
+      {
+        "whale_id": "0x44de2a52d8d2d3ddcf39d58e315a10df53ba9c08",
+        "outcome": "Yes",
+        "current_value": 214630.5273,
+        "pnl": 138729.6623
+      },
+      {
+        "whale_id": "0xa4eb52229991c074bc560f825bf2776d77acd010",
+        "outcome": "Yes",
+        "current_value": 201272.7983,
+        "pnl": 148322.701
+      },
+      {
+        "whale_id": "0x94a428cfa4f84b264e01f70d93d02bc96cb36356",
+        "outcome": "Yes",
+        "current_value": 194690.3482,
+        "pnl": 156491.0229
+      },
+      {
+        "whale_id": "0xc6587b11a2209e46dfe3928b31c5514a8e33b784",
+        "outcome": "Yes",
+        "current_value": 179767.8735,
+        "pnl": 68355.1247
+      },
+      {
+        "whale_id": "0x0eaa43c627cd482acb6866a03fe1138495e0c521",
+        "outcome": "Yes",
+        "current_value": 179507.5731,
+        "pnl": 126071.5348
+      }
+    ],
+    "news": [
+      {
+        "title": "U.S. AND IRAN AGREE TO 2-WEEK CEASEFIRE",
+        "source": "Axios",
+        "published_at": "2026-04-07T23:21:05+00:00",
+        "summary": "The U.S. has agreed to a two-week ceasefire with Iran proposed by Pakistan, President Trump said Tuesday night. \nThe big picture: The Pakistani proposal, which came hours before Trump's deadline to launch massive strikes if no deal was reached, involves a pause on Trump's threat and a commitment from Iran to open the Strait of Hormuz for two weeks.\n\nThat two-week period would be used to negotiate a larger agreement to potentially end the war.\nIran has not publicly confirmed its acceptance of the"
+      },
+      {
+        "title": "Oil prices plunge following U.S.-Iran ceasefire",
+        "source": "Axios",
+        "published_at": "2026-04-08T00:09:37+00:00",
+        "summary": "Crude oil prices dropped sharply Tuesday evening, falling well under $100 per barrel after President Trump said the U.S. agreed to a two-week ceasefire with Iran that Pakistan had proposed.\nWhy it matters: It's the biggest one-day free fall in oil prices since the 1991 Gulf War.\nDriving the news: The global benchmark Brent crude futures price fell roughly 16% to about $93 a barrel. But it's still far above the roughly $73 mark right before the war began at the end of February.\n\nWTI, the U.S. ben"
+      },
+      {
+        "title": "Iran mediators make last-ditch push for 45-day ceasefire",
+        "source": "Axios",
+        "published_at": "2026-04-06T01:58:16+00:00",
+        "summary": "The U.S., Iran and a group of regional mediators are discussing the terms for a potential 45-day ceasefire that could lead to a permanent end to the war, according to four U.S., Israeli and regional sources with knowledge of the talks.\nWhy it matters: The sources said the chances for reaching a partial deal over the next 48 hours are slim. But this last-ditch effort could be the only chance to prevent a dramatic escalation in the war that will include massive strikes on Iranian civilian infrastr"
+      }
+    ],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "netanyahu-out-before-2027",
+      "question": "Netanyahu out by...?",
+      "category": "Geopolitics",
+      "price": 37,
+      "change_24h": 0,
+      "volume": 115030595.01089466,
+      "end_date": "2026-12-31T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x96489abcb9f583d6835c8ef95ffc923d05a86825",
+        "outcome": "No",
+        "current_value": 207529.0394,
+        "pnl": 2916.3457
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "No",
+        "current_value": 21950.3255,
+        "pnl": 538.0666
+      },
+      {
+        "whale_id": "0x88c4919de76e526d55a32c1f8afb439dd1f1129a",
+        "outcome": "No",
+        "current_value": 5867.1386,
+        "pnl": -92.0676
+      },
+      {
+        "whale_id": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+        "outcome": "No",
+        "current_value": 2834.9881,
+        "pnl": 244.9998
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "la-liga-winner-114",
+      "question": "LA LIGA Winner ",
+      "category": "Sports",
+      "price": 94,
+      "change_24h": 0,
+      "volume": 106349101.19439098,
+      "end_date": "2026-05-30T00:00:00+00:00"
+    },
+    "whales": [],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "2026-f1-drivers-champion",
+      "question": "F1 Drivers' Champion",
+      "category": "Sports",
+      "price": 44,
+      "change_24h": 0,
+      "volume": 89182689.5460142,
+      "end_date": "2026-12-06T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+        "outcome": "Yes",
+        "current_value": 19789.0344,
+        "pnl": 11726.1773
+      },
+      {
+        "whale_id": "0xdd9ed02bb67b2ec504be24b98febd651fdac49b3",
+        "outcome": "Yes",
+        "current_value": 333.4927,
+        "pnl": -29.2017
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "nba-mvp-694",
+      "question": "NBA MVP ",
+      "category": "Sports",
+      "price": 94,
+      "change_24h": 0,
+      "volume": 86801230.95715712,
+      "end_date": "2026-06-10T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "No",
+        "current_value": 88143.6787,
+        "pnl": 3090.7522
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "Yes",
+        "current_value": 85402.4292,
+        "pnl": 4550.8977
+      },
+      {
+        "whale_id": "0x85f031d069de300055900c4055c1baeb6bde3f67",
+        "outcome": "Yes",
+        "current_value": 7499.9954,
+        "pnl": -9291.7944
+      },
+      {
+        "whale_id": "0x00425c692a667981118f679ef68fdc775257321e",
+        "outcome": "Yes",
+        "current_value": 13.9387,
+        "pnl": -140.7949
+      },
+      {
+        "whale_id": "0xe613b515bd46b1585a8b137a4d291d9b80bd540e",
+        "outcome": "Yes",
+        "current_value": 9.8129,
+        "pnl": -75.0492
+      },
+      {
+        "whale_id": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+        "outcome": "Yes",
+        "current_value": 9.6943,
+        "pnl": 7.9493
+      },
+      {
+        "whale_id": "0x2b3ff45c91540e46fae1e0c72f61f4b049453446",
+        "outcome": "Yes",
+        "current_value": 0.7883,
+        "pnl": -27.4923
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "kalshi-kxpresnomd-28",
+      "question": "2028 Democratic presidential nominee",
+      "category": "Elections",
+      "price": 29,
+      "change_24h": 0,
+      "volume": 82962910,
+      "end_date": "2028-11-07T15:00:00+00:00"
+    },
+    "whales": [],
+    "news": [],
+    "disagreement": {
+      "poly_price": 26,
+      "kalshi_price": 29,
+      "spread": 3,
+      "direction": "kalshi-higher"
+    }
+  },
+  {
+    "market": {
+      "id": "venezuela-leader-end-of-2026",
+      "question": "Venezuela leader end of 2026?",
+      "category": "Elections",
+      "price": 64,
+      "change_24h": 0,
+      "volume": 80614526.79259376,
+      "end_date": "2026-12-31T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xbaa2bcb5439e985ce4ccf815b4700027d1b92c73",
+        "outcome": "Yes",
+        "current_value": 4784.1857,
+        "pnl": 377.6687
+      },
+      {
+        "whale_id": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+        "outcome": "Yes",
+        "current_value": 2530.5818,
+        "pnl": 769.6074
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "No",
+        "current_value": 2438.3321,
+        "pnl": -77.0841
+      },
+      {
+        "whale_id": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+        "outcome": "No",
+        "current_value": 2388.2107,
+        "pnl": 12.2353
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 1277.3066,
+        "pnl": -124.4096
+      },
+      {
+        "whale_id": "0x96489abcb9f583d6835c8ef95ffc923d05a86825",
+        "outcome": "Yes",
+        "current_value": 273.4145,
+        "pnl": -3573.5279
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 14.6653,
+        "pnl": -127.628
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "the-masters-winner-2026",
+      "question": "The Masters - Winner ",
+      "category": "Sports",
+      "price": 14,
+      "change_24h": 0,
+      "volume": 77491124.85493906,
+      "end_date": "2026-04-13T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x84dbb7103982e3617704a2ed7d5b39691952aeeb",
+        "outcome": "No",
+        "current_value": 17852.1125,
+        "pnl": 95.4657
+      },
+      {
+        "whale_id": "0xfea31bc088000ff909be1dfd8d0e3f2c7ef2d227",
+        "outcome": "Yes",
+        "current_value": 9154.066,
+        "pnl": 7632.9525
+      },
+      {
+        "whale_id": "0x404239ba5dafb17da139d664ec720bf2f35f058f",
+        "outcome": "No",
+        "current_value": 4347.5986,
+        "pnl": 16.0258
+      },
+      {
+        "whale_id": "0x85d7f978b9ac0140d00de9388b48e1208d210501",
+        "outcome": "Yes",
+        "current_value": 2566.7494,
+        "pnl": 21.3631
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "Yes",
+        "current_value": 2103.8822,
+        "pnl": -408.218
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "No",
+        "current_value": 1644.9013,
+        "pnl": 11.4857
+      },
+      {
+        "whale_id": "0xd57d76c832674adddd39d9ae1d34cc98c69b80d0",
+        "outcome": "Yes",
+        "current_value": 778.3577,
+        "pnl": -891.6387
+      },
+      {
+        "whale_id": "0xdf98df283195174d48a946a792d6065fccc00554",
+        "outcome": "Yes",
+        "current_value": 312.9502,
+        "pnl": 46.5252
+      },
+      {
+        "whale_id": "0xd61f94d0eba22ceb7c6587f6582b9a7c8fcdc6a6",
+        "outcome": "Yes",
+        "current_value": 91.1901,
+        "pnl": -44.0266
+      },
+      {
+        "whale_id": "0x404239ba5dafb17da139d664ec720bf2f35f058f",
+        "outcome": "Yes",
+        "current_value": 53.4275,
+        "pnl": -56.9776
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "kalshi-kxpgatour-mast26",
+      "question": "The Masters Tournament Champion",
+      "category": "Sports",
+      "price": 7,
+      "change_24h": 0,
+      "volume": 75399955,
+      "end_date": "2026-04-26T23:00:00+00:00"
+    },
+    "whales": [],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "eurovision-winner-2026",
+      "question": "Eurovision Winner 2026",
+      "category": "Culture",
+      "price": 39,
+      "change_24h": 2.6,
+      "volume": 74088193.79335164,
+      "end_date": "2026-05-16T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xe613b515bd46b1585a8b137a4d291d9b80bd540e",
+        "outcome": "Yes",
+        "current_value": 37.66,
+        "pnl": -72.1351
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 24.5,
+        "pnl": -49.504
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "2026-nhl-stanley-cup-champion",
+      "question": "2026 NHL Stanley Cup Champion ",
+      "category": "Sports",
+      "price": 21,
+      "change_24h": 0,
+      "volume": 61850128.83599599,
+      "end_date": "2026-06-30T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+        "outcome": "No",
+        "current_value": 179864.1296,
+        "pnl": -833.2759
+      },
+      {
+        "whale_id": "0xfea31bc088000ff909be1dfd8d0e3f2c7ef2d227",
+        "outcome": "No",
+        "current_value": 45774.7012,
+        "pnl": 25.4176
+      },
+      {
+        "whale_id": "0x19254b55e7c48e88baab9e62cc218223a6544654",
+        "outcome": "Yes",
+        "current_value": 16216.1066,
+        "pnl": -636.7789
+      },
+      {
+        "whale_id": "0x19254b55e7c48e88baab9e62cc218223a6544654",
+        "outcome": "No",
+        "current_value": 2694.991,
+        "pnl": 0.0339
+      },
+      {
+        "whale_id": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+        "outcome": "Yes",
+        "current_value": 705.1401,
+        "pnl": -151.6135
+      },
+      {
+        "whale_id": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+        "outcome": "Yes",
+        "current_value": 324.9996,
+        "pnl": -469.4496
+      },
+      {
+        "whale_id": "0xe613b515bd46b1585a8b137a4d291d9b80bd540e",
+        "outcome": "Yes",
+        "current_value": 0,
+        "pnl": -219.455
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "fed-decision-in-april",
+      "question": "Fed decision in April?",
+      "category": "Elections",
+      "price": 97,
+      "change_24h": 0,
+      "volume": 58292440.250717536,
+      "end_date": "2026-04-29T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 58618.8593,
+        "pnl": 274.0965
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "No",
+        "current_value": 17637.2049,
+        "pnl": 308.1023
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "No",
+        "current_value": 331.25,
+        "pnl": -418.75
+      },
+      {
+        "whale_id": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+        "outcome": "Yes",
+        "current_value": 315.7665,
+        "pnl": -2022.7037
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "hungary-parliamentary-election-winner",
+      "question": "Hungary Parliamentary Election Winner",
+      "category": "Elections",
+      "price": 68,
+      "change_24h": 0,
+      "volume": 58237737.99995807,
+      "end_date": "2026-04-12T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x94a428cfa4f84b264e01f70d93d02bc96cb36356",
+        "outcome": "Yes",
+        "current_value": 1083.9345,
+        "pnl": -169.3648
+      },
+      {
+        "whale_id": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+        "outcome": "Yes",
+        "current_value": 28.707,
+        "pnl": 28.707
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "kalshi-kxnba-26",
+      "question": "Pro Basketball Champion",
+      "category": "Sports",
+      "price": 18,
+      "change_24h": 0,
+      "volume": 55687396,
+      "end_date": "2028-06-29T14:00:00+00:00"
+    },
+    "whales": [],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "will-jesus-christ-return-before-2027",
+      "question": "Will Jesus Christ return before 2027?",
+      "category": "Culture",
+      "price": 4,
+      "change_24h": 0,
+      "volume": 54976776.04214255,
+      "end_date": "2026-12-31T00:00:00+00:00"
+    },
+    "whales": [],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "next-prime-minister-of-hungary",
+      "question": "Next Prime Minister of Hungary",
+      "category": "Geopolitics",
+      "price": 64,
+      "change_24h": 0,
+      "volume": 50427586.50580822,
+      "end_date": "2026-04-12T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xfd22b8843ae03a33a8a4c5e39ef1e5ff33ebad91",
+        "outcome": "Yes",
+        "current_value": 507550.514,
+        "pnl": 8453.9328
+      },
+      {
+        "whale_id": "0xde7be6d489bce070a959e0cb813128ae659b5f4b",
+        "outcome": "No",
+        "current_value": 15206.4722,
+        "pnl": 589.398
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 7570.839,
+        "pnl": 377.7906
+      },
+      {
+        "whale_id": "0xde7be6d489bce070a959e0cb813128ae659b5f4b",
+        "outcome": "Yes",
+        "current_value": 6508.7742,
+        "pnl": 353.1892
+      },
+      {
+        "whale_id": "0xfd22b8843ae03a33a8a4c5e39ef1e5ff33ebad91",
+        "outcome": "No",
+        "current_value": 6072.9803,
+        "pnl": 427.6746
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "No",
+        "current_value": 4658.1876,
+        "pnl": -19.4633
+      },
+      {
+        "whale_id": "0xd48a81db62f742c4e42d86dfc23a7ee345366e90",
+        "outcome": "Yes",
+        "current_value": 4645.1536,
+        "pnl": 45.1623
+      },
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "No",
+        "current_value": 2412.4489,
+        "pnl": 8.8531
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 133.0493,
+        "pnl": -987.4389
+      },
+      {
+        "whale_id": "0xcb3143ee858e14d0b3fe40ffeaea78416e646b02",
+        "outcome": "Yes",
+        "current_value": 8.175,
+        "pnl": -318.825
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "brazil-presidential-election",
+      "question": "Brazil Presidential Election",
+      "category": "Geopolitics",
+      "price": 42,
+      "change_24h": 0,
+      "volume": 43564427.13947987,
+      "end_date": "2026-10-04T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+        "outcome": "Yes",
+        "current_value": 25598.3816,
+        "pnl": -5426.2401
+      },
+      {
+        "whale_id": "0xdd9ed02bb67b2ec504be24b98febd651fdac49b3",
+        "outcome": "Yes",
+        "current_value": 3629.218,
+        "pnl": 154.8466
+      },
+      {
+        "whale_id": "0xcb3143ee858e14d0b3fe40ffeaea78416e646b02",
+        "outcome": "Yes",
+        "current_value": 692.3565,
+        "pnl": -1789.203
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 581.7102,
+        "pnl": -2734.1674
+      },
+      {
+        "whale_id": "0xdd9ed02bb67b2ec504be24b98febd651fdac49b3",
+        "outcome": "No",
+        "current_value": 466.3467,
+        "pnl": 2.5999
+      },
+      {
+        "whale_id": "0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+        "outcome": "Yes",
+        "current_value": 78.3054,
+        "pnl": -425.3866
+      },
+      {
+        "whale_id": "0xa3a417e434923aeaf97afe9a61b10ff9364e5106",
+        "outcome": "Yes",
+        "current_value": 69.39,
+        "pnl": -179.3191
+      }
+    ],
+    "news": [],
+    "disagreement": null
+  },
+  {
+    "market": {
+      "id": "next-french-presidential-election",
+      "question": "Next French Presidential Election",
+      "category": "Elections",
+      "price": 27,
+      "change_24h": 0,
+      "volume": 33820153.81402709,
+      "end_date": "2027-04-30T00:00:00+00:00"
+    },
+    "whales": [
+      {
+        "whale_id": "0x94a428cfa4f84b264e01f70d93d02bc96cb36356",
+        "outcome": "Yes",
+        "current_value": 827.0211,
+        "pnl": -402.9077
+      },
+      {
+        "whale_id": "0xc1b399b26020a4f689108e9640fd3dc8ffc8501c",
+        "outcome": "Yes",
+        "current_value": 26.7325,
+        "pnl": 0.1603
+      }
+    ],
+    "news": [],
+    "disagreement": {
+      "poly_price": 27,
+      "kalshi_price": 23,
+      "spread": 4,
+      "direction": "poly-higher"
+    }
+  }
+]

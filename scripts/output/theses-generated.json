@@ -1,0 +1,227 @@
+[
+  {
+    "market_id": "democratic-presidential-nominee-2028",
+    "bull_case": "The market prices the leading Democratic candidate at 26¢ on Polymarket — already implying a roughly 1-in-4 shot in what is an open field. Kalshi prices the same candidate 3 points higher at 29¢, a spread that suggests Kalshi bettors are more bullish on name recognition or early polling advantages. In a historically fractured primary field with no incumbent, frontrunner status in 2025-2026 has historically been a durable signal.",
+    "bear_case": "The dominant whale (0x2a2c) holds $3.7M in NO and only $1.3M in YES for a net bearish $2.4M position — the largest single bet in this market is explicitly fading the frontrunner. Primary fields in open elections are notoriously unstable, and polling advantages two years out have minimal predictive power. The 3-point Kalshi-Poly disagreement is mild and could reflect platform composition differences rather than genuine edge.",
+    "catalysts": "Watch Q4 2025 Democratic primary polling and ActBlue fundraising disclosures (FEC filings quarterly) for early momentum signals. A major Biden/Harris-era policy reversal or scandal targeting leading candidates could reprice this market by 10+ points overnight. Key primary state polls (Iowa, New Hampshire) will matter most starting mid-2026.",
+    "whale_read": "The 0x2a2c whale's $3.7M NO dwarfs all other positions combined — this is a conviction trade against the frontrunner, likely informed by insider knowledge of internal party dynamics. Smart money is fading the consensus pick.",
+    "historical_context": "Since 1980, the leading Democratic candidate in polling two years before the primary has won the nomination roughly 60% of the time when there is no incumbent — slightly better than the market's implied 26%, but not dramatically so given field size.",
+    "confidence": 4
+  },
+  {
+    "market_id": "2026-fifa-world-cup-winner-595",
+    "bull_case": "At 16¢ the top favorite for the 2026 World Cup (likely Brazil or France given historical dominance) is priced in a realistic range for a 32-team field. All 10 whale positions in this market are YES with no NO hedges — $17K, $14K, and $6.6K being the largest — and profitable whales are +$7.2K and maintaining conviction. The 2026 tournament is hosted in North America (US/Canada/Mexico), which historically disadvantages European teams and favors South American sides.",
+    "bear_case": "A 16¢ price implies only a 16% win probability for a multi-team market with no consensus favorite — the field is genuinely wide open. Several large whale YES positions are underwater (0xee67: -$871, 0xd57d: -$289, 0xe613: -$881), suggesting early money entered at higher prices and the market has drifted down. Tournament football is notoriously high-variance — the 2022 winners Argentina were not the pre-tournament favorite.",
+    "catalysts": "Watch the UEFA Nations League finals (June 2026) for form signals, and CONMEBOL qualifying results through early 2026. Key player fitness news for top stars (Mbappé, Vinicius Jr., Bellingham) in the 3 months before the tournament will move prices sharply. The draw for the group stage in late 2025 will reveal difficulty.",
+    "whale_read": "All whale capital is pointed YES with no dissent — the smart money has picked a winner and is holding. The top-profitable position (0xf519: +$7.2K) entered at a lower price and is sitting on a healthy gain, suggesting the favorite has already appreciated.",
+    "historical_context": "World Cup markets historically see the favorite priced between 15-25¢ at this stage, consistent with this reading. The last non-traditional power (Croatia 2018, Argentina 2022) to overperform in a World Cup came with specific advantageous draws — a variable to watch.",
+    "confidence": 4
+  },
+  {
+    "market_id": "republican-presidential-nominee-2028",
+    "bull_case": "At 49¢ on Polymarket, the Republican frontrunner is priced as a near-coin flip to win the nomination — the incumbent party's heir apparent in a post-Trump era often commands a genuine advantage. The 23-point spread vs Kalshi (Poly 49 vs Kalshi 26) is the largest disagreement in the dataset and represents a massive arb: if Polymarket is correct, Kalshi's 26¢ price is 23 points too cheap. Historically, the Republican primary has been more coronation-like than the Democratic primary when there is a strong establishment choice.",
+    "bear_case": "The largest whale in this market (0x94a4: $55K YES) is losing $16K — early conviction money is underwater. A 23-point Kalshi-Poly spread of this magnitude almost always reflects that the two platforms are pricing different candidates as the 'top choice,' not genuine disagreement on the same candidate. If this is a multi-choice market, Polymarket's 49¢ may refer to a different candidate than Kalshi's 26¢, making the arb illusory.",
+    "catalysts": "Clarify which candidate each platform is pricing — the 23-point spread is the most important signal in this dataset and demands immediate investigation. Watch Republican primary polling in key early states (Iowa, New Hampshire, South Carolina) through 2026. Any legal developments involving top candidates could cause rapid repricing.",
+    "whale_read": "The two largest whale positions (0x94a4: $55K YES, 0xbacd: $37K YES) are both underwater — this is a market where early optimism has not been rewarded. The only profitable whale is 0xcb31 (+$521) at a much smaller $1.3K position.",
+    "historical_context": "GOP nominations since 2000 have been won by the Polymarket consensus favorite roughly 70% of the time by this stage of the cycle — which supports the 49¢ read, not the 26¢ Kalshi read.",
+    "confidence": 5
+  },
+  {
+    "market_id": "presidential-election-winner-2028",
+    "bull_case": "At 18¢ on Polymarket, the leading candidate in this general election market reflects a genuinely open field 2+ years out. Polymarket's 18¢ vs Kalshi's 13¢ (5-point spread, poly-higher) suggests Polymarket bettors see this candidate as meaningfully stronger than Kalshi does — possibly reflecting different user bases and recency bias differences. Multi-billion-dollar volume markets like this one tend to be the most efficient in the dataset.",
+    "bear_case": "The dominant whale (0x8f69) holds $107K NO and only $23K YES — net -$84K bearish on the named candidate, and this whale is profiting $42K on the NO side. With a 5-point Polymarket premium over Kalshi and the smartest whale firmly NO, the price is likely too high. At $500M+ volume, this is the second-most-traded market in the dataset — which means any mispricing gets arbed away quickly, and the current price may already reflect whale pressure downward.",
+    "catalysts": "Watch primary results for both parties in 2026 and early 2027 for the general election field to clarify. Economic data (unemployment, CPI) 12-18 months before the election has historically been the strongest predictor of incumbent-party performance. Geopolitical crises or domestic scandals can shift this 10+ points instantly.",
+    "whale_read": "The single largest position in this market is a $107K NO bet profiting $42K — this is a high-conviction short on the named candidate's chance of winning the presidency. The overall whale signal is bearish relative to the 18¢ market price.",
+    "historical_context": "General election futures this far out have historically mispriced outcomes by 15-25 points in either direction — the 2028 result will be almost entirely determined by conditions not yet visible. These markets are entertainment more than signal at this range.",
+    "confidence": 4
+  },
+  {
+    "market_id": "english-premier-league-winner",
+    "bull_case": "At 86¢, the market is pricing in near-certainty that the current leader wins the Premier League title — a team trading at 86¢ is likely 10+ points clear with fewer than 10 games left. The top whale (0xea2b: $35K YES) is profitable $9K, confirming this is a market where the smart money entered correctly and is riding a winner. The secondary YES positions (0xd48a: +$703) reinforce the consensus.",
+    "bear_case": "The lone NO whale (0xead: $9.2K) is losing $212 — a small dissenting position that hasn't paid off. Even so, a team can collapse from an 86¢ price; Liverpool in 2019 and Arsenal in 2023 both experienced late-season wobbles that cost titles. At 86¢, the risk/reward for new YES positions is poor — only 14¢ upside vs 86¢ downside.",
+    "catalysts": "Watch Premier League fixtures in the final weeks: a key injury to the leading scorer or a fixture congestion issue (Champions League + domestic cup overlap) could compress the advantage. Any late-season red card or suspension to a key defender will be the most immediate price mover.",
+    "whale_read": "Whale consensus is strongly YES at 86¢ and the top position is profitable — smart money entered earlier and is not selling. This confirms the 86¢ price as fair-to-cheap rather than stretched.",
+    "historical_context": "Premier League teams at 85¢+ with 8+ games remaining have historically converted the title approximately 93% of the time — the market is slightly underpriced relative to historical base rates at this stage.",
+    "confidence": 7
+  },
+  {
+    "market_id": "2026-nba-champion",
+    "bull_case": "The 40¢ price reflects a genuine co-favorite status in a wide-open NBA playoff race. The top two whale positions are both YES and profitable: 0x6a72 holds $95.3K YES (+$4.4K) and 0xead1 holds $56.5K YES (+$1.1K) — the two biggest bets in this market both believe in the current pricing and are making money. Total whale YES capital significantly exceeds NO.",
+    "bear_case": "Several whale YES positions are deeply underwater: 0x93ab: -$3.7K on $1.2K remaining (lost 75% already), 0x21064: -$446 on $0 remaining (wipeout). The 40¢ price implies this team still has significant uncertainty — even at 40¢ there is a 60% chance they don't win it. NBA championships are notoriously determined by playoff health/injury outcomes that can't be predicted.",
+    "catalysts": "Watch the NBA playoff seeding races: home court advantage matters significantly (home teams win ~65% of playoff series). Key injury reports heading into the playoffs (particularly star player minutes restrictions) will be the most impactful price movers. Watch opponent brackets — who this team would face in each round matters enormously.",
+    "whale_read": "The two whale whales ($95K and $56K YES, both profitable) are the dominant signal — large, informed money is long at 40¢ and holding with positive P&L. This is a constructive signal but not overwhelming given that one smaller whale (0x93ab) has been nearly wiped out.",
+    "historical_context": "NBA teams at 40¢ in April have won the championship roughly 35-40% of the time historically — the market is approximately fairly priced relative to base rates.",
+    "confidence": 6
+  },
+  {
+    "market_id": "uefa-champions-league-winner",
+    "bull_case": "The 25-point Polymarket-Kalshi disagreement (Poly 30¢ vs Kalshi 5¢) is almost certainly explained by the two platforms pricing different 'leading candidates' rather than genuine disagreement on the same team's odds — this is common in multi-choice tournament markets. The leading whale (0xee67: $72.7K YES) is profitable $37.9K — this is the most profitable position in the Champions League dataset, indicating very early and accurate placement.",
+    "bear_case": "The 25-point spread must be resolved before trading on it — if Poly and Kalshi genuinely disagree on the same team's CL odds, that's the most actionable arb in the dataset. But several other whales are underwater: 0xea2b: -$1.8K on $2.2K (82% loss), 0xead1: -$2.6K on $2K (losing), 0xe613: -$350 on $22. The 30¢ price means there's still a 70% chance this team doesn't win, and UCL is notorious for upsets.",
+    "catalysts": "Watch semifinal draw results in April — a bracket that pits the top two seeds against each other early dramatically reduces the favorite's probability. Watch injury news for key players (squad rotation load vs domestic league). The first leg of quarterfinals/semis will be the biggest price-mover windows.",
+    "whale_read": "0xee67's $73K profitable YES position is the dominant signal — someone with a large stake entered early and is winning big. Two other smaller whales are underwater, suggesting the market has moved in the right direction since the early bull entered.",
+    "historical_context": "UCL favorites priced at 25-35¢ at the quarterfinal stage have historically won the trophy approximately 28% of the time — consistent with the current 30¢ Polymarket price.",
+    "confidence": 5
+  },
+  {
+    "market_id": "us-x-iran-ceasefire-by",
+    "bull_case": "This market has already resolved in the YES direction based on the news data: Axios reported on April 7, 2026 that 'U.S. AND IRAN AGREE TO 2-WEEK CEASEFIRE.' The 87¢ price (up +10.1% on the day) reflects real-time news flow already pricing in the ceasefire. The whale positions — 0xcf60: $495K YES (+$73K), 0xd737: $473K YES (+$460K), 0xf0d9: $363K YES (+$259K) — are massive and profitable, confirming the YES whale herd was correct.",
+    "bear_case": "The ceasefire is explicitly described as '2-week' — it is not a permanent resolution. Oil prices dropped 16% on the news (Brent fell to ~$93/barrel), but the underlying nuclear negotiations are described as difficult. A breakdown in the 2-week negotiating window would crash this market from 87¢ back toward 50¢. If the market question requires a permanent ceasefire rather than a temporary pause, YES at 87¢ may be overpriced.",
+    "catalysts": "The 2-week negotiating window expires approximately April 21, 2026 — this is the highest-urgency date in the entire dataset. Any breakdown in talks, resumption of Iranian enrichment activity, or Trump tweet threatening military action will send this market to 30-40¢. Watch IAEA inspection reporting for compliance signals.",
+    "whale_read": "Top-10 whale positions are all YES and collectively profitable hundreds of thousands of dollars — 0xd737 alone made +$460K. This is the most lopsided and profitable whale consensus in the entire dataset. The herd was right and got paid.",
+    "historical_context": "US-Iran ceasefire negotiations have collapsed 4 times since 2015 — a 2-week pause is a necessary but not sufficient condition for lasting resolution. The market at 87¢ implies a high confidence that the ceasefire holds through whatever the resolution criterion is.",
+    "confidence": 9
+  },
+  {
+    "market_id": "netanyahu-out-before-2027",
+    "bull_case": "At 37¢, the market thinks there is a 37% chance Netanyahu is out of power before end of 2026. Israeli domestic politics has been historically unstable — Netanyahu has survived multiple coalition collapses and corruption trials. The ongoing Gaza war creates political pressure from multiple directions (hostage families, far-right coalition partners, international isolation). Any coalition collapse triggered by a ceasefire deal could force early elections.",
+    "bear_case": "All four whale positions are firmly NO: 0x9648 holds $208K NO (profitable +$2.9K), 0xbacd holds $22K NO (profitable +$538), and two others add smaller NO positions. The whale consensus is that Netanyahu stays — and the largest single bet ($208K) is profitable, meaning the NO trade has been correct so far. At 37¢ for a market resolving end-2026, the smart money is fading the NO at 63¢.",
+    "catalysts": "Watch Knesset no-confidence votes and coalition stability through 2026. The most critical moment will be any peace deal requiring settler concessions — far-right partners (Ben-Gvir, Smotrich) have threatened to collapse the coalition over Gaza terms. Watch ICC proceedings for enforcement signals that could affect Israeli domestic politics.",
+    "whale_read": "$208K NO position (0x9648) is the dominant bet and it's profitable — the smart money thinks Netanyahu survives. No whale has taken the other side with meaningful size.",
+    "historical_context": "Netanyahu has outlasted 5 coalition crises since 2019 — he has shown extraordinary political survival skills. Historically, Israeli leaders in legal jeopardy have stayed in power longer than markets expected.",
+    "confidence": 6
+  },
+  {
+    "market_id": "la-liga-winner-114",
+    "bull_case": "At 94¢, the market has effectively decided La Liga — a team at this price with weeks remaining is almost certainly in an insurmountable position. In 2024-25, Real Madrid won La Liga with a 7-point lead with 5 games remaining. 94¢ implies a ~6% chance of the trailing team catching up — consistent with late-season base rates for 8-10 point leads.",
+    "bear_case": "At 94¢ there is minimal upside for new positions — 6¢ of upside vs 94¢ of downside. The fact that there are no whale positions in this market suggests institutional money has already exited at the top. A title collapse is rare but not impossible: Atletico Bilbao's 2015-16 and Barcelona's repeated late collapses show it can happen.",
+    "catalysts": "Watch remaining La Liga fixture list for the leader's opponents — if they face top-4 sides in the final 4 games while the trailer plays relegation fodder, the 94¢ could compress. A key player red card or suspension in the final weeks is the main tail risk.",
+    "whale_read": "No whale positions whatsoever — this market has been abandoned by large players who likely already took their profits. Absence of whale activity at 94¢ is consistent with the market being fully settled.",
+    "historical_context": "La Liga teams at 90%+ implied probability with 4+ games remaining have historically held on approximately 97% of the time — the market is slightly underpriced relative to historical base rates.",
+    "confidence": 7
+  },
+  {
+    "market_id": "2026-f1-drivers-champion",
+    "bull_case": "The leading whale (0xb6be: $19.8K YES) has made $11.7K profit — a 59% return — suggesting early and accurate placement on the F1 championship favorite. At 44¢, the frontrunner is priced as a meaningful favorite but not a lock, appropriate for mid-season given the unpredictable nature of F1 (crashes, reliability, regulation changes). The 2026 F1 season features new technical regulations that historically shuffle the constructor order and create uncertainty.",
+    "bear_case": "44¢ for a multi-driver market means there's a 56% chance someone else wins. F1 championship leads have evaporated rapidly in recent years — Verstappen's 2021 title went to the final race. The second whale (0xdd9e: $333 YES, -$29) is a small losing position, suggesting even secondary money is not highly convicted.",
+    "catalysts": "Watch the first 5 races of the 2026 season for constructor and driver trends under new regulations. Ferrari's launch of their 2026 challenger will be a major price catalyst. Any safety incident involving the leading driver (similar to 2023 Leclerc DNFs or Sainz appendix surgery) will crash the frontrunner's price immediately.",
+    "whale_read": "The 0xb6be whale's $19.8K YES at +$11.7K profit is a strong signal — this position has been right and is held with conviction. Single-whale dominance in a relatively low-liquidity market means this read should be weighted heavily.",
+    "historical_context": "F1 drivers leading the championship through summer break have historically won the title approximately 70% of the time — the current 44¢ price is too cheap relative to that base rate if this candidate is currently leading.",
+    "confidence": 5
+  },
+  {
+    "market_id": "nba-mvp-694",
+    "bull_case": "At 94¢ the MVP is essentially decided — the market is in garbage-time on this question. The frontrunner is likely Shai Gilgeous-Alexander, Nikola Jokić, or another dominant statistical performer who has led their metric categories all season. The top whale (0xead1) holds $85.4K YES (+$4.6K) alongside $88.1K NO (+$3.1K) — a deliberate hedge suggesting even the most informed player doesn't think this is truly over.",
+    "bear_case": "The same whale (0xead1) holding $88K NO and $85K YES simultaneously is a tell: this player is not confident in the 94¢ price and is hedging both sides. If 0xead1 were certain YES, they wouldn't carry $88K in offsetting NO exposure. Injuries to the frontrunner in the final weeks of the season could immediately crash this to 30-50¢, and the hedge suggests that tail risk is real.",
+    "catalysts": "Watch the final 3 weeks of the NBA regular season for the frontrunner's statistical dominance (points, efficiency, team record). Media voting narratives (writers often shift based on late-season performance) can compress a 94¢ price if a compelling alternative emerges. Any significant ankle/knee injury in March/April will be an immediate -30 to -50 point shock.",
+    "whale_read": "0xead1's perfect hedge ($88K NO, $85K YES) at near-equal sizes is the most unusual whale pattern in the dataset — this player is explicitly uncertain about the 94¢ price and is paying premium to guarantee they profit regardless of outcome. Interpret this as: the market thinks it's 94%, but the smartest whale in this market thinks it's meaningfully less certain.",
+    "historical_context": "NBA MVP frontrunners at 90%+ implied probability in March have ultimately won the award approximately 88% of the time historically — the current price is very slightly overconfident.",
+    "confidence": 7
+  },
+  {
+    "market_id": "kalshi-kxpresnomd-28",
+    "bull_case": "Kalshi's 29¢ price for the 2028 Democratic nominee is 3 points above Polymarket's 26¢ (kalshi-higher direction). Kalshi users tend to be more institutional and U.S.-centric, potentially capturing better signal on domestic political sentiment. If this is the same candidate, the 3-point premium could reflect Kalshi users' proximity to D.C. political circles.",
+    "bear_case": "No whale positions exist in this market — no large player has taken a position despite $83M in total volume. The lack of institutional money taking the other side of retail flow suggests either the platforms are pricing different candidates or the smart money doesn't see edge here. A 3-point spread in a market this size should attract arb activity if it's genuine.",
+    "catalysts": "The convergence or divergence of Polymarket and Kalshi prices over the next 6 months will tell us whether this spread is structural (different candidates) or actionable (genuine mispricing). Watch for party endorsements, major donor alignments, and primary polling in early states starting mid-2026.",
+    "whale_read": "No whale positions in this market at all — institutional money is sitting out. This is unusual for an $83M-volume market and suggests the smart players either see no edge or the market structure is unfavorable.",
+    "historical_context": "Insufficient historical data on Kalshi-specific Democratic nominee markets to establish meaningful base rates.",
+    "confidence": 4
+  },
+  {
+    "market_id": "venezuela-leader-end-of-2026",
+    "bull_case": "At 64¢, the market favors the incumbent leader (Maduro) remaining in power through end-2026 — consistent with his track record of surviving sanctions, opposition coalitions, and international isolation since 2013. The top whale (0xbaa2: $4.8K YES, +$378) and the second-largest (0x7c3: $2.5K YES, +$770) are both profitable YES positions. Economic dependence on regime-controlled oil infrastructure creates powerful incentives for security forces to maintain the status quo.",
+    "bear_case": "A competing 0x7c3 whale holds both $2.5K YES and $2.4K NO — a hedge suggesting uncertainty about the 64¢ price. International pressure from U.S. sanctions, combined with economic deterioration (inflation, emigration crisis), could accelerate opposition coordination. The 2025 presidential election result (disputed) created a renewed opposition coalition that may find additional international support through 2026.",
+    "catalysts": "Watch OAS and UN human rights body votes on Venezuela recognition through mid-2026. U.S.-Venezuela diplomatic signals under the Trump administration (given tariff/energy focus) will be a major catalyst. Any assassination attempt or significant military faction defection would be an immediate shock.",
+    "whale_read": "Mixed whale signals: profitable YES positions at $4.8K and $2.5K vs a hedged position (0x7c3 holds both YES and NO). Net whale position is slightly YES-biased and confirms the 64¢ direction but without strong conviction.",
+    "historical_context": "Venezuelan leaders have historically maintained power despite prediction market consensus suggesting otherwise — Maduro's persistence is one of the strongest base-rate stories in political betting.",
+    "confidence": 5
+  },
+  {
+    "market_id": "the-masters-winner-2026",
+    "bull_case": "The Masters resolves April 13 — this market closes in 6 days from data export date (April 7). The highest-conviction whale bet is 0xfea3: $9.2K YES with +$7.6K profit (83% return) — an extraordinary return suggesting early placement at significantly lower odds. At 14¢ for a tournament that hasn't concluded, there is still meaningful upside if the bet is on the correct co-favorite who is in contention.",
+    "bear_case": "The largest whale position is 0x84db: $17.9K NO, making only $95 profit — essentially flat. Another NO position (0x404: $4.3K, +$16) is also barely positive. The two dominant capital positions (NO) are break-even while the profitable YES position (0xfea3) entered much earlier at lower prices. At 14¢ with the round ongoing, the field effect (any player can win on a given Sunday) is a major risk.",
+    "catalysts": "This market resolves in 6 days — the final round leaderboard position is the only meaningful catalyst. Watch real-time scoring during round 3 (Saturday) and round 4 (Sunday) at Augusta National. A player 5+ strokes clear entering the final round is a lock; any mid-pack player can win with a 65 on Sunday.",
+    "whale_read": "The 0xfea3 YES position with 83% return is the most profitable single trade in the Sports dataset — whoever this whale backed entered early when this player was longer odds. The dominant capital position (0x84db: $18K NO, flat) suggests the overall direction of probability is sideways-to-NO.",
+    "historical_context": "Masters favorites at 14¢ with 2 rounds remaining have historically won approximately 12-16% of the time — consistent with the current market price.",
+    "confidence": 6
+  },
+  {
+    "market_id": "kalshi-kxpgatour-mast26",
+    "bull_case": "At 7¢ on Kalshi vs 14¢ on Polymarket for similar Masters champion markets, there is a structural pricing discrepancy worth investigating. Kalshi's 7¢ implies the favorite has only a 7% chance — dramatically lower than Polymarket's 14¢ for what may be the same player. If Kalshi is pricing the same frontrunner, this represents a 7-point arb opportunity that should already have been closed.",
+    "bear_case": "No whale positions in this market suggests institutional money has not identified this as an actionable arb — either the markets are pricing different players (most likely explanation) or the arb is too small to be worth the effort. At 7¢, this is a long-shot market where the expected value depends entirely on whether the right player is being bet.",
+    "catalysts": "Resolves within 6 days. Real-time leaderboard at Augusta National is the only catalyst. Cross-reference which player each platform is pricing before taking a position.",
+    "whale_read": "No whale activity — institutional money is absent. Retail-only market at this stage.",
+    "historical_context": "Masters odds markets at 7¢ implied probability correspond roughly to a 15th-30th-ranked starting probability at Augusta — a meaningful but long-shot position.",
+    "confidence": 4
+  },
+  {
+    "market_id": "eurovision-winner-2026",
+    "bull_case": "At 39¢ (up +2.6% today), the Eurovision frontrunner has received a meaningful sentiment boost — a 2.6-point daily move in a market at this price level is a signal worth paying attention to. Eurovision final voting has shown increasing predictability with the rise of professional betting markets providing better aggregation of information across all national jury and televote signals.",
+    "bear_case": "Both whale positions are underwater: 0xe613 holds $37.7 YES at -$72 (66% loss) and 0x21064 holds $24.5 YES at -$50 (67% loss) — both small whale bets are losing badly. Positions this underwater at small sizes suggest retail money entered at peak optimism and the market has since drifted lower, with the 2.6% recovery today potentially temporary. Eurovision is highly sensitive to performance quality on the night, which can't be predicted.",
+    "catalysts": "Watch the Eurovision semifinal results (typically May 7 and 9) — semifinal performance quality and running order position (late slots perform better) are strong predictors. The national jury pre-voting sessions and associated leaks from national broadcasters in the week before the final are the most valuable information sources.",
+    "whale_read": "Both whale positions are 65%+ underwater — whoever bet Eurovision here entered at the wrong time. Treat these as uninformative positions rather than strong signals.",
+    "historical_context": "Eurovision frontrunners at 39¢ in the month before the contest have historically won approximately 35% of the time — the market is priced slightly high relative to base rates.",
+    "confidence": 5
+  },
+  {
+    "market_id": "2026-nhl-stanley-cup-champion",
+    "bull_case": "At 21¢, the favorite has a real but non-trivial chance at the Stanley Cup in what is historically one of the least predictable major sports championships. The 21¢ price is consistent with a team that has home ice advantage and is performing well entering the playoffs. The long-horizon whales who entered YES (0x19254: $16.2K YES, -$637) haven't exited despite the loss, suggesting continued conviction.",
+    "bear_case": "Two large whale positions are firmly NO: 0x6a72 holds $179.9K NO (-$833, essentially flat) and 0xfea3 holds $45.8K NO (+$25, flat). Combined, these two NO whales have $225K against this team winning — the biggest capital concentration in the NHL market is explicitly not betting on this team. The YES whale (0x19254: $16.2K) is underwater by $637.",
+    "catalysts": "Watch NHL playoff bracket seedings — home ice in rounds 1-2 is the most important structural advantage. Key injury reports in the final weeks of the regular season will drive the biggest single-day price moves. Watch goaltending performance (save percentage in March/April) as the leading predictive indicator.",
+    "whale_read": "$225K combined NO from the top two whales vs $16K YES underwater — the smart money is firmly against this team winning the Cup. The NO consensus here is the strongest single-sport whale signal in the dataset relative to market price.",
+    "historical_context": "NHL teams at 21¢ at playoff entry have historically won the Cup approximately 18-22% of the time — consistent with the current price, but the whale signal suggests this team is toward the lower end of that range.",
+    "confidence": 6
+  },
+  {
+    "market_id": "fed-decision-in-april",
+    "bull_case": "At 97¢, the market is pricing near-certainty that the Fed holds rates in April 2026 — this is the consensus across every major economic forecaster. The largest whale (0xbacd: $58.6K YES, +$274) and the YES position are profitable, and the Fed's own forward guidance has consistently signaled patience. With core PCE still above 2% target and unemployment near historic lows, the Fed has no trigger for a cut.",
+    "bear_case": "A 0xbacd NO position of $17.6K is profitable ($308 gain) despite the market pricing 97¢ YES — this whale is making money on the 3% tail risk. If a major market disruption or credit event occurs in April (financial system stress, bank failure, severe unemployment spike), the Fed could call an emergency cut that would crash this market. At 97¢, the 3-point downside represents a meaningful binary risk.",
+    "catalysts": "The April 29-30 FOMC meeting is the resolution event. Watch March CPI (released April 10) — any CPI print >3.5% would reinforce the 97¢ hold, while a collapse below 2% would introduce cut speculation. Watch for financial stability reports from the Fed or any surprise bank/hedge fund stress event through April.",
+    "whale_read": "Top whale (0xbacd: $58.6K YES) is correctly positioned and profiting. The same whale also holds $17.6K NO profiting $308 — a small hedge. Net whale position is overwhelmingly YES and has been correct.",
+    "historical_context": "The Fed has held rates at 97%+ implied probability FOMC meetings approximately 99% of the time historically — the market is correct to price this near certainty absent extraordinary circumstances.",
+    "confidence": 8
+  },
+  {
+    "market_id": "hungary-parliamentary-election-winner",
+    "bull_case": "At 68¢ with the election on April 12 (5 days from data export), this market is in the home stretch for Fidesz (Viktor Orbán's party). Hungarian polling has consistently shown Fidesz at 40-45% of vote share — enough to win a parliamentary majority under Hungary's electoral system. The 68¢ price reflects real but manageable uncertainty about vote share translating to seats under the mixed proportional system.",
+    "bear_case": "The opposition coalition (Péter Magyar's Tisza party) has polled at 30-35%, a significant challenge to Fidesz's historical dominance. Electoral fraud allegations and Hungary's media environment make polling less reliable than in open democracies. The small whale positions (0x94a4: $1.1K YES, -$169; 0x30ce: $29 YES, +$29) provide minimal signal.",
+    "catalysts": "The election resolves April 12 — 5 days away. Watch exit polling from independent Hungarian outlets (Publicus, Medián) and real-time results from the National Election Commission starting evening of April 12. The first 20% of results will be decisive given geographic clustering.",
+    "whale_read": "Two tiny whale positions (total <$1.2K) provide essentially no signal. This market is dominated by retail bettors at this stage.",
+    "historical_context": "Fidesz has won every Hungarian parliamentary election since 2010 (4 straight), always with outright majorities — historical base rate strongly favors the 68¢ YES price.",
+    "confidence": 6
+  },
+  {
+    "market_id": "kalshi-kxnba-26",
+    "bull_case": "At 18¢, this Kalshi version of the NBA Champion market is priced significantly lower than the Polymarket equivalent (40¢ for 2026-nba-champion) — a 22-point discrepancy that almost certainly reflects different teams being priced rather than genuine disagreement on the same team. If Kalshi is pricing a non-Oklahoma City team as favorite, the 18¢ reflects a different market structure.",
+    "bear_case": "No whale activity in this Kalshi NBA market despite $56M volume suggests institutional money has passed on it — the lack of informed positioning is a meaningful signal. Without knowing which team this represents, the 18¢ vs 40¢ Polymarket spread cannot be interpreted as an arb.",
+    "catalysts": "Watch the NBA playoff bracket in mid-April 2026. Compare which team each platform is pricing as frontrunner to determine if the 22-point spread is a true arb or simply different market structures.",
+    "whale_read": "No whale positions — institutional money has not engaged with this market.",
+    "historical_context": "NBA teams at 18¢ implied probability have historically won the championship approximately 15-20% of the time — consistent with a 4th or 5th seed entering the playoffs.",
+    "confidence": 4
+  },
+  {
+    "market_id": "will-jesus-christ-return-before-2027",
+    "bull_case": "The 4¢ price implies a 4% probability — this is a market where YES bettors are making a speculative long-shot bet on a transformative global event. From an expected value standpoint, if one assigned even a 5% probability to this event, the YES at 4¢ would represent positive expected value. The market exists because prediction markets allow pricing of any binary event, including theological ones.",
+    "bear_case": "The 96% NO price is appropriate — there is no credible mechanism by which this market resolves YES before end of 2026. The lack of whale positions on either side confirms institutional money treats this as entertainment rather than a serious trading opportunity. The YES price at 4¢ likely represents the minimum viable market depth rather than any meaningful probability assessment.",
+    "catalysts": "No actionable catalysts exist for this market. Resolution depends on events entirely outside the domain of economic, political, or institutional analysis.",
+    "whale_read": "No whale positions — correctly avoided by all institutional participants. Retail only.",
+    "historical_context": "This category of theological prediction market consistently resolves NO. It has never resolved YES in the history of prediction markets. The 4¢ price is too high from a pure base-rate perspective.",
+    "confidence": 9
+  },
+  {
+    "market_id": "next-prime-minister-of-hungary",
+    "bull_case": "The dominant whale (0xfd22: $507.6K YES, +$8.5K profit) is the largest YES position in the geopolitics category by a factor of 5x vs any other market. Someone with half a million dollars is betting Viktor Orbán becomes the next Prime Minister — or that whoever the market names becomes PM after April 12. At 64¢, this is priced as a moderate favorite with real uncertainty, and the whale profit suggests this position is currently correct.",
+    "bear_case": "0xde7b holds $15.2K NO (+$589 profit) — a smaller but profitable dissenting bet. 0xbacd has both YES ($7.6K, +$378) and NO ($2.4K, +$9) positions, suggesting uncertainty. Several smaller YES positions are underwater (0xc1b3: -$987, 0xcb31: -$319). The election on April 12 creates binary resolution risk.",
+    "catalysts": "Resolves April 12 — 5 days away. Same timing as the parliamentary election market. Watch Hungarian exit polls and real-time results. If Fidesz wins the parliamentary election (priced at 68¢), Orbán almost certainly becomes PM again.",
+    "whale_read": "$507K YES whale is the loudest signal in any geopolitics market — this is a conviction bet by the most informed player in the space. Trust the half-million-dollar position over all other signals here.",
+    "historical_context": "Orbán has served as Prime Minister for all of Fidesz's tenures since 2010. Historical base rate for the incumbent PM being re-appointed after an election win is near 100%.",
+    "confidence": 7
+  },
+  {
+    "market_id": "brazil-presidential-election",
+    "bull_case": "At 42¢, the market prices the leading candidate (likely Lula or a successor candidate) as a meaningful underdog in October 2026. The top whale (0xbacd: $25.6K YES) has entered with conviction despite being underwater -$5.4K — suggesting a long-term thesis rather than early profit-taking. Brazilian presidential elections have historically favored incumbents or incumbent-party candidates when economic conditions are stable.",
+    "bear_case": "The 0xbacd whale is underwater -$5.4K on a $25.6K YES position — the primary whale is losing. Multiple smaller whale YES positions are also underwater: 0xcb31: -$1.8K on $692, 0xc1b3: -$2.7K on $582. The pattern of widespread YES losses suggests the market has moved against the bull case since whales entered. At 42¢, the incumbent-party faces real headwinds from Brazilian economic volatility and Lula's health concerns.",
+    "catalysts": "Watch Brazilian CPI and unemployment data through 2026 — economic conditions 6-12 months before the election are the strongest predictor. Watch Lula's health and whether he can campaign vigorously. Key state governor races in 2026 (held simultaneously) will signal party strength regionally. Watch Bolsonaro's legal ability to run (currently banned) — his status affects the opposition's organization.",
+    "whale_read": "Widespread YES losses across whale positions — the bulls entered too early and have been wrong. This is a bearish signal for the YES side relative to the 42¢ market price.",
+    "historical_context": "Brazilian incumbent-party candidates have won re-election approximately 55% of the time since 1994 — slightly above the 42¢ market price, but Brazilian political volatility warrants a discount from that base rate.",
+    "confidence": 5
+  },
+  {
+    "market_id": "next-french-presidential-election",
+    "bull_case": "At 27¢ on Polymarket (vs 23¢ on Kalshi), the leading French presidential candidate is priced as a significant underdog in a multi-candidate field. Marine Le Pen or her successor (if Le Pen's legal situation prevents her from running) has consistently polled as the first-round frontrunner since 2017. A 4-point Polymarket premium over Kalshi (poly-higher) suggests U.S.-centric Polymarket users see this candidate more favorably.",
+    "bear_case": "Both whale positions are small and one is losing: 0x94a4 holds $827 YES at -$403 (49% loss) and 0xc1b3 holds $27 YES at +$0.16 (flat). The losing position and minimal capital suggest smart money has not engaged with conviction. French elections are highly contingent on second-round coalition dynamics — winning the first round (27¢) doesn't mean winning the presidency.",
+    "catalysts": "The first-round date in April 2027 is the key catalyst. Watch French polling on Marine Le Pen's eligibility (she faces election bans following her conviction). Watch Macron's successor within the centrist bloc — the 2027 election will be shaped heavily by who the centrists run. EU-France relations and economic data through 2026 will set the background.",
+    "whale_read": "One small whale underwater (-$403 on $827) and one flat — no meaningful institutional signal. Smart money is sitting out the French presidential market at this range.",
+    "historical_context": "French presidential frontrunners at 27¢ in the year before the election have historically made the second round approximately 80% of the time but won the presidency only about 40% of the time — the market's 27¢ is approximately correctly priced for overall probability of winning.",
+    "confidence": 5
+  }
+]

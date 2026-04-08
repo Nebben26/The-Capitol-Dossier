@@ -1157,3 +1157,33 @@ export async function getMorningBrief(): Promise<{ data: MorningBrief; source: D
     return { data: emptyBrief(), source: "mock" };
   }
 }
+
+// ─── MARKET THESIS ────────────────────────────────────────────────────────────
+
+export interface MarketThesis {
+  id: number;
+  market_id: string;
+  bull_case: string;
+  bear_case: string;
+  catalysts: string;
+  whale_read: string;
+  historical_context: string;
+  confidence: number;
+  generated_at: string;
+  model: string;
+}
+
+export async function getMarketThesis(marketId: string): Promise<MarketThesis | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data } = await supabase
+      .from("market_theses")
+      .select("*")
+      .eq("market_id", marketId)
+      .limit(1)
+      .maybeSingle();
+    return data || null;
+  } catch {
+    return null;
+  }
+}
