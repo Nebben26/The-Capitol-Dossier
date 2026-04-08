@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .from("markets")
     .select(
-      "id, question, category, platform, price, volume, change_24h, end_date, active, created_at"
+      "id, question, category, platform, price, volume, change_24h, end_date, days_left, resolved, created_at"
     )
     .order(sort, { ascending: false, nullsFirst: false })
     .limit(limit);

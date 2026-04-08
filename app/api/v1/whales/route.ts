@@ -36,11 +36,9 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from("whales")
-    .select("address, display_name, total_pnl, accuracy, total_trades, active_positions, tag")
+    .select("address, display_name, total_pnl, total_volume, accuracy, win_rate, positions_count, markets_traded, rank")
     .order(sort, { ascending: false })
     .limit(limit);
-
-  if (category) query = query.eq("best_category", category);
 
   const { data: whaleRows, error } = await query;
 
@@ -53,10 +51,12 @@ export async function GET(req: NextRequest) {
     address: w.address,
     display_name: w.display_name || null,
     total_pnl: w.total_pnl,
+    total_volume: w.total_volume,
     accuracy: w.accuracy,
-    total_trades: w.total_trades,
-    active_positions: w.active_positions,
-    tag: w.tag || null,
+    win_rate: w.win_rate,
+    positions_count: w.positions_count,
+    markets_traded: w.markets_traded,
+    rank: w.rank,
   }));
 
   // Optionally attach position count per whale (pro+)
