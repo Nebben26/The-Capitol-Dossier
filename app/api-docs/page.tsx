@@ -396,13 +396,13 @@ export default function ApiDocsPage() {
                   </div>
                 ))}
               </div>
-              <a
-                href={t.ctaLink}
+              <Link
+                href="/pricing"
                 className="flex items-center justify-center gap-1 w-full py-2 rounded-lg text-xs font-semibold transition-all"
                 style={{ backgroundColor: `${t.color}18`, color: t.color, border: `1px solid ${t.color}30` }}
               >
                 {t.cta} <ArrowUpRight className="size-3" />
-              </a>
+              </Link>
             </CardContent>
           </Card>
         ))}

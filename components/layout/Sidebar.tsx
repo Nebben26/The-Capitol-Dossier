@@ -17,6 +17,7 @@ import {
   DollarSign,
   Copy,
   Code,
+  CreditCard,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -32,6 +33,7 @@ const navItems = [
   { label: "Watchlist", icon: Star, href: "/watchlist" },
   { label: "Calibration", icon: Crosshair, href: "/calibration" },
   { label: "API", icon: Code, href: "/api-docs" },
+  { label: "Pricing", icon: CreditCard, href: "/pricing" },
   { label: "Alerts", icon: Bell, href: "/alerts" },
 ];
 

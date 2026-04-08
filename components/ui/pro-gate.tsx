@@ -16,7 +16,7 @@ export function ProBadge({ className = "" }: { className?: string }) {
 
 /** Trial banner shown at top of gated pages */
 export function TrialBanner() {
-  const { isPro, trialDaysLeft, user, setShowLogin, startTrial } = useAuth();
+  const { isPro, trialDaysLeft } = useAuth();
 
   if (isPro && trialDaysLeft !== null && trialDaysLeft > 0) {
     return (
@@ -35,15 +35,11 @@ export function TrialBanner() {
           <Lock className="size-3.5 text-[#8892b0]" />
           <span className="text-xs text-[#8892b0]">This feature requires <span className="text-[#f59e0b] font-semibold">Pro</span></span>
         </div>
-        {user ? (
-          <Button onClick={startTrial} size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1">
-            <Zap className="size-3" />Start Free Trial
+        <Link href="/pricing">
+          <Button size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1">
+            <Zap className="size-3" />View Pricing
           </Button>
-        ) : (
-          <Button onClick={() => setShowLogin(true)} size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1">
-            Sign In to Try Pro
-          </Button>
-        )}
+        </Link>
       </div>
     );
   }
@@ -53,7 +49,7 @@ export function TrialBanner() {
 
 /** Overlay gate for locked content sections */
 export function ProGate({ children, feature }: { children: React.ReactNode; feature: string }) {
-  const { isPro, user, setShowLogin, startTrial } = useAuth();
+  const { isPro } = useAuth();
 
   if (isPro) return <>{children}</>;
 
@@ -67,15 +63,11 @@ export function ProGate({ children, feature }: { children: React.ReactNode; feat
           </div>
           <h3 className="text-sm font-bold">{feature}</h3>
           <p className="text-[10px] text-[#8892b0]">Upgrade to Pro to unlock this feature</p>
-          {user ? (
-            <Button onClick={startTrial} size="sm" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1.5 w-full">
-              <Zap className="size-3.5" />Start 14-Day Free Trial
+          <Link href="/pricing" className="block w-full">
+            <Button size="sm" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1.5 w-full">
+              <Zap className="size-3.5" />See Pricing
             </Button>
-          ) : (
-            <Button onClick={() => setShowLogin(true)} size="sm" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1.5 w-full">
-              Sign In to Try Pro
-            </Button>
-          )}
+          </Link>
         </div>
       </div>
     </div>
@@ -84,7 +76,7 @@ export function ProGate({ children, feature }: { children: React.ReactNode; feat
 
 /** Upgrade CTA for sidebar */
 export function SidebarUpgradeCard() {
-  const { isPro, trialDaysLeft, startTrial, user, setShowLogin } = useAuth();
+  const { isPro, trialDaysLeft } = useAuth();
 
   if (isPro && trialDaysLeft !== null && trialDaysLeft > 0) {
     return (
@@ -118,11 +110,9 @@ export function SidebarUpgradeCard() {
         <span className="text-xs font-medium">Unlock Pro</span>
       </div>
       <p className="text-[10px] text-[#8892b0] leading-relaxed mb-2">Real-time alerts, full API, advanced calibration & more.</p>
-      {user ? (
-        <Button onClick={startTrial} className="w-full h-7 text-xs bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">Start Free Trial</Button>
-      ) : (
-        <Button onClick={() => setShowLogin(true)} className="w-full h-7 text-xs bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">Sign In</Button>
-      )}
+      <Link href="/pricing" className="block w-full">
+        <Button className="w-full h-7 text-xs bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">View Pricing</Button>
+      </Link>
     </div>
   );
 }

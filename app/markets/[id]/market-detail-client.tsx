@@ -451,9 +451,9 @@ export default function MarketDetailPage() {
                       <Brain className="size-6 text-[#57D7BA] mx-auto mb-2" />
                       <p className="text-sm font-semibold text-[#e2e8f0] mb-1">Full analysis is Pro-only</p>
                       <p className="text-[11px] text-[#8892b0] mb-3">Unlock bear case, catalysts, whale read &amp; historical context</p>
-                      <button className="px-4 py-2 rounded-lg bg-[#57D7BA] text-[#0f1119] text-xs font-bold hover:bg-[#57D7BA]/90 transition-colors">
+                      <Link href="/pricing" className="inline-block px-4 py-2 rounded-lg bg-[#57D7BA] text-[#0f1119] text-xs font-bold hover:bg-[#57D7BA]/90 transition-colors">
                         Unlock full analysis with Pro
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
