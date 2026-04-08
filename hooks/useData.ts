@@ -73,6 +73,24 @@ function useAutoRefresh(
   return { refreshing, lastFetched, error, retry: doFetch };
 }
 
+// ─── HEADER MARKETS HOOK — single query, no pagination ────────────────
+// Used by the global Header for search + pulse gauge.
+// Fetches top 1000 markets by volume in ONE request instead of paginating all 6000+.
+export function useTopMarkets(limit = 1000, autoRefreshMs = 60000) {
+  const [markets, setMarkets] = useState<Market[]>(mockMarkets.slice(0, limit));
+  const [source, setSource] = useState<DataSource>("mock");
+
+  const fetchTopMarkets = useCallback(async () => {
+    const { getTopMarkets } = await import("@/lib/api");
+    const result = await getTopMarkets(limit);
+    setMarkets(result.data);
+    setSource(result.source);
+  }, [limit]);
+
+  const { refreshing, lastFetched, error, retry } = useAutoRefresh(fetchTopMarkets, autoRefreshMs);
+  return { markets, source, refreshing, lastFetched, error, retry };
+}
+
 // ─── MARKETS HOOK (with auto-refresh) ─────────────────────────────────
 export function useMarkets(autoRefreshMs = 45000) {
   const [markets, setMarkets] = useState<Market[]>(mockMarkets);

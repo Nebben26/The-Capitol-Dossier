@@ -121,7 +121,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
           {/* Body */}
           <div className="flex-1 min-w-0 space-y-1.5">
-            {/* Type badge + confidence */}
+            {/* Type badge + confidence + historical accuracy */}
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide"
@@ -130,6 +130,24 @@ function SignalCard({ signal }: { signal: Signal }) {
                 {cfg.label}
               </span>
               <ConfidenceBar score={signal.confidence} />
+              {signal.historical_accuracy_pct != null && (
+                <span
+                  className="text-[9px] font-semibold tabular-nums"
+                  style={{
+                    color:
+                      signal.historical_accuracy_pct > 60
+                        ? "#22c55e"
+                        : signal.historical_accuracy_pct >= 50
+                        ? "#f59e0b"
+                        : "#8892b0",
+                  }}
+                >
+                  {signal.historical_accuracy_pct}% hist.
+                  {signal.historical_sample_size != null && (
+                    <span className="text-[#4a5168] font-normal"> ({signal.historical_sample_size})</span>
+                  )}
+                </span>
+              )}
               <span className="text-[9px] text-[#8892b0] ml-auto">{ageStr}</span>
             </div>
 
@@ -351,8 +369,8 @@ export default function AlertsPage() {
 
       <TrialBanner />
 
-      {/* Filter chips */}
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* Filter chips — horizontally scrollable on mobile */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap sm:flex-wrap">
         {CHIP_OPTIONS.map((chip) => (
           <button
             key={chip.key}

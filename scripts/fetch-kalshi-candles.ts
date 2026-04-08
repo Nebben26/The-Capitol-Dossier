@@ -1,7 +1,7 @@
 /**
  * Session 29 — Fetch Kalshi Candlestick Data
- * Pulls top 50 active Kalshi markets, fetches 30d of 1h candles from the
- * Kalshi public API, and upserts into market_candles table.
+ * Pulls top 50 active Kalshi markets, resolves each event ticker → best sub-market ticker,
+ * fetches 30d of 1h candles from the Kalshi public API, and upserts into market_candles table.
  *
  * Run: npx tsx scripts/fetch-kalshi-candles.ts
  *
@@ -24,49 +24,115 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 /**
- * Parse a Kalshi market ID to (series_ticker, market_ticker).
- *
- * Market IDs are stored as:  "kalshi-kxnyaibill-27jan01"
- * Kalshi ticker format:       "KXNYAIBILL-27JAN01"
- * Series ticker:              "KXNYAIBILL"  (everything before the first dash in the ticker)
- *
- * Steps:
- *   1. Strip "kalshi-" prefix          → "kxnyaibill-27jan01"
- *   2. Uppercase                        → "KXNYAIBILL-27JAN01"
- *   3. series = everything before first dash → "KXNYAIBILL"
- *   4. market = full uppercased ticker  → "KXNYAIBILL-27JAN01"
+ * Parse a Kalshi market ID to the event ticker.
+ * "kalshi-kxnba-26" → "KXNBA-26"
  */
-function parseKalshiId(marketId: string): { series: string; ticker: string } | null {
+function parseEventTicker(marketId: string): string | null {
   const stripped = marketId.replace(/^kalshi-/i, "");
-  if (!stripped || stripped === marketId) return null; // not a kalshi ID
-  const upper = stripped.toUpperCase();
-  const dashIdx = upper.indexOf("-");
-  const series = dashIdx > 0 ? upper.slice(0, dashIdx) : upper;
-  return { series, ticker: upper };
+  if (!stripped || stripped === marketId) return null;
+  return stripped.toUpperCase();
 }
 
+/**
+ * Fetch the Kalshi event and return the best sub-market ticker and series ticker.
+ * For binary events (1 market), market ticker = event markets[0].ticker.
+ * For multi-outcome, pick highest volume sub-market.
+ * Returns null on API error.
+ */
+async function fetchEventInfo(
+  eventTicker: string
+): Promise<{ series: string; marketTicker: string } | null> {
+  const url = `${KALSHI_BASE}/events/${eventTicker}?with_nested_markets=true`;
+  try {
+    const res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const event = json.event;
+    if (!event) return null;
+
+    const series: string =
+      event.series_ticker || eventTicker.split("-")[0];
+
+    const markets: Array<{ ticker: string; volume: number }> = (
+      event.markets || []
+    ).map((m: any) => ({
+      ticker: m.ticker as string,
+      volume:
+        parseFloat(m.volume_fp || "") || Number(m.volume) || 0,
+    }));
+
+    if (markets.length === 0) return null;
+
+    // Pick highest-volume sub-market (same logic as ingest.ts bestTicker)
+    let best = markets[0];
+    for (const m of markets) {
+      if (m.volume > best.volume) best = m;
+    }
+
+    return { series, marketTicker: best.ticker };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch candlestick data for a specific market ticker.
+ * Handles both old API shape (yes_price cents) and new shape (price.*_dollars strings).
+ */
 async function fetchCandles(
   series: string,
-  ticker: string,
+  marketTicker: string,
   startTs: number,
   endTs: number,
   periodMinutes = 60
-): Promise<Array<{ ts: number; open: number; high: number; low: number; close: number; volume: number }>> {
+): Promise<
+  Array<{
+    ts: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+  }>
+> {
   const url =
-    `${KALSHI_BASE}/series/${series}/markets/${ticker}/candlesticks` +
+    `${KALSHI_BASE}/series/${series}/markets/${marketTicker}/candlesticks` +
     `?start_ts=${startTs}&end_ts=${endTs}&period_interval=${periodMinutes}`;
 
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(10_000),
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    return [];
+  }
 
-  if (res.status === 404) return []; // market has no candle data yet
+  if (res.status === 429) {
+    // Rate limited — wait 2s and retry once
+    await delay(2_000);
+    try {
+      res = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  if (res.status === 404) return [];
   if (!res.ok) {
-    console.warn(`    Kalshi ${res.status} for ${ticker}`);
+    console.warn(`    Kalshi ${res.status} for ${marketTicker}`);
     return [];
   }
 
@@ -74,14 +140,39 @@ async function fetchCandles(
   const items: any[] = json?.candlesticks ?? json?.candles ?? json?.data ?? [];
   if (!Array.isArray(items) || items.length === 0) return [];
 
-  return items.map((c: any) => ({
-    ts: typeof c.ts === "number" ? c.ts : Math.floor(new Date(c.ts ?? c.end_period_ts).getTime() / 1000),
-    open: Number(c.yes_price?.open ?? c.open ?? 0) / 100,    // Kalshi prices are cents
-    high: Number(c.yes_price?.high ?? c.high ?? 0) / 100,
-    low: Number(c.yes_price?.low ?? c.low ?? 0) / 100,
-    close: Number(c.yes_price?.close ?? c.close ?? 0) / 100,
-    volume: Number(c.volume ?? c.yes_volume ?? 0),
-  })).filter((c) => c.open > 0 || c.close > 0);
+  return items
+    .map((c: any) => {
+      // New API shape: price.{open,high,low,close}_dollars (decimal strings)
+      const newShape = c.price && typeof c.price.close_dollars === "string";
+      const open = newShape
+        ? parseFloat(c.price.open_dollars || "0")
+        : Number(c.yes_price?.open ?? c.open ?? 0) / 100;
+      const high = newShape
+        ? parseFloat(c.price.high_dollars || "0")
+        : Number(c.yes_price?.high ?? c.high ?? 0) / 100;
+      const low = newShape
+        ? parseFloat(c.price.low_dollars || "0")
+        : Number(c.yes_price?.low ?? c.low ?? 0) / 100;
+      const close = newShape
+        ? parseFloat(c.price.close_dollars || "0")
+        : Number(c.yes_price?.close ?? c.close ?? 0) / 100;
+
+      // Timestamp: prefer end_period_ts (new shape), then ts
+      const ts =
+        typeof c.end_period_ts === "number"
+          ? c.end_period_ts
+          : typeof c.ts === "number"
+          ? c.ts
+          : Math.floor(
+              new Date(c.end_period_ts ?? c.ts ?? 0).getTime() / 1000
+            );
+
+      const volume =
+        parseFloat(c.volume_fp || "") || Number(c.volume ?? c.yes_volume ?? 0);
+
+      return { ts, open, high, low, close, volume };
+    })
+    .filter((c) => c.open > 0 || c.close > 0);
 }
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -93,7 +184,7 @@ async function main() {
     if (pingErr.message.includes("does not exist") || pingErr.code === "42P01") {
       console.error(
         "❌ market_candles table not found.\n" +
-        "   Apply scripts/migrations/session29_candles.sql in Supabase SQL Editor first."
+          "   Apply scripts/migrations/session29_candles.sql in Supabase SQL Editor first."
       );
       process.exit(1);
     }
@@ -125,22 +216,47 @@ async function main() {
   let totalCandles = 0;
 
   for (const m of markets) {
-    const parsed = parseKalshiId(m.id);
-    if (!parsed) { console.log(`  skip ${m.id} (not a Kalshi ID)`); skipCount++; continue; }
+    const eventTicker = parseEventTicker(m.id);
+    if (!eventTicker) {
+      console.log(`  skip ${m.id} (not a Kalshi ID)`);
+      skipCount++;
+      continue;
+    }
 
-    const { series, ticker } = parsed;
-    process.stdout.write(`  ${ticker} ... `);
+    process.stdout.write(`  ${eventTicker} ... `);
 
+    // Step 1: resolve event → series + best sub-market ticker
+    const info = await fetchEventInfo(eventTicker);
+    await delay(400); // polite gap between event lookup and candle fetch
+
+    if (!info) {
+      console.log("event not found");
+      skipCount++;
+      continue;
+    }
+
+    const { series, marketTicker } = info;
+
+    // Step 2: fetch candles for the resolved market ticker
+    let candles: Awaited<ReturnType<typeof fetchCandles>>;
     try {
-      const candles = await fetchCandles(series, ticker, startTs, endTs, 60);
+      candles = await fetchCandles(series, marketTicker, startTs, endTs, 60);
+    } catch (err: any) {
+      console.log(`fetch error: ${err.message}`);
+      errorCount++;
+      await delay(500);
+      continue;
+    }
 
-      if (candles.length === 0) {
-        console.log("no data");
-        skipCount++;
-        continue;
-      }
+    if (candles.length === 0) {
+      console.log(`no data (${marketTicker})`);
+      skipCount++;
+      await delay(500);
+      continue;
+    }
 
-      // Upsert in batches of 200
+    // Upsert in batches of 200
+    try {
       const rows = candles.map((c) => ({
         market_id: m.id,
         timestamp: new Date(c.ts * 1000).toISOString(),
@@ -157,23 +273,27 @@ async function main() {
       for (let i = 0; i < rows.length; i += BATCH) {
         const { error } = await supabase
           .from("market_candles")
-          .upsert(rows.slice(i, i + BATCH), { onConflict: "market_id,timestamp,period_minutes" });
+          .upsert(rows.slice(i, i + BATCH), {
+            onConflict: "market_id,timestamp,period_minutes",
+          });
         if (error) throw error;
       }
 
       totalCandles += candles.length;
-      console.log(`${candles.length} candles`);
+      console.log(`${candles.length} candles (${marketTicker})`);
       successCount++;
     } catch (err: any) {
-      console.log(`error: ${err.message}`);
+      console.log(`upsert error: ${err.message}`);
       errorCount++;
     }
 
-    // Polite rate limiting — Kalshi public API allows ~10 req/sec
-    await new Promise((r) => setTimeout(r, 120));
+    // Polite delay between markets (events API + candles API = ~2 calls/market)
+    await delay(500);
   }
 
-  console.log(`\nDone: ${successCount} markets, ${totalCandles} candles upserted, ${skipCount} skipped, ${errorCount} errors`);
+  console.log(
+    `\nDone: ${successCount} markets, ${totalCandles} candles upserted, ${skipCount} skipped, ${errorCount} errors`
+  );
 }
 
 main().catch(console.error);

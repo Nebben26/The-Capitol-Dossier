@@ -175,6 +175,41 @@ function dbTradeToWhaleAlert(row: any, idx: number): WhaleAlert {
  * Fetch all markets from Supabase.
  * Falls back to mock data if Supabase is not configured or query fails.
  */
+/**
+ * Lightweight market fetch for the global header — single query, top N by volume.
+ * Does NOT paginate through all 6000+ markets. Use getAllMarkets() for pages that
+ * need the full corpus (screener, homepage).
+ */
+export async function getTopMarkets(limit = 1000): Promise<ApiResult<Market[]>> {
+  const cacheKey = `top_markets_${limit}`;
+  const cached = getCached<ApiResult<Market[]>>(cacheKey);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) {
+    return { data: mockMarkets.slice(0, limit), source: "mock" };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("markets")
+      .select("*")
+      .eq("resolved", false)
+      .order("volume", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    if (!data || data.length === 0) return { data: mockMarkets.slice(0, limit), source: "mock" };
+
+    const markets = data.map(dbMarketToFrontend);
+    const result: ApiResult<Market[]> = { data: markets, source: "live" };
+    setCache(cacheKey, result);
+    return result;
+  } catch (err) {
+    console.error("[getTopMarkets] failed:", err);
+    return { data: mockMarkets.slice(0, limit), source: "mock" };
+  }
+}
+
 export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
   const cached = getCached<ApiResult<Market[]>>("all_markets");
   if (cached) return cached;
@@ -1351,7 +1386,7 @@ export async function getSignals(opts: GetSignalsOpts = {}): Promise<{
   try {
     let query = supabase
       .from("signals")
-      .select("*")
+      .select("signal_id, type, confidence, market_id, market_question, headline, detail, detected_at, stats, historical_accuracy_pct, historical_sample_size")
       .gte("confidence", minConfidence)
       .order("confidence", { ascending: false })
       .order("detected_at", { ascending: false })

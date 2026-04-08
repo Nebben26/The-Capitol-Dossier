@@ -12,7 +12,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import {
-  getAllMarkets,
+  getTopMarkets,
   getDisagreements,
   getAllWhales,
   getSmartMoneyFlow,
@@ -78,7 +78,7 @@ export function FirstVisitHero() {
     if (!visible) return;
 
     Promise.all([
-      getAllMarkets(),
+      getTopMarkets(500),
       getDisagreements(),
       getAllWhales(),
       getSmartMoneyFlow(),
@@ -185,7 +185,7 @@ export function FirstVisitHero() {
       <div className="rounded-xl bg-gradient-to-br from-[#1e2235] to-[#222638] border border-[#2f374f] overflow-hidden mb-5">
 
         {/* ── SECTION A: VALUE PROP ────────────────────────────────────── */}
-        <div className="relative px-5 pt-6 pb-5">
+        <div className="relative px-4 sm:px-5 pt-5 sm:pt-6 pb-4 sm:pb-5">
           {/* Dismiss X */}
           <button
             onClick={() => dismiss(false)}
@@ -246,7 +246,7 @@ export function FirstVisitHero() {
         <div className="border-t border-[#2f374f]" />
 
         {/* ── SECTION B: FEATURE CARDS ─────────────────────────────────── */}
-        <div className="px-5 py-5">
+        <div className="px-4 sm:px-5 py-4 sm:py-5">
           <p className="text-[10px] text-[#8892b0] uppercase tracking-widest font-semibold mb-4">What you get</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {featureCards.map((card) => (
@@ -274,7 +274,7 @@ export function FirstVisitHero() {
         <div className="border-t border-[#2f374f]" />
 
         {/* ── SECTION C: HOW IT WORKS ──────────────────────────────────── */}
-        <div className="px-5 py-4">
+        <div className="px-4 sm:px-5 py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-0">
             {steps.map((step, i) => (
               <div key={step.n} className="flex items-start sm:items-center gap-3 flex-1 sm:min-w-0">

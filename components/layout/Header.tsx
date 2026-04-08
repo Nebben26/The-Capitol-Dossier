@@ -15,14 +15,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { markets as mockMarkets, whales as mockWhales } from "@/lib/mockData";
-import { useMarkets, useWhales, useDisagreements } from "@/hooks/useData";
+import { useTopMarkets, useWhales, useDisagreements } from "@/hooks/useData";
 import { useDataSource } from "./DataSourceContext";
 import { useAuth } from "./AuthContext";
 import { LogOut, User } from "lucide-react";
 
 // ─── MINI PULSE GAUGE ─────────────────────────────────────────────────
 function MiniPulseGauge() {
-  const { markets: pulseMarkets } = useMarkets();
+  const { markets: pulseMarkets } = useTopMarkets();
   const value = useMemo(() => {
     const top = pulseMarkets.filter(m => m.volNum > 100000 && m.change !== 0);
     if (top.length === 0) return 50;
@@ -60,7 +60,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const router = useRouter();
   const { source } = useDataSource();
   const { user, setShowLogin, signOut } = useAuth();
-  const { markets: liveMarkets } = useMarkets();
+  const { markets: liveMarkets } = useTopMarkets();
   const { whales: liveWhales } = useWhales();
   const { disagreements } = useDisagreements();
   const markets = liveMarkets.length > 24 ? liveMarkets : mockMarkets;

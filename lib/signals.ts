@@ -24,6 +24,8 @@ export interface Signal {
   detail: string;
   detected_at: string; // ISO
   stats: Record<string, unknown>;
+  historical_accuracy_pct?: number | null;
+  historical_sample_size?: number | null;
 }
 
 // ─── INTERNAL TYPES ──────────────────────────────────────────────────────────
