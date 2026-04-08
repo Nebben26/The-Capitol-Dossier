@@ -51,6 +51,7 @@ import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
 import { MorningBriefCard } from "@/components/ui/morning-brief";
+import { FirstVisitHero } from "@/components/ui/first-visit-hero";
 import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
@@ -135,6 +136,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [priceOffsets, setPriceOffsets] = useState<Record<string, number>>({});
   const [moversFallbackCategory, setMoversFallbackCategory] = useState<string | null>(null);
+  const [isNarrow, setIsNarrow] = useState(false);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -157,6 +159,13 @@ export default function HomePage() {
   }, [rawDisagreements, allMarkets]);
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    const check = () => setIsNarrow(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -238,6 +247,12 @@ export default function HomePage() {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+      {/* ─── FIRST-VISIT HERO ────────────────────────────────── */}
+      <FirstVisitHero />
+
+      {/* ─── DASHBOARD ANCHOR ────────────────────────────────── */}
+      <div id="dashboard-content" />
+
       {/* ─── MORNING BRIEF ───────────────────────────────────── */}
       <MorningBriefCard />
 
@@ -521,7 +536,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ─── TREEMAP: MARKET VOLUME HEATMAP ──────────────────── */}
+      {/* ─── TREEMAP / MOBILE LIST: MARKET VOLUME HEATMAP ───── */}
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -537,22 +552,66 @@ export default function HomePage() {
           </div>
         </CardHeader>
         <CardContent className="pb-3">
-          <div className="h-64 sm:h-80 w-full rounded-lg border border-[#2f374f] overflow-hidden">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-              <Treemap data={treemapData.filter(t => t.name && t.size >= 100 && typeof t.change === 'number')} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
-            </ResponsiveContainer>
-          </div>
+          {isNarrow ? (
+            /* Mobile fallback: simple top-10 list */
+            <div className="space-y-1">
+              {[...treemapData]
+                .filter(t => t.name && t.size >= 100 && typeof t.change === "number")
+                .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
+                .slice(0, 10)
+                .map((t) => (
+                  <div key={t.name} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-[#57D7BA]/5">
+                    <div className="w-1.5 h-8 rounded-full shrink-0" style={{ backgroundColor: t.change >= 0 ? "#22c55e" : "#ef4444" }} />
+                    <span className="flex-1 text-xs text-[#e2e8f0] truncate">{t.name}</span>
+                    <span className={`font-mono text-xs font-bold tabular-nums whitespace-nowrap ${t.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                      {formatSignedPct(t.change)}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="h-64 sm:h-80 w-full rounded-lg border border-[#2f374f] overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <Treemap data={treemapData.filter(t => t.name && t.size >= 100 && typeof t.change === "number")} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
+              </ResponsiveContainer>
+            </div>
+          )}
         </CardContent>
       </Card>
 
 
       {/* ─── FOOTER ──────────────────────────────────────────── */}
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
-        <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
-        <div className="flex items-center gap-3">
-          <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
-          <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
-          
+      <footer className="py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0] space-y-3">
+        {/* Trust signals */}
+        <div className="text-center text-[#8892b0]/70">
+          <span className="font-mono tabular-nums">
+            {allMarkets.length > 0 ? allMarkets.length.toLocaleString() : "6,070"} markets
+            {" · "}
+            {allMarkets.filter(m => Math.abs(m.change) > 0).length > 0
+              ? `${allMarkets.filter(m => Math.abs(m.change) > 0).length.toLocaleString()} movers today`
+              : "Live data"}
+            {" · updated every 30 min"}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link href="/about" className="hover:text-[#57D7BA] transition-colors">About</Link>
+            <Link href="/roadmap" className="hover:text-[#57D7BA] transition-colors">Roadmap</Link>
+            <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
+            <a href="https://twitter.com/quivermarkets" target="_blank" rel="noopener noreferrer" className="hover:text-[#57D7BA] transition-colors">Twitter</a>
+            <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
+            <button
+              onClick={() => {
+                localStorage.removeItem("qm_seen_hero");
+                window.location.reload();
+              }}
+              className="hover:text-[#57D7BA] transition-colors"
+            >
+              Show intro
+            </button>
+          </div>
         </div>
       </footer>
     </div>

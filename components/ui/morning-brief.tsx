@@ -121,7 +121,7 @@ export function MorningBriefCard() {
               Loading brief…
             </div>
           ) : (
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+            <div className="flex flex-wrap items-center gap-2 pb-1">
               {/* New spreads */}
               <Chip
                 icon={GitCompareArrows}
