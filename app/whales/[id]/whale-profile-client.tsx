@@ -357,11 +357,15 @@ export default function WhaleProfilePage() {
               <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full">
                 <div className="text-center">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Accuracy</div>
-                  <div className="text-lg font-bold font-mono text-[#57D7BA]">{whale.accuracy}%</div>
+                  <div className="text-lg font-bold font-mono text-[#57D7BA]">
+                    {accuracyProfile ? `${accuracyProfile.overallAccuracy}%` : whale.accuracy > 0 ? `${whale.accuracy}%` : "—"}
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Win Rate</div>
-                  <div className="text-lg font-bold font-mono text-[#22c55e]">{whale.winRate}%</div>
+                  <div className="text-lg font-bold font-mono text-[#22c55e]">
+                    {accuracyProfile ? `${accuracyProfile.overallAccuracy}%` : whale.winRate > 0 ? `${whale.winRate}%` : "—"}
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Total P&L</div>

@@ -64,6 +64,9 @@ import {
   LineChart as LineChartIcon,
 } from "lucide-react";
 import { useMarketDetail } from "@/hooks/useData";
+import { supabase } from "@/lib/supabase";
+import { Sparkline } from "@/components/ui/sparkline";
+import { getSpreadHistory } from "@/lib/api";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -143,6 +146,39 @@ export default function MarketDetailPage() {
     const timer = setTimeout(() => setLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  // ─── Real data for tabs ───────────────────────────────────────────────
+  const [marketWhales, setMarketWhales] = useState<any[]>([]);
+  const [marketDisagreement, setMarketDisagreement] = useState<any | null>(null);
+  const [marketNews, setMarketNews] = useState<any[]>([]);
+  const [spreadHistory, setSpreadHistory] = useState<Array<{ t: number; spread: number }>>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (!market?.id || market.id === id && market.question === "Loading...") return;
+    (async () => {
+      try {
+        const [whalesRes, disagreeRes, newsRes] = await Promise.all([
+          supabase.from("whale_positions").select("whale_id, outcome, current_value, pnl, updated_at").eq("market_id", market.id).order("current_value", { ascending: false }).limit(50),
+          supabase.from("disagreements").select("*").or(`poly_market_id.eq.${market.id},kalshi_market_id.eq.${market.id}`).limit(1),
+          supabase.from("news_market_tags").select("market_id, score, news_articles(id, title, url, source, published_at)").eq("market_id", market.id).order("score", { ascending: false }).limit(3),
+        ]);
+        setMarketWhales(whalesRes.data || []);
+        const d = disagreeRes.data?.[0] || null;
+        setMarketDisagreement(d);
+        setMarketNews(newsRes.data || []);
+        // Fetch spread history if disagreement exists
+        if (d?.poly_market_id) {
+          const hist = await getSpreadHistory([d.poly_market_id]);
+          setSpreadHistory(hist[d.poly_market_id] || []);
+        }
+      } catch (err) {
+        console.error("[market detail] fetch failed:", err);
+      } finally {
+        setDataLoading(false);
+      }
+    })();
+  }, [market?.id]);
 
   if (notFound) {
     return (
@@ -281,13 +317,58 @@ export default function MarketDetailPage() {
           </div>
 
           {/* ─── OVERVIEW TAB ──────────────────────────────────────── */}
-          <TabsContent value="overview" className="pt-5">
-            <div className="flex items-center justify-center py-16">
-              <p className="text-sm text-[#8892b0] text-center max-w-md">
-                Detailed analytics will populate as we accumulate historical data on this market.
-                Check the <span className="text-[#57D7BA]">Price Chart</span> and <span className="text-[#57D7BA]">Whale Flows</span> tabs for available data.
-              </p>
-            </div>
+          <TabsContent value="overview" className="pt-5 space-y-4">
+            {/* Whale position summary */}
+            {(() => {
+              const totalVal = marketWhales.reduce((s, w) => s + Number(w.current_value || 0), 0);
+              const yesVal = marketWhales.filter(w => w.outcome?.toLowerCase().startsWith("y")).reduce((s, w) => s + Number(w.current_value || 0), 0);
+              const noVal = totalVal - yesVal;
+              const fmtUsd = (n: number) => n >= 1e6 ? `$${(n/1e6).toFixed(2)}M` : n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+              return (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: "Whale Holders", val: dataLoading ? "—" : String(marketWhales.length), color: "#8b5cf6" },
+                    { label: "Total Whale Capital", val: dataLoading ? "—" : fmtUsd(totalVal), color: "#57D7BA" },
+                    { label: "YES Whale Capital", val: dataLoading ? "—" : fmtUsd(yesVal), color: "#22c55e" },
+                    { label: "NO Whale Capital", val: dataLoading ? "—" : fmtUsd(noVal), color: "#ef4444" },
+                  ].map((s) => (
+                    <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-lg font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
+                        <div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">{s.label}</div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              );
+            })()}
+            {/* Tagged news */}
+            {marketNews.length > 0 && (
+              <Card className="bg-[#222638] border-[#2a2f45]">
+                <CardContent className="p-4 space-y-2">
+                  <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mb-3">Related News</div>
+                  {marketNews.map((tag: any) => {
+                    const art = tag.news_articles;
+                    if (!art) return null;
+                    return (
+                      <a key={art.id} href={art.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#1a1e2e] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors group">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors leading-snug line-clamp-2">{art.title}</div>
+                          <div className="text-[10px] text-[#8892b0] mt-0.5">{art.source}</div>
+                        </div>
+                        <ExternalLink className="size-3.5 text-[#8892b0] shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            )}
+            {!dataLoading && marketWhales.length === 0 && marketNews.length === 0 && (
+              <div className="flex items-center justify-center py-12 text-[#8892b0] text-sm">
+                No whale activity or news found for this market yet.
+              </div>
+            )}
           </TabsContent>
 
           {/* ─── PRICE CHART TAB ───────────────────────────────────── */}
@@ -382,73 +463,60 @@ export default function MarketDetailPage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <Users className="size-4 text-[#8b5cf6]" />
-                    Recent Whale Trades
+                    Whale Positions in This Market
                   </CardTitle>
-                  <span className="text-[10px] text-[#8892b0] flex items-center gap-1">
-                    <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse" /> Live
-                  </span>
+                  <span className="text-[10px] text-[#8892b0]">{marketWhales.length} positions</span>
                 </div>
               </CardHeader>
               <CardContent className="px-0 pb-2">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#2a2f45] hover:bg-transparent">
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">WALLET</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">SIDE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">SIZE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">ENTRY</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">ACCURACY</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">P&L IMPACT</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">TIME</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {whaleFlows.map((w) => (
-                      <TableRow key={w.id} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
-                        <TableCell className="pl-4 py-2.5">
-                          <Link href={`/whales/${w.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors">
-                            <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119]">
-                              #{w.rank}
-                            </div>
-                            <span className="text-xs font-medium">{w.wallet}</span>
-                          </Link>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                            w.side === "YES" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"
-                          }`}>
-                            {w.side === "YES" ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
-                            {w.side}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <span className="font-mono text-xs font-semibold">{w.size}</span>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <span className="font-mono text-xs text-[#8892b0]">{w.price}</span>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-12 h-1 rounded-full bg-[#1a1e2e] overflow-hidden">
-                              <div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${w.acc}%` }} />
-                            </div>
-                            <span className="text-[10px] text-[#57D7BA] font-mono">{w.acc}%</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-2.5">
-                          <span className={`font-mono text-xs font-semibold ${
-                            w.pnl.startsWith("+") ? "text-[#22c55e]" : "text-[#ef4444]"
-                          }`}>
-                            {w.pnl}
-                          </span>
-                        </TableCell>
-                        <TableCell className="pr-4 py-2.5">
-                          <span className="text-[10px] text-[#8892b0]">{w.time}</span>
-                        </TableCell>
+                {dataLoading ? (
+                  <div className="py-8 text-center text-sm text-[#8892b0]">Loading…</div>
+                ) : marketWhales.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-[#8892b0]">No whale positions found for this market.</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-[#2a2f45] hover:bg-transparent">
+                        <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">WALLET</TableHead>
+                        <TableHead className="text-[10px] text-[#8892b0] font-medium">OUTCOME</TableHead>
+                        <TableHead className="text-[10px] text-[#8892b0] font-medium">VALUE</TableHead>
+                        <TableHead className="text-[10px] text-[#8892b0] font-medium">P&L</TableHead>
+                        <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">UPDATED</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {marketWhales.map((w: any, i: number) => {
+                        const val = Number(w.current_value || 0);
+                        const pnl = Number(w.pnl || 0);
+                        const fmtV = (n: number) => n >= 1e6 ? `$${(n/1e6).toFixed(2)}M` : n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+                        const isYes = w.outcome?.toLowerCase().startsWith("y");
+                        const elapsed = w.updated_at ? Math.floor((Date.now() - new Date(w.updated_at).getTime()) / 1000) : 0;
+                        const timeStr = elapsed < 3600 ? `${Math.floor(elapsed/60)}m ago` : elapsed < 86400 ? `${Math.floor(elapsed/3600)}h ago` : `${Math.floor(elapsed/86400)}d ago`;
+                        const short = `${w.whale_id?.slice(0,6)}…${w.whale_id?.slice(-4)}`;
+                        return (
+                          <TableRow key={i} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                            <TableCell className="pl-4 py-2.5">
+                              <Link href={`/whales/${w.whale_id}`} className="font-mono text-xs text-[#ccd6f6] hover:text-[#57D7BA] transition-colors">{short}</Link>
+                            </TableCell>
+                            <TableCell className="py-2.5">
+                              <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${isYes ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
+                                {isYes ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
+                                {w.outcome}
+                              </span>
+                            </TableCell>
+                            <TableCell className="py-2.5"><span className="font-mono text-xs font-semibold">{fmtV(val)}</span></TableCell>
+                            <TableCell className="py-2.5">
+                              <span className={`font-mono text-xs font-semibold ${pnl >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                                {pnl >= 0 ? "+" : ""}{fmtV(pnl)}
+                              </span>
+                            </TableCell>
+                            <TableCell className="pr-4 py-2.5"><span className="text-[10px] text-[#8892b0]">{timeStr}</span></TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -457,86 +525,69 @@ export default function MarketDetailPage() {
           <TabsContent value="cross" className="pt-5">
             <Card className="bg-[#222638] border-[#2a2f45]">
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Layers className="size-4 text-[#57D7BA]" />
-                    Cross-Platform Comparison
-                  </CardTitle>
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-[10px] font-semibold">
-                    <AlertTriangle className="size-3" />
-                    8pt divergence
-                  </div>
-                </div>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Layers className="size-4 text-[#57D7BA]" />
+                  Cross-Platform Comparison
+                </CardTitle>
                 <CardDescription className="text-xs text-[#8892b0]">
-                  Price differences across platforms may indicate arbitrage opportunities
+                  Price differences across Polymarket and Kalshi
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-0 pb-2">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#2a2f45] hover:bg-transparent">
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">PLATFORM</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">PRICE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">24H CHANGE</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">VOLUME</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">LIQUIDITY</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium">TRADERS</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium pr-4">DIVERGENCE</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {crossPlatformPrices.map((p) => {
-                      const basePrice = 68;
-                      const div = p.price - basePrice;
-                      const divAbs = Math.abs(div);
-                      return (
-                        <TableRow key={p.platform} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
-                          <TableCell className="pl-4 py-2.5">
-                            <div className="flex items-center gap-2">
-                              <div className="size-6 rounded-md bg-[#1a1e2e] border border-[#2a2f45] flex items-center justify-center">
-                                <ExternalLink className="size-3 text-[#8892b0]" />
-                              </div>
-                              <a href={p.link} className="text-xs font-medium hover:text-[#57D7BA] transition-colors">
-                                {p.platform}
-                              </a>
-                            </div>
-                          </TableCell>
-                          <TableCell className="py-2.5">
-                            <span className="font-mono text-sm font-bold">{p.price}¢</span>
-                          </TableCell>
-                          <TableCell className="py-2.5">
-                            <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold ${p.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                              {p.change >= 0 ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-                              {Math.abs(p.change)}%
-                            </span>
-                          </TableCell>
-                          <TableCell className="py-2.5">
-                            <span className="font-mono text-xs text-[#8892b0]">{p.vol}</span>
-                          </TableCell>
-                          <TableCell className="py-2.5">
-                            <span className="font-mono text-xs text-[#8892b0]">{p.liquidity}</span>
-                          </TableCell>
-                          <TableCell className="py-2.5">
-                            <span className="font-mono text-xs text-[#8892b0]">{p.traders}</span>
-                          </TableCell>
-                          <TableCell className="pr-4 py-2.5">
-                            {divAbs === 0 ? (
-                              <span className="text-xs text-[#8892b0] font-mono">—</span>
-                            ) : (
-                              <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-mono text-[10px] font-bold ${
-                                divAbs >= 5
-                                  ? "bg-[#f59e0b]/10 text-[#f59e0b]"
-                                  : "bg-[#2a2f45] text-[#8892b0]"
-                              }`}>
-                                {div > 0 ? "+" : ""}{div}pt
-                              </span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+              <CardContent className="pb-4">
+                {dataLoading ? (
+                  <div className="py-8 text-center text-sm text-[#8892b0]">Loading…</div>
+                ) : !marketDisagreement ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-2 text-[#8892b0]">
+                    <Layers className="size-8 opacity-20" />
+                    <p className="text-sm">This market is only on one platform — no cross-platform data available.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Spread header */}
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="size-4 text-[#f59e0b]" />
+                      <span className="text-sm font-semibold text-[#e2e8f0]">{Math.round(marketDisagreement.spread)}pt spread</span>
+                      {marketDisagreement.spread >= 10 && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20">ARBITRAGE</span>
+                      )}
+                      {marketDisagreement.opportunityScore > 0 && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] border border-[#57D7BA]/20">
+                          Score: {Math.round(marketDisagreement.spread * 1)}
+                        </span>
+                      )}
+                    </div>
+                    {/* Platform comparison */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: "Polymarket", price: Math.round(marketDisagreement.poly_price), color: "#6366f1" },
+                        { label: "Kalshi", price: Math.round(marketDisagreement.kalshi_price), color: "#22c55e" },
+                      ].map((p) => (
+                        <div key={p.label} className="p-4 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-center">
+                          <div className="text-[10px] text-[#8892b0] mb-1">{p.label}</div>
+                          <div className="text-2xl font-mono font-bold tabular-nums" style={{ color: p.color }}>{p.price}¢</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Direction + trend */}
+                    <div className="flex items-center gap-3 text-xs text-[#8892b0]">
+                      <span className={`font-semibold ${marketDisagreement.direction === "poly-higher" ? "text-[#6366f1]" : "text-[#22c55e]"}`}>
+                        {marketDisagreement.direction === "poly-higher" ? "Poly prices higher" : "Kalshi prices higher"}
+                      </span>
+                      {marketDisagreement.spread_trend && marketDisagreement.spread_trend !== "stable" && (
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${marketDisagreement.spread_trend === "converging" ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
+                          {marketDisagreement.spread_trend === "converging" ? "Converging" : "Diverging"}
+                        </span>
+                      )}
+                    </div>
+                    {/* Sparkline */}
+                    {spreadHistory.length >= 2 && (
+                      <div className="pt-2 border-t border-[#2f374f]">
+                        <div className="text-[10px] text-[#8892b0] mb-2 uppercase tracking-wide">48h Spread History</div>
+                        <Sparkline data={spreadHistory} width={300} height={48} strokeColor="#f59e0b" />
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

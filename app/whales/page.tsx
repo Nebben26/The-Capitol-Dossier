@@ -95,7 +95,7 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
             <div><div className={`text-xs font-bold font-mono tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</div><div className="text-[8px] text-[#8892b0]">P&L</div></div>
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{displayAccuracy}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{liveAccuracy && liveAccuracy.total >= 3 ? `${liveAccuracy.accuracy}%` : w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
           </div>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#2f374f]">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}><Trophy className="size-2.5" />{w.bestCategory}</span>
@@ -246,7 +246,7 @@ export default function WhalesBrowsePage() {
                         );
                       })()}
                     </TableCell>
-                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{w.winRate > 0 ? `${w.winRate}%` : "—"}</span></TableCell>
+                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{(() => { const la = accuracyMap[w.id]; return la && la.total >= 3 ? `${la.accuracy}%` : w.winRate > 0 ? `${w.winRate}%` : "—"; })()}</span></TableCell>
                     <TableCell className="py-3"><span className="font-mono text-xs text-[#8892b0] tabular-nums">{w.totalVolume}</span></TableCell>
                     <TableCell className="pr-4 py-3"><span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}>{w.bestCategory}</span></TableCell>
                   </TableRow>

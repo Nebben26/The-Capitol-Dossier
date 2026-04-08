@@ -6,7 +6,6 @@ import {
   Activity,
   Users,
   Trophy,
-  Zap,
   Bell,
   Home,
   Target,
@@ -15,25 +14,21 @@ import {
   Crosshair,
   Star,
   Newspaper,
-  Code,
-  BarChart3,
   DollarSign,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
-  { label: "Markets", icon: Target, href: "/screener" },
+  { label: "Screener", icon: Target, href: "/screener" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Insights", icon: Newspaper, href: "/insights" },
   { label: "Flow", icon: DollarSign, href: "/flow" },
   { label: "Whales", icon: Users, href: "/whales" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
-  { label: "Strategies", icon: Zap, href: "/strategies" },
   { label: "Watchlist", icon: Star, href: "/watchlist" },
   { label: "Calibration", icon: Crosshair, href: "/calibration" },
   { label: "Alerts", icon: Bell, href: "/alerts" },
-  { label: "Widgets", icon: Code, href: "/widgets" },
 ];
 
 export function Sidebar({

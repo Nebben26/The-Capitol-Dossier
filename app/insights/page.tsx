@@ -279,7 +279,13 @@ function ArticleCard({ article }: { article: NewsArticle }) {
   const sourceClass = SOURCE_COLORS[article.source] || "bg-[#2f374f] text-[#8892b0] border-[#2f374f]";
 
   return (
-    <div className="bg-[#222638] border border-[#2f374f] rounded-xl p-4 flex flex-col gap-3 hover:border-[#57D7BA]/30 transition-colors">
+    <div className="bg-[#222638] border border-[#2f374f] rounded-xl p-4 flex flex-col gap-3 hover:border-[#57D7BA]/30 transition-colors overflow-hidden">
+      {/* Thumbnail */}
+      {article.image_url && (
+        <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#1a1e2e] -mt-4 -mx-4 mb-2" style={{ width: "calc(100% + 2rem)" }}>
+          <img src={article.image_url} alt="" className="w-full h-full object-cover" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        </div>
+      )}
       {/* Source + time */}
       <div className="flex items-center justify-between gap-2">
         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${sourceClass}`}>
