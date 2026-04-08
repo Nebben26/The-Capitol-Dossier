@@ -14,12 +14,9 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { getMorningBrief, type MorningBrief } from "@/lib/api";
+import { formatSignedPct, formatUsd as fmtUsdLib } from "@/lib/format";
 
-function fmtUsd(n: number): string {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n.toFixed(0)}`;
-}
+function fmtUsd(n: number): string { return fmtUsdLib(n); }
 
 function fmtAge(iso: string): string {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -141,7 +138,7 @@ export function MorningBriefCard() {
                 <Chip
                   icon={brief.biggestMover.change24h >= 0 ? TrendingUp : TrendingDown}
                   label="Biggest Mover"
-                  value={`${brief.biggestMover.change24h >= 0 ? "+" : ""}${brief.biggestMover.change24h.toFixed(1)}%`}
+                  value={formatSignedPct(brief.biggestMover.change24h)}
                   color={brief.biggestMover.change24h >= 0 ? "#22c55e" : "#ef4444"}
                   href={`/markets/${brief.biggestMover.id}`}
                 />

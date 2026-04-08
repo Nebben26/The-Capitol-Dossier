@@ -51,6 +51,7 @@ import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
 import { MorningBriefCard } from "@/components/ui/morning-brief";
+import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -81,7 +82,7 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
           </text>
           {width > 80 && height > 40 && (
             <text x={x + width / 2} y={y + height / 2 + (width > 100 && height > 55 ? 8 : 12)} textAnchor="middle" fill={color} fontSize={12} fontWeight={700}>
-              {change >= 0 ? "+" : ""}{change.toFixed(1)}%
+              {formatSignedPct(change)}
             </text>
           )}
           {width > 110 && height > 60 && (
@@ -427,12 +428,12 @@ export default function HomePage() {
                         <Sparkline data={m.spark} positive={m.change >= 0} />
                       </TableCell>
                       <TableCell className="py-2.5">
-                        <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{m.price + (priceOffsets[m.id] || 0)}¢</span>
+                        <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{formatCents(m.price + (priceOffsets[m.id] || 0))}</span>
                       </TableCell>
-                      <TableCell className="py-2.5">
+                      <TableCell className="py-2.5 whitespace-nowrap">
                         <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${(m.change + (priceOffsets[m.id] || 0)) >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
                           {(m.change + (priceOffsets[m.id] || 0)) >= 0 ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-                          {Math.abs(m.change + (priceOffsets[m.id] || 0))}%
+                          {formatPct(Math.abs(m.change + (priceOffsets[m.id] || 0)))}
                         </span>
                       </TableCell>
                       <TableCell className="pr-4 py-2.5 hidden md:table-cell">

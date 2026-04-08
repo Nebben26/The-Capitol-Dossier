@@ -48,6 +48,7 @@ import { CATEGORIES, PLATFORMS } from "@/lib/mockData";
 import type { Market } from "@/lib/mockData";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { ProBadge } from "@/components/ui/pro-gate";
+import { formatPct, formatCents } from "@/lib/format";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -102,9 +103,9 @@ function ScreenerCard({ m, spread }: { m: Market; spread: number | null }) {
           </div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{m.price}¢</span>
+              <span className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{formatCents(m.price)}</span>
               <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{Math.abs(m.change)}%
+                {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{formatPct(Math.abs(m.change))}
               </span>
             </div>
             <span className="font-mono text-[10px] text-[#8892b0] tabular-nums">{m.volume}</span>
@@ -363,10 +364,10 @@ export default function ScreenerPage() {
                         <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors line-clamp-1 truncate block">{m.question}</Link>
                       </TableCell>
                       <TableCell className="py-2.5 hidden sm:table-cell"><MiniSparkline data={m.spark} positive={m.change >= 0} /></TableCell>
-                      <TableCell className="py-2.5"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{m.price}¢</span></TableCell>
-                      <TableCell className="py-2.5">
+                      <TableCell className="py-2.5"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{formatCents(m.price)}</span></TableCell>
+                      <TableCell className="py-2.5 whitespace-nowrap">
                         <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${m.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                          {m.change >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}{Math.abs(m.change)}%
+                          {m.change >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}{formatPct(Math.abs(m.change))}
                         </span>
                       </TableCell>
                       <TableCell className="py-2.5 hidden md:table-cell"><span className="font-mono text-[11px] text-[#8892b0] tabular-nums">{m.volume}</span></TableCell>
