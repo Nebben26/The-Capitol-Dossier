@@ -152,14 +152,14 @@ export default function AlertsPage() {
   useEffect(() => {
     supabase
       .from("whale_positions")
-      .select("id, whale_address, market_id, outcome, value, pnl, updated_at")
+      .select("id, whale_id, market_id, outcome, current_value, pnl, updated_at")
       .order("updated_at", { ascending: false })
       .limit(50)
       .then(({ data }) => {
         if (!data || data.length === 0) return;
         const mapped: WhaleAlert[] = data.map((row, i) => {
-          const addr = row.whale_address as string;
-          const val = Number(row.value) || 0;
+          const addr = row.whale_id as string;
+          const val = Number(row.current_value) || 0;
           const outcome = (row.outcome as string)?.toUpperCase() === "NO" ? "NO" : "YES";
           const age = Math.floor((Date.now() - new Date(row.updated_at).getTime()) / 1000);
           const ageStr = age < 60 ? `${age}s ago` : age < 3600 ? `${Math.floor(age / 60)}m ago` : `${Math.floor(age / 3600)}h ago`;
@@ -179,6 +179,7 @@ export default function AlertsPage() {
             isNew: age < 300,
           };
         });
+        console.log(`[alerts] mapped ${mapped.length} real whale alerts from Supabase`);
         setAlerts(mapped);
         setAlertCount(mapped.length);
       });
