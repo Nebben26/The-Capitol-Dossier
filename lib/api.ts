@@ -1009,3 +1009,151 @@ export async function getAllWhaleAccuracies(): Promise<{
     return { data: {}, source: "mock" };
   }
 }
+
+// ─── MORNING BRIEF ───────────────────────────────────────────────────────────
+
+export interface MorningBrief {
+  generatedAt: string;
+  newDisagreementsCount: number;
+  biggestNewSpread: { question: string; spread: number; id: string } | null;
+  biggestMover: { question: string; change24h: number; id: string } | null;
+  topFlowShift: { category: string; direction: "YES" | "NO"; amountUsd: number } | null;
+  mostActiveWhale: { whaleId: string; positionCount: number; displayName?: string } | null;
+  marketsResolvingThisWeek: number;
+}
+
+function emptyBrief(): MorningBrief {
+  return {
+    generatedAt: new Date().toISOString(),
+    newDisagreementsCount: 0,
+    biggestNewSpread: null,
+    biggestMover: null,
+    topFlowShift: null,
+    mostActiveWhale: null,
+    marketsResolvingThisWeek: 0,
+  };
+}
+
+export async function getMorningBrief(): Promise<{ data: MorningBrief; source: DataSource }> {
+  const cacheKey = "morning_brief";
+  const cached = getCached<{ data: MorningBrief; source: DataSource }>(cacheKey, WHALE_CACHE_TTL);
+  if (cached) return cached;
+
+  if (!isSupabaseConfigured()) return { data: emptyBrief(), source: "mock" };
+
+  try {
+    const since24h = new Date(Date.now() - 86_400_000).toISOString();
+    const now = new Date().toISOString();
+    const in7d = new Date(Date.now() + 7 * 86_400_000).toISOString();
+
+    const [recentDResp, topMoverAsc, topMoverDesc, whaleResp, resolvingResp, flowResp] = await Promise.all([
+      // Disagreements updated in last 24h, ordered by spread desc
+      supabase.from("disagreements")
+        .select("id, question, spread, poly_market_id")
+        .gte("updated_at", since24h)
+        .order("spread", { ascending: false })
+        .limit(200),
+
+      // Biggest negative mover
+      supabase.from("markets")
+        .select("id, question, change_24h")
+        .not("change_24h", "is", null)
+        .order("change_24h", { ascending: true })
+        .limit(1),
+
+      // Biggest positive mover
+      supabase.from("markets")
+        .select("id, question, change_24h")
+        .not("change_24h", "is", null)
+        .order("change_24h", { ascending: false })
+        .limit(1),
+
+      // Most active whale: positions updated in last 24h
+      supabase.from("whale_positions")
+        .select("whale_id")
+        .gte("updated_at", since24h)
+        .limit(1000),
+
+      // Markets resolving this week
+      supabase.from("markets")
+        .select("id")
+        .gte("end_date", now)
+        .lte("end_date", in7d)
+        .limit(1000),
+
+      // Smart money flow (cached)
+      getSmartMoneyFlow(),
+    ]);
+
+    // newDisagreementsCount + biggestNewSpread
+    const recentD = recentDResp.data || [];
+    // If no recent by updated_at, count high-spread ones as "notable"
+    const newDisagreementsCount = recentD.length;
+    const biggestNewSpread = recentD.length > 0
+      ? { question: recentD[0].question, spread: Math.round(recentD[0].spread), id: recentD[0].poly_market_id || recentD[0].id }
+      : null;
+
+    // biggestMover: pick whichever abs change is larger
+    const negM = topMoverAsc.data?.[0];
+    const posM = topMoverDesc.data?.[0];
+    let biggestMover: MorningBrief["biggestMover"] = null;
+    if (negM || posM) {
+      const negAbs = Math.abs(negM?.change_24h ?? 0);
+      const posAbs = Math.abs(posM?.change_24h ?? 0);
+      const best = negAbs > posAbs ? negM : posM;
+      if (best && best.change_24h != null) {
+        biggestMover = { question: best.question, change24h: Number(best.change_24h), id: best.id };
+      }
+    }
+
+    // mostActiveWhale
+    const whaleCounts: Record<string, number> = {};
+    for (const p of whaleResp.data || []) {
+      if (p.whale_id) whaleCounts[p.whale_id] = (whaleCounts[p.whale_id] || 0) + 1;
+    }
+    let mostActiveWhale: MorningBrief["mostActiveWhale"] = null;
+    const topEntry = Object.entries(whaleCounts).sort((a, b) => b[1] - a[1])[0];
+    if (topEntry) {
+      // Try to get display name
+      const { data: wRow } = await supabase.from("whales").select("display_name").eq("address", topEntry[0]).limit(1);
+      mostActiveWhale = {
+        whaleId: topEntry[0],
+        positionCount: topEntry[1],
+        displayName: wRow?.[0]?.display_name || undefined,
+      };
+    }
+
+    // marketsResolvingThisWeek
+    const marketsResolvingThisWeek = resolvingResp.data?.length ?? 0;
+
+    // topFlowShift
+    let topFlowShift: MorningBrief["topFlowShift"] = null;
+    if (flowResp.data.length > 0) {
+      const top = flowResp.data.reduce((a, b) => Math.abs(a.netFlowUsd) > Math.abs(b.netFlowUsd) ? a : b);
+      topFlowShift = {
+        category: top.category,
+        direction: top.netFlowUsd >= 0 ? "YES" : "NO",
+        amountUsd: Math.abs(top.netFlowUsd),
+      };
+    }
+
+    console.log(`[getMorningBrief] generated: ${newDisagreementsCount} new spreads, mover=${biggestMover?.change24h}, whale=${mostActiveWhale?.whaleId?.slice(0, 8)}`);
+
+    const brief: MorningBrief = {
+      generatedAt: new Date().toISOString(),
+      newDisagreementsCount,
+      biggestNewSpread,
+      biggestMover,
+      topFlowShift,
+      mostActiveWhale,
+      marketsResolvingThisWeek,
+    };
+
+    const out = { data: brief, source: "live" as DataSource };
+    setCache(cacheKey, out);
+    return out;
+  } catch (err) {
+    console.error("[getMorningBrief] failed:", err);
+    return { data: emptyBrief(), source: "mock" };
+  }
+}

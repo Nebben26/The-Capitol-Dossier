@@ -50,6 +50,7 @@ import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
+import { MorningBriefCard } from "@/components/ui/morning-brief";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -230,6 +231,9 @@ export default function HomePage() {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+      {/* ─── MORNING BRIEF ───────────────────────────────────── */}
+      <MorningBriefCard />
+
       {/* ─── HERO: MARKET PULSE ──────────────────────────────── */}
       <Card className="bg-[#222638] border-[#2f374f] overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[#57D7BA]/5 via-transparent to-[#ef4444]/5 pointer-events-none" />
