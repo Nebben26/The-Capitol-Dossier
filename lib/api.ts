@@ -1360,3 +1360,59 @@ export async function getSignals(opts: GetSignalsOpts = {}): Promise<{
     return { data: [], source: "mock" };
   }
 }
+
+// ─── CANDLES ─────────────────────────────────────────────────────────────────
+
+export interface Candle {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export async function getMarketCandles(marketId: string, days = 30): Promise<Candle[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const since = new Date(Date.now() - days * 86_400_000).toISOString();
+    const { data } = await supabase
+      .from("market_candles")
+      .select("timestamp, open, high, low, close, volume")
+      .eq("market_id", marketId)
+      .gte("timestamp", since)
+      .order("timestamp", { ascending: true });
+    return (data || []) as Candle[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getCrossPlatformPrice(
+  marketId: string
+): Promise<{ counterpart_id: string; counterpart_platform: string; counterpart_price: number } | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data } = await supabase
+      .from("disagreements")
+      .select("poly_market_id, kalshi_market_id, poly_price, kalshi_price")
+      .or(`poly_market_id.eq.${marketId},kalshi_market_id.eq.${marketId}`)
+      .limit(1)
+      .maybeSingle();
+    if (!data) return null;
+    if (data.poly_market_id === marketId) {
+      return {
+        counterpart_id: data.kalshi_market_id,
+        counterpart_platform: "Kalshi",
+        counterpart_price: data.kalshi_price,
+      };
+    }
+    return {
+      counterpart_id: data.poly_market_id,
+      counterpart_platform: "Polymarket",
+      counterpart_price: data.poly_price,
+    };
+  } catch {
+    return null;
+  }
+}

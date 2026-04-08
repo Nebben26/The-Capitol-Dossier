@@ -66,7 +66,8 @@ import {
 import { useMarketDetail } from "@/hooks/useData";
 import { supabase } from "@/lib/supabase";
 import { Sparkline } from "@/components/ui/sparkline";
-import { getSpreadHistory, getMarketThesis, type MarketThesis } from "@/lib/api";
+import { getSpreadHistory, getMarketThesis, getMarketCandles, type MarketThesis, type Candle } from "@/lib/api";
+import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { formatSignedPct, formatCents } from "@/lib/format";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
@@ -155,22 +156,40 @@ export default function MarketDetailPage() {
   const [spreadHistory, setSpreadHistory] = useState<Array<{ t: number; spread: number }>>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [thesis, setThesis] = useState<MarketThesis | null>(null);
+  const [candles, setCandles] = useState<Candle[]>([]);
+  const [crossPlatformPrice, setCrossPlatformPrice] = useState<number | null>(null);
+  const [crossPlatformLabel, setCrossPlatformLabel] = useState<string>("Counterpart");
 
   useEffect(() => {
     if (!market?.id || market.question === "Loading...") return;
     (async () => {
       try {
-        const [whalesRes, disagreeRes, newsRes, thesisData] = await Promise.all([
+        const [whalesRes, disagreeRes, newsRes, thesisData, candleData] = await Promise.all([
           supabase.from("whale_positions").select("whale_id, outcome, current_value, pnl, updated_at").eq("market_id", market.id).order("current_value", { ascending: false }).limit(50),
           supabase.from("disagreements").select("*").or(`poly_market_id.eq.${market.id},kalshi_market_id.eq.${market.id}`).limit(1),
           supabase.from("news_market_tags").select("market_id, score, news_articles(id, title, url, source, published_at)").eq("market_id", market.id).order("score", { ascending: false }).limit(3),
           getMarketThesis(market.id),
+          getMarketCandles(market.id, 30),
         ]);
         setMarketWhales(whalesRes.data || []);
         const d = disagreeRes.data?.[0] || null;
         setMarketDisagreement(d);
         setMarketNews(newsRes.data || []);
         setThesis(thesisData);
+        setCandles(candleData);
+
+        // Cross-platform overlay price from disagreement data
+        if (d) {
+          const isKalshi = market.id.startsWith("kalshi-");
+          if (isKalshi && d.poly_price != null) {
+            setCrossPlatformPrice(Number(d.poly_price));
+            setCrossPlatformLabel("Polymarket");
+          } else if (!isKalshi && d.kalshi_price != null) {
+            setCrossPlatformPrice(Number(d.kalshi_price));
+            setCrossPlatformLabel("Kalshi");
+          }
+        }
+
         if (d?.poly_market_id) {
           const hist = await getSpreadHistory([d.poly_market_id]);
           setSpreadHistory(hist[d.poly_market_id] || []);
@@ -538,41 +557,80 @@ export default function MarketDetailPage() {
               </CardHeader>
               <CardContent className="pb-3">
                 {/* Price Chart */}
-                <div className="h-72 sm:h-96 w-full">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                    {chartMode === "area" ? (
-                      <AreaChart data={priceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#57D7BA" stopOpacity={0.5} />
-                            <stop offset="95%" stopColor="#57D7BA" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} interval="preserveStartEnd" />
-                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v: number) => `${Math.round(v)}¢`} domain={[0, 100]} />
-                        <Area type="monotone" dataKey="price" stroke="#57D7BA" strokeWidth={2} fill="url(#priceGradient)" />
-                      </AreaChart>
-                    ) : (
-                      <BarChart data={priceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
-                        <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} interval="preserveStartEnd" />
-                        <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v: number) => `${Math.round(v)}¢`} domain={[0, 100]} />
-                        <Bar dataKey="close" fill="#57D7BA" radius={[2, 2, 0, 0]} />
-                      </BarChart>
-                    )}
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Volume Bars */}
-                <div className="h-20 w-full mt-2">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                    <BarChart data={priceData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                      <XAxis dataKey="time" tick={false} axisLine={{ stroke: "#2a2f45" }} />
-                      <Bar dataKey="vol" fill="#57D7BA" fillOpacity={0.2} radius={[1, 1, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                {chartMode === "area" ? (
+                  <>
+                    <div className="h-72 sm:h-96 w-full">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                        <AreaChart data={priceData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#57D7BA" stopOpacity={0.5} />
+                              <stop offset="95%" stopColor="#57D7BA" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#2a2f45" />
+                          <XAxis dataKey="time" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} interval="preserveStartEnd" />
+                          <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2a2f45" }} tickFormatter={(v: number) => `${Math.round(v)}¢`} domain={[0, 100]} />
+                          <Area type="monotone" dataKey="price" stroke="#57D7BA" strokeWidth={2} fill="url(#priceGradient)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {/* Volume Bars */}
+                    <div className="h-20 w-full mt-2">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                        <BarChart data={priceData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+                          <XAxis dataKey="time" tick={false} axisLine={{ stroke: "#2a2f45" }} />
+                          <Bar dataKey="vol" fill="#57D7BA" fillOpacity={0.2} radius={[1, 1, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </>
+                ) : candles.length > 0 ? (
+                  <>
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 mb-2 text-[10px] text-[#8892b0]">
+                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#22c55e]" />Bullish candle</span>
+                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#ef4444]" />Bearish candle</span>
+                      {crossPlatformPrice !== null && (
+                        <span className="flex items-center gap-1"><span className="inline-block w-4 h-0.5 bg-[#57D7BA]" />{crossPlatformLabel} price ({crossPlatformPrice}¢)</span>
+                      )}
+                    </div>
+                    <CandlestickChartComponent
+                      candles={candles}
+                      overlayLine={
+                        crossPlatformPrice !== null && candles.length > 0
+                          ? [
+                              { timestamp: candles[0].timestamp, value: crossPlatformPrice / 100 },
+                              { timestamp: candles[candles.length - 1].timestamp, value: crossPlatformPrice / 100 },
+                            ]
+                          : undefined
+                      }
+                      overlayLabel={crossPlatformLabel}
+                      height={384}
+                    />
+                  </>
+                ) : (
+                  /* Fallback: no candle data yet */
+                  <div className="flex flex-col items-center justify-center h-72 sm:h-96 text-center space-y-3">
+                    <div className="size-12 rounded-xl bg-[#57D7BA]/10 flex items-center justify-center">
+                      <CandlestickChart className="size-6 text-[#57D7BA]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#e2e8f0]">
+                        Historical price data not yet available
+                      </p>
+                      <p className="text-[11px] text-[#8892b0] mt-1 max-w-xs mx-auto leading-relaxed">
+                        Charts populate hourly for active Kalshi markets. Switch to the area chart view to see the simulated price curve, or check back after the next data refresh.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setChartMode("area")}
+                      className="px-3 py-1.5 rounded-lg bg-[#57D7BA]/10 text-[#57D7BA] text-xs font-semibold hover:bg-[#57D7BA]/20 transition-colors"
+                    >
+                      Switch to area chart
+                    </button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
