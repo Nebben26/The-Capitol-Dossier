@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
+import { decodeHtmlEntities } from "@/lib/decode";
 import {
   Newspaper,
   ExternalLink,
@@ -304,7 +305,7 @@ function ArticleCard({ article }: { article: NewsArticle }) {
         rel="noopener noreferrer"
         className="text-sm font-semibold text-[#ccd6f6] leading-snug hover:text-[#57D7BA] transition-colors flex items-start gap-1.5 group"
       >
-        <span className="flex-1">{article.title}</span>
+        <span className="flex-1">{decodeHtmlEntities(article.title)}</span>
         <ExternalLink className="size-3 mt-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
       </a>
 

@@ -7,10 +7,10 @@ import { Activity, Users, GitCompareArrows, Zap } from "lucide-react";
 
 export default function AboutPage() {
   const [stats, setStats] = useState({
-    markets: "6,070+",
-    whales: "149",
-    disagreements: "286+",
-    signals: "50+",
+    markets: "6,500+",
+    whales: "200+",
+    disagreements: "300+",
+    signals: "180+",
   });
 
   useEffect(() => {
@@ -24,10 +24,10 @@ export default function AboutPage() {
           supabase.from("signals").select("id", { count: "exact", head: true }),
         ]);
         setStats({
-          markets: mRes.count ? `${mRes.count.toLocaleString()}+` : "6,070+",
-          whales: wRes.count ? wRes.count.toLocaleString() : "149",
-          disagreements: dRes.count ? `${dRes.count.toLocaleString()}+` : "286+",
-          signals: sRes.count ? `${sRes.count.toLocaleString()}+` : "50+",
+          markets: mRes.count ? `${mRes.count.toLocaleString()}+` : "6,500+",
+          whales: wRes.count ? wRes.count.toLocaleString() : "200+",
+          disagreements: dRes.count ? `${dRes.count.toLocaleString()}+` : "300+",
+          signals: sRes.count ? `${sRes.count.toLocaleString()}+` : "180+",
         });
       } catch { /* use defaults */ }
     })();
@@ -54,7 +54,7 @@ export default function AboutPage() {
       <div className="space-y-5 text-[#8892b0] text-[15px] leading-relaxed">
         <p>
           Quiver Markets is the intelligence layer for prediction markets. We aggregate live data from
-          Polymarket and Kalshi, track 149 of the most accurate whale traders, detect cross-platform
+          Polymarket and Kalshi, track 200+ of the most accurate whale traders, detect cross-platform
           arbitrage, and surface AI-generated market analysis you can&apos;t get anywhere else. Built for
           serious prediction market traders, quants, and researchers.
         </p>

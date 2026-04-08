@@ -20,14 +20,15 @@ export async function GET() {
     dbStatus = "error";
   }
 
+  const degraded = dbStatus === "degraded" || dbStatus === "error";
   return Response.json(
     {
-      status: "ok",
+      status: degraded ? "degraded" : "ok",
       version: "v1",
       uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
       database: dbStatus,
       timestamp: new Date().toISOString(),
     },
-    { headers: CORS_HEADERS }
+    { status: degraded ? 503 : 200, headers: CORS_HEADERS }
   );
 }

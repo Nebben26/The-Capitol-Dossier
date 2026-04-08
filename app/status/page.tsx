@@ -167,27 +167,15 @@ export default function StatusPage() {
         </CardContent>
       </Card>
 
-      {/* Uptime placeholder */}
+      {/* Uptime */}
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardContent className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="size-4 text-[#57D7BA]" />
             <h2 className="text-sm font-semibold text-[#e2e8f0]">Uptime</h2>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { period: "30 days", uptime: "99.9%" },
-              { period: "90 days", uptime: "99.7%" },
-              { period: "All time", uptime: "99.8%" },
-            ].map((u) => (
-              <div key={u.period} className="text-center">
-                <div className="text-xl font-bold font-mono text-[#22c55e]">{u.uptime}</div>
-                <div className="text-[10px] text-[#8892b0] mt-1">{u.period}</div>
-              </div>
-            ))}
-          </div>
-          <p className="text-[10px] text-[#4a5168] text-center mt-4">
-            Hosted on Netlify CDN. SLA uptime tracking coming soon.
+          <p className="text-[13px] text-[#8892b0] leading-relaxed">
+            Uptime tracking via UptimeRobot — public dashboard coming soon.
           </p>
         </CardContent>
       </Card>

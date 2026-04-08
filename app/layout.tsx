@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +15,10 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#57D7BA",
+};
+
 export const metadata: Metadata = {
   title: "Quiver Markets — Prediction Market Intelligence",
   description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection. Track the smartest money in prediction markets.",
@@ -25,19 +29,20 @@ export const metadata: Metadata = {
     siteName: "Quiver Markets",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: "Quiver Markets — Prediction Market Intelligence" }],
+    images: [{ url: "/og-image", width: 1200, height: 630, alt: "Quiver Markets — Prediction Market Intelligence" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Quiver Markets — Prediction Market Intelligence",
     description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",
     creator: "@quivermarkets",
-    images: ["/og-image.svg"],
+    images: ["/og-image"],
   },
   robots: {
     index: true,
     follow: true,
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

@@ -1,0 +1,21 @@
+{
+  "name": "Quiver Markets",
+  "short_name": "Quiver",
+  "description": "Prediction market intelligence — real-time analytics, whale tracking, and arbitrage detection.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1e2e",
+  "theme_color": "#57D7BA",
+  "icons": [
+    {
+      "src": "/icon-192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

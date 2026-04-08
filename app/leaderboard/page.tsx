@@ -491,6 +491,11 @@ export default function LeaderboardPage() {
               ))}
             </div>
 
+            {/* ─── ACCURACY NOTE ───────────────────────────────────── */}
+            <p className="text-[11px] text-[#4a5168] text-center py-2">
+              * Accuracy scores reflect verified resolved markets only. Backfill in progress — scores improve as markets resolve.
+            </p>
+
             {/* ─── FOOTER ──────────────────────────────────────────── */}
             <footer className="flex items-center justify-between py-4 border-t border-[#2a2f45] text-[10px] text-[#8892b0]">
               <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>

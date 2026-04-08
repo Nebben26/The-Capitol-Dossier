@@ -71,6 +71,7 @@ export function Sidebar({
           </Link>
           <button
             onClick={onClose}
+            aria-label="Close navigation menu"
             className="ml-auto lg:hidden text-[#8892b0] hover:text-[#e2e8f0]"
           >
             <X className="size-4" />

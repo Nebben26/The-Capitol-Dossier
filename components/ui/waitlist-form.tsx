@@ -6,6 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 export function WaitlistForm({ compact = false, source }: { compact?: boolean; source?: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [ageChecked, setAgeChecked] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,6 +20,8 @@ export function WaitlistForm({ compact = false, source }: { compact?: boolean; s
           name: formData.get("name"),
           email: formData.get("email"),
           source: source || "homepage",
+          // honeypot field — bots fill this, humans don't
+          website: formData.get("website") || "",
         }),
       });
       if (res.ok) {
@@ -69,9 +72,31 @@ export function WaitlistForm({ compact = false, source }: { compact?: boolean; s
         required
         className="w-full px-3 py-2 bg-[#1a1e2e] border border-[#2f374f] rounded-lg text-sm text-[#e2e8f0] placeholder-[#4a5168] focus:border-[#57D7BA] outline-none transition-colors"
       />
+      {/* Honeypot — hidden from real users, filled by bots */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+        aria-hidden="true"
+      />
+      {/* 18+ consent */}
+      <label className="flex items-start gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          required
+          checked={ageChecked}
+          onChange={(e) => setAgeChecked(e.target.checked)}
+          className="mt-0.5 accent-[#57D7BA] shrink-0"
+        />
+        <span className="text-[11px] text-[#8892b0] leading-relaxed">
+          I am 18+ and consent to receive launch updates from Quiver Markets.
+        </span>
+      </label>
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || !ageChecked}
         className="w-full py-2 bg-[#57D7BA] text-[#0f1119] font-bold rounded-lg hover:bg-[#57D7BA]/90 disabled:opacity-50 text-sm transition-colors"
       >
         {submitting ? "Joining..." : "Join the waitlist"}

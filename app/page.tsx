@@ -615,7 +615,7 @@ export default function HomePage() {
         {/* Trust signals */}
         <div className="text-center text-[#8892b0]/70">
           <span className="font-mono tabular-nums">
-            {allMarkets.length > 0 ? allMarkets.length.toLocaleString() : "6,070"} markets
+            {allMarkets.length > 0 ? allMarkets.length.toLocaleString() : "6,500"} markets
             {" · "}
             {allMarkets.filter(m => Math.abs(m.change) > 0).length > 0
               ? `${allMarkets.filter(m => Math.abs(m.change) > 0).length.toLocaleString()} movers today`

@@ -6,7 +6,7 @@ import { CheckCircle2, Clock, Calendar } from "lucide-react";
 
 const SHIPPED = [
   "Cross-platform arbitrage scanner (Polymarket vs Kalshi, 286+ disagreements tracked)",
-  "Whale tracking and Smart Money Flow (149 wallets, $47M+ tracked)",
+  "Whale tracking and Smart Money Flow (200+ wallets, $60M+ tracked)",
   "AI Market Thesis on top markets (bull case, bear case, catalysts, whale read)",
   "Smart Signal Alerts (Consensus, Concentration, Size Spike, Divergence detection)",
   "Copy the Whales virtual portfolio tracker",

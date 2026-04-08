@@ -102,7 +102,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
 
   return (
     <header className="sticky top-0 z-30 h-14 bg-[#1a1e2e]/95 backdrop-blur-md border-b border-[#2f374f] flex items-center gap-3 px-4">
-      <button onClick={onMenuClick} className="lg:hidden text-[#8892b0] hover:text-[#e2e8f0]">
+      <button onClick={onMenuClick} aria-label="Open navigation menu" className="lg:hidden text-[#8892b0] hover:text-[#e2e8f0]">
         <Menu className="size-5" />
       </button>
 

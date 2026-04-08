@@ -45,9 +45,9 @@ const COMPARISON: FeatureSection[] = [
   {
     heading: "DATA",
     rows: [
-      { label: "6,070+ markets", free: true, pro: true, starter: true, quant: true, premium: true },
-      { label: "286 disagreements", free: true, pro: true, starter: true, quant: true, premium: true },
-      { label: "149 whale wallets", free: true, pro: true, starter: true, quant: true, premium: true },
+      { label: "6,500+ markets", free: true, pro: true, starter: true, quant: true, premium: true },
+      { label: "300+ disagreements", free: true, pro: true, starter: true, quant: true, premium: true },
+      { label: "200+ whale wallets", free: true, pro: true, starter: true, quant: true, premium: true },
       { label: "News catalysts", free: true, pro: true, starter: true, quant: true, premium: true },
       { label: "Spread history", free: false, pro: "7d", starter: "7d", quant: "30d", premium: "90d" },
       { label: "Historical archive", free: false, pro: false, starter: false, quant: false, premium: "Full" },
@@ -132,7 +132,7 @@ export default function PricingPage() {
       description: "Everything you need to scan the prediction market landscape",
       featured: false,
       features: [
-        { label: "All 6,070 markets across Polymarket and Kalshi", included: true },
+        { label: "All 6,500+ markets across Polymarket and Kalshi", included: true },
         { label: "Cross-platform arbitrage detection (286 opportunities)", included: true },
         { label: "Smart Money Flow by category", included: true },
         { label: "Whale leaderboard (149 tracked wallets)", included: true },
@@ -169,8 +169,8 @@ export default function PricingPage() {
         { label: "Telegram + email notifications", included: true },
         { label: "Priority support", included: true },
       ],
-      cta: "Upgrade to Pro",
-      ctaHref: "mailto:hello@quivermarkets.com?subject=Pro%20Tier%20Inquiry",
+      cta: "Join the waitlist",
+      ctaHref: "#waitlist",
       ctaStyle: "bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/90 font-bold",
     },
     {
@@ -332,11 +332,11 @@ export default function PricingPage() {
                 {tier.cta}
               </a>
 
-              {/* Pro tier — compact waitlist form as secondary CTA */}
+              {/* Pro tier — waitlist form */}
               {tier.id === "pro" && (
-                <div className="pt-3 border-t border-[#2f374f] space-y-2">
+                <div id="waitlist" className="pt-3 border-t border-[#2f374f] space-y-2">
                   <p className="text-[10px] text-[#8892b0] text-center">
-                    Or join the waitlist for $39/mo founder pricing.
+                    Founder pricing $39/mo — locks in for life.
                   </p>
                   <WaitlistForm compact source="pricing-pro-tier" />
                 </div>
