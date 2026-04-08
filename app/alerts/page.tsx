@@ -53,6 +53,7 @@ import {
 import { useAlertData } from "@/hooks/useData";
 import type { WhaleAlert, PriceMover, ResolutionItem } from "@/lib/mockData";
 import { recentlyResolved } from "@/lib/mockData";
+import { supabase } from "@/lib/supabase";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
@@ -137,7 +138,7 @@ export default function AlertsPage() {
 
   useEffect(() => { setSource(source); }, [source, setSource]);
 
-  const [alerts, setAlerts] = useState(initialWhaleAlerts);
+  const [alerts, setAlerts] = useState<WhaleAlert[]>(initialWhaleAlerts);
   const [alertCount, setAlertCount] = useState(2847);
   const [pmSort, setPmSort] = useState<PmSort>("change1h");
   const [pmDir, setPmDir] = useState<SortDir>("desc");
@@ -146,6 +147,42 @@ export default function AlertsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
+
+  // Load real whale positions from Supabase
+  useEffect(() => {
+    supabase
+      .from("whale_positions")
+      .select("id, whale_address, market_id, outcome, value, pnl, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        const mapped: WhaleAlert[] = data.map((row, i) => {
+          const addr = row.whale_address as string;
+          const val = Number(row.value) || 0;
+          const outcome = (row.outcome as string)?.toUpperCase() === "NO" ? "NO" : "YES";
+          const age = Math.floor((Date.now() - new Date(row.updated_at).getTime()) / 1000);
+          const ageStr = age < 60 ? `${age}s ago` : age < 3600 ? `${Math.floor(age / 60)}m ago` : `${Math.floor(age / 3600)}h ago`;
+          return {
+            id: String(row.id ?? i),
+            wallet: `${addr.slice(0, 6)}…${addr.slice(-4)}`,
+            walletId: addr,
+            rank: i + 1,
+            accuracy: 0,
+            market: String(row.market_id ?? ""),
+            marketId: String(row.market_id ?? ""),
+            side: outcome as "YES" | "NO",
+            size: val >= 1_000_000 ? `$${(val / 1_000_000).toFixed(1)}M` : val >= 1_000 ? `$${(val / 1_000).toFixed(0)}K` : `$${Math.round(val)}`,
+            price: "—",
+            time: ageStr,
+            seconds: age,
+            isNew: age < 300,
+          };
+        });
+        setAlerts(mapped);
+        setAlertCount(mapped.length);
+      });
+  }, []);
 
   // Alerts update when the data refreshes via the hook, not via fake injection
 

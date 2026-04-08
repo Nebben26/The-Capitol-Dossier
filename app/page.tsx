@@ -134,6 +134,7 @@ export default function HomePage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [loading, setLoading] = useState(true);
   const [priceOffsets, setPriceOffsets] = useState<Record<string, number>>({});
+  const [moversFallbackCategory, setMoversFallbackCategory] = useState<string | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -165,11 +166,16 @@ export default function HomePage() {
   // Derive biggest movers from centralized markets, filtered by active category
   const filteredMovers = useMemo(() => {
     let filtered = allMarkets;
+    let fallback: string | null = null;
     if (activeCategory === "Trending") {
       filtered = allMarkets.filter((m) => m.trending);
+      if (filtered.length < 3 && allMarkets.length > 0) { filtered = allMarkets; fallback = activeCategory; }
     } else {
-      filtered = allMarkets.filter((m) => m.category === activeCategory);
+      const catFiltered = allMarkets.filter((m) => m.category === activeCategory);
+      if (catFiltered.length >= 3) { filtered = catFiltered; }
+      else if (allMarkets.length > 0) { filtered = allMarkets; fallback = activeCategory; }
     }
+    setMoversFallbackCategory(fallback);
     return [...filtered]
       .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
       .slice(0, 8)
@@ -371,6 +377,9 @@ export default function HomePage() {
                 </CardTitle>
                 <span className="text-[10px] text-[#8892b0] font-mono">24H</span>
               </div>
+              {moversFallbackCategory && (
+                <p className="text-[10px] text-[#f59e0b] mt-1">Showing all categories (no {moversFallbackCategory} movers in 24h)</p>
+              )}
             </CardHeader>
             <CardContent className="px-0 pb-2 overflow-x-hidden">
               <Table className="table-fixed w-full">
@@ -444,7 +453,7 @@ export default function HomePage() {
                   {sortedMovers.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-8 text-xs text-[#8892b0]">
-                        No movers in this category
+                        Loading market data…
                       </TableCell>
                     </TableRow>
                   )}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useLeaderboard } from "@/hooks/useData";
+import { getAllWhaleAccuracies } from "@/lib/api";
 import { TIME_FILTERS as timeFilters, CATEGORIES as categories } from "@/lib/mockData";
 import type { Whale } from "@/lib/mockData";
 import {
@@ -133,7 +134,7 @@ function MiniCalibration({ data }: { data: { predicted: number; actual: number }
 }
 
 // ─── MOBILE CARD ──────────────────────────────────────────────────────
-function TraderCard({ t, followed, onFollow }: { t: Whale; followed: boolean; onFollow: () => void }) {
+function TraderCard({ t, followed, onFollow, liveAccuracy }: { t: Whale; followed: boolean; onFollow: () => void; liveAccuracy?: { accuracy: number; total: number } }) {
   return (
     <Card className="bg-[#222638] border-[#2a2f45]">
       <CardContent className="p-4">
@@ -158,7 +159,7 @@ function TraderCard({ t, followed, onFollow }: { t: Whale; followed: boolean; on
               </div>
               <div>
                 <span className="text-[#8892b0] block">Win Rate</span>
-                <span className="font-mono font-bold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
+                <span className="font-mono font-bold">{liveAccuracy && liveAccuracy.total >= 1 ? `${liveAccuracy.accuracy}%` : t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
               </div>
               <div>
                 <span className="text-[#8892b0] block">Volume</span>
@@ -189,8 +190,15 @@ export default function LeaderboardPage() {
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [accuracyMap, setAccuracyMap] = useState<Record<string, { accuracy: number; total: number }>>({});
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    getAllWhaleAccuracies().then((res) => {
+      if (Object.keys(res.data).length > 0) setAccuracyMap(res.data);
+    });
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -308,8 +316,14 @@ export default function LeaderboardPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(() => {
                 const totalVol = traders.reduce((s, w) => s + w.volumeNum, 0);
-                const tradersWithWR = traders.filter(w => w.winRate > 0);
-                const avgWR = tradersWithWR.length > 0 ? Math.round(tradersWithWR.reduce((s, w) => s + w.winRate, 0) / tradersWithWR.length) : 0;
+                const tradersWithWR = traders.filter(w => {
+                  const live = accuracyMap[w.id];
+                  return (live && live.total >= 1) || w.winRate > 0;
+                });
+                const avgWR = tradersWithWR.length > 0 ? Math.round(tradersWithWR.reduce((s, w) => {
+                  const live = accuracyMap[w.id];
+                  return s + (live && live.total >= 1 ? live.accuracy : w.winRate);
+                }, 0) / tradersWithWR.length) : 0;
                 const topWhale = traders[0];
                 const mostActive = [...traders].sort((a, b) => b.totalTrades - a.totalTrades)[0];
                 return [
@@ -434,7 +448,7 @@ export default function LeaderboardPage() {
                           <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
                         </TableCell>
                         <TableCell className="py-3">
-                          <span className="font-mono text-xs font-semibold">{t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
+                          <span className="font-mono text-xs font-semibold">{(() => { const la = accuracyMap[t.id]; return la && la.total >= 1 ? `${la.accuracy}%` : t.winRate > 0 ? `${t.winRate}%` : "—"; })()}</span>
                         </TableCell>
                         <TableCell className="py-3 hidden xl:table-cell">
                           <span className={`font-mono text-xs font-semibold ${t.brier > 0 ? (t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]") : "text-[#8892b0]"}`}>
@@ -473,7 +487,7 @@ export default function LeaderboardPage() {
             {/* ─── MOBILE CARDS ─────────────────────────────────────── */}
             <div className="lg:hidden space-y-3">
               {sorted.map((t) => (
-                <TraderCard key={t.id} t={t} followed={followedIds.has(t.id)} onFollow={() => toggleFollow(t.id)} />
+                <TraderCard key={t.id} t={t} followed={followedIds.has(t.id)} onFollow={() => toggleFollow(t.id)} liveAccuracy={accuracyMap[t.id]} />
               ))}
             </div>
 

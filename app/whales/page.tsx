@@ -70,9 +70,11 @@ function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; po
 }
 
 function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: number; total: number } }) {
-  const displayAccuracy = liveAccuracy && liveAccuracy.total >= 3
+  const hasLiveData = liveAccuracy && liveAccuracy.total >= 1;
+  const isNew = liveAccuracy && liveAccuracy.total === 0;
+  const displayAccuracy = hasLiveData
     ? `${liveAccuracy.accuracy}%`
-    : w.accuracy > 0 ? `${w.accuracy}%` : "—";
+    : isNew ? "New" : w.accuracy > 0 ? `${w.accuracy}%` : "—";
 
   return (
     <Link href={`/whales/${w.id}`} className="block group">
@@ -95,7 +97,7 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
             <div><div className={`text-xs font-bold font-mono tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</div><div className="text-[8px] text-[#8892b0]">P&L</div></div>
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{displayAccuracy}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{liveAccuracy && liveAccuracy.total >= 3 ? `${liveAccuracy.accuracy}%` : w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{hasLiveData ? `${liveAccuracy.accuracy}%` : isNew ? "New" : w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
           </div>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#2f374f]">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}><Trophy className="size-2.5" />{w.bestCategory}</span>
@@ -235,7 +237,7 @@ export default function WhalesBrowsePage() {
                     <TableCell className="py-3">
                       {(() => {
                         const live = accuracyMap[w.id];
-                        const acc = live && live.total >= 3 ? live.accuracy : w.accuracy > 0 ? w.accuracy : null;
+                        const acc = live && live.total >= 1 ? live.accuracy : w.accuracy > 0 ? w.accuracy : null;
                         return acc !== null ? (
                           <div className="flex items-center gap-1.5">
                             <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${acc}%` }} /></div>
@@ -246,7 +248,7 @@ export default function WhalesBrowsePage() {
                         );
                       })()}
                     </TableCell>
-                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{(() => { const la = accuracyMap[w.id]; return la && la.total >= 3 ? `${la.accuracy}%` : w.winRate > 0 ? `${w.winRate}%` : "—"; })()}</span></TableCell>
+                    <TableCell className="py-3"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{(() => { const la = accuracyMap[w.id]; return la && la.total >= 1 ? `${la.accuracy}%` : la && la.total === 0 ? "New" : w.winRate > 0 ? `${w.winRate}%` : "—"; })()}</span></TableCell>
                     <TableCell className="py-3"><span className="font-mono text-xs text-[#8892b0] tabular-nums">{w.totalVolume}</span></TableCell>
                     <TableCell className="pr-4 py-3"><span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}>{w.bestCategory}</span></TableCell>
                   </TableRow>
