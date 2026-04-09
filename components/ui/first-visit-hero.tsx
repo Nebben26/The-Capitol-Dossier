@@ -289,6 +289,20 @@ export function FirstVisitHero() {
             ))}
           </div>
         </div>
+
+        <div className="border-t border-[#2f374f]" />
+
+        {/* ── SECTION D: PRIMARY CTA ───────────────────────────────────── */}
+        <div className="px-4 sm:px-5 py-4 flex justify-center">
+          <Link
+            href="/disagrees"
+            onClick={() => dismiss(false)}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#57D7BA] text-[#0f1119] text-sm font-bold hover:bg-[#57D7BA]/90 transition-colors shadow-lg shadow-[#57D7BA]/20"
+          >
+            See today&apos;s biggest disagreement
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
       </div>
     </div>
   );

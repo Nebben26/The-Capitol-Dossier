@@ -183,7 +183,7 @@ export default function WhalesBrowsePage() {
             <span className="text-sm font-semibold text-[#e2e8f0]">
               Want to track multiple whales at once?
             </span>
-            <span className="text-sm text-[#57D7BA] font-semibold ml-2">→ Copy the Whales</span>
+            <span className="text-sm text-[#57D7BA] font-semibold ml-2">→ Smart Money Watch</span>
           </div>
           <ChevronRight className="size-4 text-[#57D7BA] shrink-0" />
         </div>

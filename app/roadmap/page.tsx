@@ -9,7 +9,7 @@ const SHIPPED = [
   "Whale tracking and Smart Money Flow (200+ wallets, $60M+ tracked)",
   "AI Market Thesis on top markets (bull case, bear case, catalysts, whale read)",
   "Smart Signal Alerts (Consensus, Concentration, Size Spike, Divergence detection)",
-  "Copy the Whales virtual portfolio tracker",
+  "Smart Money Watch — virtual portfolio tracker for top whale positions",
   "Kalshi candlestick charts",
   "Public REST API with three pricing tiers",
   "Morning Brief overnight summary",

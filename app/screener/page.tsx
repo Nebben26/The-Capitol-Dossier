@@ -55,8 +55,8 @@ type SortDir = "asc" | "desc";
 type ViewMode = "grid" | "table";
 
 const sortOptions: { label: string; key: SortKey }[] = [
-  { label: "Volume", key: "volume" },
-  { label: "24h Change", key: "change" },
+  { label: "Top volume", key: "volume" },
+  { label: "Biggest movers", key: "change" },
   { label: "Spread", key: "spread" },
   { label: "Resolution", key: "resolution" },
   { label: "Liquidity", key: "liquidity" },
@@ -167,6 +167,8 @@ export default function ScreenerPage() {
     if (minVolume) result = result.filter((m) => m.volNum >= parseInt(minVolume));
     if (spreadOnly) result = result.filter((m) => (spreadMap[m.id] || 0) >= 10);
     if (resolvingSoon) result = result.filter((m) => m.daysLeft <= 30);
+    // When sorting by biggest movers, exclude zero-change markets
+    if (sortBy === "change") result = result.filter((m) => Math.abs(m.change) > 0.05);
 
     return [...result].sort((a, b) => {
       let av: number, bv: number;

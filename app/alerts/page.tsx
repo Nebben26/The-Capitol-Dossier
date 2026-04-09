@@ -283,6 +283,7 @@ export default function AlertsPage() {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<FilterChip>("all");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
   // Page skeleton
@@ -300,10 +301,11 @@ export default function AlertsPage() {
     });
   }, []);
 
-  const filteredSignals =
-    activeFilter === "all"
-      ? signals
-      : signals.filter((s) => s.type === activeFilter);
+  const filteredSignals = signals.filter((s) => {
+    const typeMatch = activeFilter === "all" || s.type === activeFilter;
+    const catMatch = activeCategory === "All" || (s as any).category === activeCategory;
+    return typeMatch && catMatch;
+  });
 
   // Derive freshness from loaded signals
   const latestSignalAt = signals.length > 0
@@ -402,7 +404,7 @@ export default function AlertsPage() {
 
       <TrialBanner />
 
-      {/* Filter chips — horizontally scrollable on mobile */}
+      {/* Filter chips — signal type */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap sm:flex-wrap">
         {CHIP_OPTIONS.map((chip) => (
           <button
@@ -420,6 +422,23 @@ export default function AlertsPage() {
                 {typeCount(chip.key as SignalType)}
               </span>
             )}
+          </button>
+        ))}
+      </div>
+
+      {/* Filter chips — category */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap sm:flex-wrap">
+        {["All", "Elections", "Sports", "Crypto", "Economy", "Geopolitics", "Entertainment", "Other"].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors ${
+              activeCategory === cat
+                ? "bg-[#6366f1] text-white"
+                : "bg-[#222638] border border-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0]"
+            }`}
+          >
+            {cat}
           </button>
         ))}
       </div>

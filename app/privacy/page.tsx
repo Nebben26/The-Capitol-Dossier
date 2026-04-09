@@ -48,8 +48,8 @@ export default function PrivacyPage() {
           <li>Account credentials if you create an account (email and hashed password only)</li>
         </ul>
         <p>
-          We do not collect, store, or process credit card information directly. All payment processing is handled
-          by Stripe under their privacy policy.
+          We do not currently process payments. When paid tiers launch, all payment processing will be handled by
+          Stripe under their privacy policy, and we will not store credit card information directly.
         </p>
       </Section>
 
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
         <p>
           We do not sell, rent, or trade your personal information. We share data only with service providers
           strictly necessary to operate the service: Supabase (database hosting), Netlify (web hosting), Cloudflare
-          (analytics, CDN), Sentry (error reporting), Stripe (payment processing, when applicable).
+          (analytics, CDN), Sentry (error reporting), Stripe (when payment processing launches).
         </p>
       </Section>
 

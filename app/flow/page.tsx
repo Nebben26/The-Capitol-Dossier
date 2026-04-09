@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, ArrowRight, DollarSign, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getSmartMoneyFlow, type SmartMoneyFlowByCategory } from "@/lib/api";
+import { getSmartMoneyFlow, getLastIngestTimestamp, type SmartMoneyFlowByCategory } from "@/lib/api";
 import { formatUsd } from "@/lib/format";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -26,6 +26,7 @@ export default function SmartMoneyFlowPage() {
   const [flows, setFlows] = useState<SmartMoneyFlowByCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState<"live" | "mock">("live");
+  const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
 
   function load() {
     setLoading(true);
@@ -36,7 +37,10 @@ export default function SmartMoneyFlowPage() {
     });
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    getLastIngestTimestamp().then(setLastIngestAt);
+  }, []);
 
   const totalYes = flows.reduce((s, f) => s + f.yesValueUsd, 0);
   const totalNo  = flows.reduce((s, f) => s + f.noValueUsd, 0);
@@ -62,6 +66,17 @@ export default function SmartMoneyFlowPage() {
           <p className="text-sm text-[#8892b0] mt-1">
             Where whale capital is positioned right now, broken down by category
           </p>
+          {lastIngestAt && (() => {
+            const ageMs = Date.now() - new Date(lastIngestAt).getTime();
+            const ageStr = ageMs < 60_000 ? "just now" : ageMs < 3_600_000 ? `${Math.floor(ageMs / 60_000)}m ago` : `${Math.floor(ageMs / 3_600_000)}h ago`;
+            const color = ageMs < 3_600_000 ? "#22c55e" : ageMs < 6 * 3_600_000 ? "#f59e0b" : "#ef4444";
+            return (
+              <div className="flex items-center gap-1.5 mt-1 text-[10px] font-mono tabular-nums" style={{ color }}>
+                <span className="size-1.5 rounded-full" style={{ backgroundColor: color }} />
+                Data last updated {ageStr}
+              </div>
+            );
+          })()}
         </div>
         <button
           onClick={load}

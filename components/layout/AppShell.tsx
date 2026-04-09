@@ -7,6 +7,7 @@ import { DataSourceProvider } from "./DataSourceContext";
 import { AuthProvider } from "./AuthContext";
 import { LoginModal } from "./LoginModal";
 import { StickyIntroBanner } from "@/components/ui/sticky-intro-banner";
+import { BackToTop } from "@/components/ui/back-to-top";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <LoginModal />
+        <BackToTop />
       </DataSourceProvider>
     </AuthProvider>
   );

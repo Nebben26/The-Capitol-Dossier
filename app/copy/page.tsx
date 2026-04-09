@@ -476,10 +476,10 @@ export default function CopyWhalesPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
             <Users className="size-7 text-[#57D7BA]" />
-            Copy the Whales
+            Smart Money Watch
           </h1>
           <p className="text-sm text-[#8892b0] mt-1">
-            Build a virtual portfolio that mirrors what the smartest whales are doing
+            Track a custom portfolio of top whale positions
           </p>
         </div>
         <div className="flex items-center gap-2">

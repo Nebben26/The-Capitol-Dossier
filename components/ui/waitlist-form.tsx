@@ -55,7 +55,7 @@ export function WaitlistForm({ compact = false, source }: { compact?: boolean; s
     >
       {!compact && (
         <h3 className="text-base font-bold text-[#e2e8f0]">
-          Get notified when Pro launches — founder pricing $39/mo (save $21/mo)
+          Join the founder cohort — lock in $39/mo before Pro launches at $60/mo
         </h3>
       )}
       <input

@@ -29,7 +29,7 @@ interface Endpoint {
   description: string;
   params?: { name: string; type: string; required: boolean; description: string }[];
   response: string;
-  tiers: ("free" | "pro" | "premium")[];
+  tiers: ("free" | "pro" | "enterprise")[];
   tierNote?: string;
 }
 
@@ -47,7 +47,7 @@ const ENDPOINTS: Endpoint[] = [
   "database": "connected",
   "timestamp": "2026-04-07T12:00:00Z"
 }`,
-    tiers: ["free", "pro", "premium"],
+    tiers: ["free", "pro", "enterprise"],
   },
   {
     method: "GET",
@@ -57,7 +57,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "category", type: "string", required: false, description: "Filter by category (Economics, Elections, Sports, Crypto, Tech, Geopolitics)" },
       { name: "min_volume", type: "number", required: false, description: "Minimum volume in USD" },
       { name: "sort", type: "string", required: false, description: "Sort by: volume (default) or change_24h" },
-      { name: "limit", type: "number", required: false, description: "Results per page. Free: max 25, Pro: max 200, Premium: max 10,000" },
+      { name: "limit", type: "number", required: false, description: "Results per page. Free: max 25, Pro: max 200, Enterprise: max 10,000" },
     ],
     response: `{
   "data": [
@@ -74,8 +74,8 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "count": 25, "tier": "free", "tier_limit": 25 }
 }`,
-    tiers: ["free", "pro", "premium"],
-    tierNote: "Free: 25 results · Pro: 200 results · Premium: all markets",
+    tiers: ["free", "pro", "enterprise"],
+    tierNote: "Free: 25 results · Pro: 200 results · Enterprise: all markets",
   },
   {
     method: "GET",
@@ -84,7 +84,7 @@ const ENDPOINTS: Endpoint[] = [
     params: [
       { name: "min_spread", type: "number", required: false, description: "Minimum spread in percentage points (e.g. 5 = 5pp gap)" },
       { name: "category", type: "string", required: false, description: "Filter by market category" },
-      { name: "limit", type: "number", required: false, description: "Free: max 10, Pro: max 100, Premium: max 1,000" },
+      { name: "limit", type: "number", required: false, description: "Free: max 10, Pro: max 100, Enterprise: max 1,000" },
     ],
     response: `{
   "data": [
@@ -102,8 +102,8 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "count": 10, "tier": "free" }
 }`,
-    tiers: ["free", "pro", "premium"],
-    tierNote: "Free: 10 results · Pro: 100 results · Premium: 1,000 results",
+    tiers: ["free", "pro", "enterprise"],
+    tierNote: "Free: 10 results · Pro: 100 results · Enterprise: 1,000 results",
   },
   {
     method: "GET",
@@ -111,7 +111,7 @@ const ENDPOINTS: Endpoint[] = [
     description: "Returns historical spread snapshots for a specific market, showing how the gap between Polymarket and Kalshi has evolved.",
     params: [
       { name: "market_id", type: "string", required: true, description: "Polymarket market ID (from /disagreements response)" },
-      { name: "days", type: "number", required: false, description: "Days of history. Pro: max 7, Premium: max 90" },
+      { name: "days", type: "number", required: false, description: "Days of history. Pro: max 7, Enterprise: max 90" },
     ],
     response: `{
   "data": [
@@ -120,8 +120,8 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "market_id": "abc123", "days_requested": 7, "count": 336 }
 }`,
-    tiers: ["pro", "premium"],
-    tierNote: "Free: blocked · Pro: 7 days history · Premium: 90 days",
+    tiers: ["pro", "enterprise"],
+    tierNote: "Free: blocked · Pro: 7 days history · Enterprise: 90 days",
   },
   {
     method: "GET",
@@ -129,7 +129,7 @@ const ENDPOINTS: Endpoint[] = [
     description: "Returns tracked whale wallets sorted by P&L or accuracy.",
     params: [
       { name: "sort", type: "string", required: false, description: "Sort by: pnl (default) or accuracy" },
-      { name: "limit", type: "number", required: false, description: "Free: max 25, Pro: max 100, Premium: max 1,000" },
+      { name: "limit", type: "number", required: false, description: "Free: max 25, Pro: max 100, Enterprise: max 1,000" },
       { name: "include_positions", type: "boolean", required: false, description: "Include position count per whale (Pro+ only)" },
     ],
     response: `{
@@ -145,8 +145,8 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "count": 25, "sort": "total_pnl", "tier": "free" }
 }`,
-    tiers: ["free", "pro", "premium"],
-    tierNote: "Free: 25 whales · Pro: 100 whales + position counts · Premium: all 149+",
+    tiers: ["free", "pro", "enterprise"],
+    tierNote: "Free: 25 whales · Pro: 100 whales + position counts · Enterprise: all 200+",
   },
   {
     method: "GET",
@@ -169,8 +169,8 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "address": "0x1234...", "count": 12 }
 }`,
-    tiers: ["pro", "premium"],
-    tierNote: "Free: blocked · Pro: current positions · Premium: all positions + full history",
+    tiers: ["pro", "enterprise"],
+    tierNote: "Free: blocked · Pro: current positions · Enterprise: all positions + full history",
   },
   {
     method: "GET",
@@ -191,7 +191,7 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "count": 8, "total_positions_analyzed": 5928 }
 }`,
-    tiers: ["free", "pro", "premium"],
+    tiers: ["free", "pro", "enterprise"],
   },
   {
     method: "GET",
@@ -200,7 +200,7 @@ const ENDPOINTS: Endpoint[] = [
     params: [
       { name: "type", type: "string", required: false, description: "Filter by: whale_consensus, smart_money_concentration, size_spike, whale_divergence" },
       { name: "min_confidence", type: "number", required: false, description: "Minimum confidence score (1-10)" },
-      { name: "limit", type: "number", required: false, description: "Free: max 5, Pro: max 50, Premium: max 500" },
+      { name: "limit", type: "number", required: false, description: "Free: max 5, Pro: max 50, Enterprise: max 500" },
     ],
     response: `{
   "data": [
@@ -217,18 +217,18 @@ const ENDPOINTS: Endpoint[] = [
   ],
   "meta": { "count": 5, "tier": "free" }
 }`,
-    tiers: ["free", "pro", "premium"],
-    tierNote: "Free: 5 signals · Pro: 50 signals · Premium: 500 signals + historical",
+    tiers: ["free", "pro", "enterprise"],
+    tierNote: "Free: 5 signals · Pro: 50 signals · Enterprise: 500 signals + historical",
   },
 ];
 
 // ─── SUB-COMPONENTS ───────────────────────────────────────────────────────────
 
-function TierBadge({ tier }: { tier: "free" | "pro" | "premium" }) {
+function TierBadge({ tier }: { tier: "free" | "pro" | "enterprise" }) {
   const styles = {
     free: "bg-[#8892b0]/10 text-[#8892b0]",
     pro: "bg-[#57D7BA]/10 text-[#57D7BA]",
-    premium: "bg-[#f59e0b]/10 text-[#f59e0b]",
+    enterprise: "bg-[#8b5cf6]/10 text-[#8b5cf6]",
   };
   return (
     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${styles[tier]}`}>
@@ -334,37 +334,27 @@ export default function ApiDocsPage() {
       </div>
 
       {/* Pricing tiers */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto w-full">
         {[
           {
-            tier: PRICING.starterApi.name,
-            price: PRICING.starterApi.priceLabel,
+            tier: PRICING.pro.name,
+            price: PRICING.pro.priceLabel,
             sub: "per month",
-            color: "#22d3ee",
+            color: "#57D7BA",
             limits: ["20 req/min", "1,000 req/day"],
-            endpoints: ["All endpoints (limited results)", "/api/v1/disagreements", "/api/v1/whales", "7-day history"],
-            cta: "Get Starter API",
-            ctaLink: "/pricing",
-          },
-          {
-            tier: PRICING.quantApi.name,
-            price: PRICING.quantApi.priceLabel,
-            sub: "per month",
-            color: "#f59e0b",
-            limits: ["60 req/min", "5,000 req/day"],
-            endpoints: ["All Starter endpoints (expanded)", "/api/v1/disagreements/history (30d)", "/api/v1/whales/{address}/positions", "Signals + flow feeds"],
-            cta: "Get Quant API",
+            endpoints: ["All endpoints (limited results)", "/api/v1/disagreements", "/api/v1/whales", "7-day history", "CSV export"],
+            cta: "Get Pro",
             ctaLink: "/pricing",
             featured: true,
           },
           {
-            tier: PRICING.premium.name,
-            price: PRICING.premium.priceLabel,
+            tier: PRICING.enterprise.name,
+            price: PRICING.enterprise.priceLabel,
             sub: "per month",
             color: "#8b5cf6",
-            limits: ["600 req/min", "100,000 req/day"],
-            endpoints: ["All Quant endpoints (expanded)", "/api/v1/disagreements/history (90d)", "Full market universe (6,070+)", "Priority support & SLA"],
-            cta: "Contact us",
+            limits: ["60 req/min", "5,000 req/day"],
+            endpoints: ["All Pro endpoints (expanded)", "/api/v1/disagreements/history (30d)", "/api/v1/whales/{address}/positions", "Webhooks + signals feed", "White-glove onboarding"],
+            cta: "Talk to Sales",
             ctaLink: "/pricing",
           },
         ].map((t) => (

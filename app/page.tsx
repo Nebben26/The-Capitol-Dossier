@@ -55,6 +55,7 @@ import { MorningBriefCard } from "@/components/ui/morning-brief";
 import { FirstVisitHero } from "@/components/ui/first-visit-hero";
 import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
+import { SearchBox } from "@/components/ui/search-box";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -257,16 +258,11 @@ export default function HomePage() {
       {/* ─── FIRST-VISIT HERO ────────────────────────────────── */}
       <FirstVisitHero />
 
+      {/* ─── SEARCH BOX ──────────────────────────────────────── */}
+      <SearchBox />
+
       {/* ─── DASHBOARD ANCHOR ────────────────────────────────── */}
       <div id="dashboard-content" />
-
-      {/* ─── WAITLIST ────────────────────────────────────────── */}
-      <Card className="bg-[#222638] border-[#2f374f]">
-        <CardContent className="p-5">
-          <p className="text-xs font-semibold text-[#57D7BA] uppercase tracking-widest mb-3">Be first when Pro launches</p>
-          <WaitlistForm source="homepage" />
-        </CardContent>
-      </Card>
 
       {/* ─── INGEST FRESHNESS ────────────────────────────────── */}
       {lastIngestAt && (() => {
@@ -285,6 +281,14 @@ export default function HomePage() {
 
       {/* ─── MORNING BRIEF ───────────────────────────────────── */}
       <MorningBriefCard />
+
+      {/* ─── WAITLIST ────────────────────────────────────────── */}
+      <Card className="bg-[#222638] border-[#2f374f]">
+        <CardContent className="p-5">
+          <p className="text-xs font-semibold text-[#57D7BA] uppercase tracking-widest mb-1">Founder cohort</p>
+          <WaitlistForm source="homepage" />
+        </CardContent>
+      </Card>
 
       {/* ─── HERO: MARKET PULSE ──────────────────────────────── */}
       <Card className="bg-[#222638] border-[#2f374f] overflow-hidden relative">
@@ -632,6 +636,8 @@ export default function HomePage() {
             <Link href="/pricing" className="hover:text-[#57D7BA] transition-colors">Pricing</Link>
             <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
             <a href="https://twitter.com/quivermarkets" target="_blank" rel="noopener noreferrer" className="hover:text-[#57D7BA] transition-colors">Twitter</a>
+            <Link href="/changelog" className="hover:text-[#57D7BA] transition-colors">Changelog</Link>
+            <Link href="/status" className="hover:text-[#57D7BA] transition-colors">Status</Link>
             <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-[#57D7BA] transition-colors">Privacy</Link>
             <button

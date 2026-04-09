@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { useParams } from "next/navigation";
 import {
   AreaChart,
@@ -251,6 +252,13 @@ export default function MarketDetailPage() {
       </div>
 
       <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+        {/* ─── BREADCRUMBS ─────────────────────────────────────────── */}
+        <Breadcrumbs items={[
+          { label: "Home", href: "/" },
+          { label: market.category || "Markets", href: "/screener" },
+          { label: market.question },
+        ]} />
+
         {/* ─── CONTRACT HEADER ─────────────────────────────────────── */}
         <div className="flex flex-col lg:flex-row lg:items-start gap-5">
           <div className="flex-1 min-w-0">
@@ -429,57 +437,47 @@ export default function MarketDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Bear case + catalysts + whale read + historical — blurred with Pro gate */}
-                <div className="relative">
-                  <div style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }} className="space-y-3">
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardContent className="p-4">
+                {/* Bear case + catalysts + whale read + historical — sentence preview + gradient cut */}
+                {[
+                  { icon: TrendingDown, color: "#ef4444", label: "Bear Case", text: thesis.bear_case },
+                  { icon: Calendar, color: "#f59e0b", label: "Catalysts to Watch", text: thesis.catalysts },
+                  { icon: Users, color: "#8b5cf6", label: "Whale Consensus", text: thesis.whale_read },
+                  { icon: BookOpen, color: "#6366f1", label: "Historical Context", text: thesis.historical_context },
+                ].map(({ icon: Icon, color, label, text }) => {
+                  // Show first sentence clearly; cut the rest
+                  const firstSentence = text?.split(/(?<=[.!?])\s/)[0] ?? "";
+                  const hasMore = text && text.length > firstSentence.length + 1;
+                  return (
+                    <div key={label} className="relative overflow-hidden rounded-xl border border-[#2a2f45] bg-[#222638]">
+                      <div className="p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <TrendingDown className="size-4 text-[#ef4444]" />
-                          <span className="text-xs font-semibold text-[#ef4444] uppercase tracking-wide">Bear Case</span>
+                          <Icon className="size-4" style={{ color }} />
+                          <span className="text-xs font-semibold uppercase tracking-wide" style={{ color }}>{label}</span>
                         </div>
-                        <p className="text-sm text-[#e2e8f0] leading-relaxed">{thesis.bear_case}</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Calendar className="size-4 text-[#f59e0b]" />
-                          <span className="text-xs font-semibold text-[#f59e0b] uppercase tracking-wide">Catalysts to Watch</span>
-                        </div>
-                        <p className="text-sm text-[#e2e8f0] leading-relaxed">{thesis.catalysts}</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Users className="size-4 text-[#8b5cf6]" />
-                          <span className="text-xs font-semibold text-[#8b5cf6] uppercase tracking-wide">Whale Consensus</span>
-                        </div>
-                        <p className="text-sm text-[#e2e8f0] leading-relaxed">{thesis.whale_read}</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="bg-[#222638] border-[#2a2f45]">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <BookOpen className="size-4 text-[#6366f1]" />
-                          <span className="text-xs font-semibold text-[#6366f1] uppercase tracking-wide">Historical Context</span>
-                        </div>
-                        <p className="text-sm text-[#e2e8f0] leading-relaxed">{thesis.historical_context}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  {/* Pro gate overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-[#1a1e2e]/95 backdrop-blur-sm rounded-xl border border-[#2f374f] px-6 py-4 text-center shadow-xl">
-                      <Brain className="size-6 text-[#57D7BA] mx-auto mb-2" />
-                      <p className="text-sm font-semibold text-[#e2e8f0] mb-1">Full analysis is Pro-only</p>
-                      <p className="text-[11px] text-[#8892b0] mb-3">Unlock bear case, catalysts, whale read &amp; historical context</p>
-                      <Link href="/pricing" className="inline-block px-4 py-2 rounded-lg bg-[#57D7BA] text-[#0f1119] text-xs font-bold hover:bg-[#57D7BA]/90 transition-colors">
-                        Unlock full analysis with Pro
-                      </Link>
+                        <p className="text-sm text-[#e2e8f0] leading-relaxed">{firstSentence}</p>
+                        {hasMore && (
+                          <p className="text-sm text-[#e2e8f0] leading-relaxed opacity-60 line-clamp-1 mt-0.5">
+                            {text.slice(firstSentence.length + 1, firstSentence.length + 80)}…
+                          </p>
+                        )}
+                      </div>
+                      {/* Gradient fade cut */}
+                      {hasMore && (
+                        <div className="absolute bottom-0 left-0 right-0 h-10 pointer-events-none"
+                          style={{ background: "linear-gradient(to bottom, transparent, #222638)" }} />
+                      )}
                     </div>
-                  </div>
+                  );
+                })}
+
+                {/* Pro gate CTA */}
+                <div className="rounded-xl border border-[#57D7BA]/20 bg-[#57D7BA]/5 px-5 py-4 text-center space-y-2">
+                  <Brain className="size-5 text-[#57D7BA] mx-auto" />
+                  <p className="text-sm font-semibold text-[#e2e8f0]">Full analysis is Pro-only</p>
+                  <p className="text-[11px] text-[#8892b0]">You&apos;re seeing the first sentence of each section. Upgrade to read everything.</p>
+                  <Link href="/pricing" className="inline-block mt-1 px-5 py-2 rounded-lg bg-[#57D7BA] text-[#0f1119] text-xs font-bold hover:bg-[#57D7BA]/90 transition-colors">
+                    Unlock with Pro →
+                  </Link>
                 </div>
               </div>
             )}
