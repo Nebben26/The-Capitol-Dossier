@@ -343,7 +343,7 @@ export default function MarketDetailPage() {
                 <TabsTrigger
                   key={tab.val}
                   value={tab.val}
-                  className="px-3 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0] shrink-0"
+                  className="px-3 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0] shrink-0 transition-all duration-300"
                 >
                   <tab.icon className="size-3.5" />
                   {tab.label}
@@ -509,6 +509,46 @@ export default function MarketDetailPage() {
                 </div>
               );
             })()}
+            {/* Top 3 whales on this market */}
+            {!dataLoading && marketWhales.length > 0 && (
+              <Card className="bg-[#222638] border-[#2a2f45]">
+                <CardContent className="p-4">
+                  <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mb-3">Top Whales on This Market</div>
+                  <div className="space-y-2">
+                    {marketWhales.slice(0, 3).map((w: any, i: number) => {
+                      const isYes = (w.outcome || "").toLowerCase().startsWith("y");
+                      const val = Number(w.current_value || 0);
+                      const pnl = Number(w.pnl || 0);
+                      const fmtUsd = (n: number) => n >= 1e6 ? `$${(n/1e6).toFixed(2)}M` : n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+                      const addr = w.whale_id || "";
+                      const label = addr.length > 10 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
+                      return (
+                        <div key={i} className="flex items-center gap-3 py-2 border-b border-[#2f374f]/40 last:border-0">
+                          <span className="text-[10px] font-mono font-bold text-[#4a5168] w-4 shrink-0">{i + 1}</span>
+                          <Link href={`/whales/${addr}`} className="flex-1 text-xs text-[#e2e8f0] hover:text-[#57D7BA] transition-colors font-mono truncate">
+                            {label}
+                          </Link>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${isYes ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>
+                            {isYes ? "YES" : "NO"}
+                          </span>
+                          <span className="font-mono text-xs text-[#e2e8f0] tabular-nums">{fmtUsd(val)}</span>
+                          {pnl !== 0 && (
+                            <span className={`font-mono text-[10px] tabular-nums ${pnl >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                              {pnl >= 0 ? "+" : ""}{fmtUsd(pnl)}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Link href="/whales" className="mt-2 block text-[10px] text-[#57D7BA] hover:underline">View all whales →</Link>
+                </CardContent>
+              </Card>
+            )}
+            {!dataLoading && marketWhales.length === 0 && (
+              <div className="text-xs text-[#8892b0] text-center py-4">No tracked whales in this market yet.</div>
+            )}
+
             {/* Tagged news */}
             {marketNews.length > 0 && (
               <Card className="bg-[#222638] border-[#2a2f45]">

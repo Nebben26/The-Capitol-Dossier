@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   AreaChart,
@@ -42,6 +42,10 @@ import {
   SlidersHorizontal,
   X,
   Crown,
+  Zap,
+  GitCompareArrows,
+  Newspaper,
+  Brain,
 } from "lucide-react";
 import { useMarkets, useDisagreements } from "@/hooks/useData";
 import { CATEGORIES, PLATFORMS } from "@/lib/mockData";
@@ -49,6 +53,7 @@ import type { Market } from "@/lib/mockData";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { ProBadge } from "@/components/ui/pro-gate";
 import { formatPct, formatCents } from "@/lib/format";
+import { getMarketInsights, type MarketInsight } from "@/lib/api";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -79,11 +84,18 @@ function ResBadge({ days }: { days: number }) {
   return <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold ${bg}`} style={{ color }}><Timer className="size-2.5" />{label}</span>;
 }
 
-function ScreenerCard({ m, spread }: { m: Market; spread: number | null }) {
+function InsightIcon({ type }: { type: MarketInsight["type"] }) {
+  if (type === "signal") return <Zap className="size-2.5 shrink-0" />;
+  if (type === "disagreement") return <GitCompareArrows className="size-2.5 shrink-0" />;
+  if (type === "catalyst") return <Newspaper className="size-2.5 shrink-0" />;
+  return <Brain className="size-2.5 shrink-0" />;
+}
+
+function ScreenerCard({ m, spread, insight }: { m: Market; spread: number | null; insight?: MarketInsight }) {
   const positive = m.change >= 0;
   return (
     <Link href={`/markets/${m.id}`} className="block group">
-      <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/20 transition-all h-full">
+      <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200 h-full">
         <CardContent className="p-4 flex flex-col h-full">
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{m.category}</span>
@@ -93,6 +105,12 @@ function ScreenerCard({ m, spread }: { m: Market; spread: number | null }) {
             <span className="px-1.5 py-0.5 rounded text-[8px] font-medium bg-[#2a2f45] text-[#8892b0]">{m.platform}</span>
           </div>
           <p className="text-xs font-semibold leading-snug group-hover:text-[#57D7BA] transition-colors line-clamp-2 mb-2 flex-1">{m.question}</p>
+          {insight && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#57D7BA] bg-[#57D7BA]/10 mb-2 max-w-full truncate">
+              <InsightIcon type={insight.type} />
+              <span className="truncate">{insight.label}</span>
+            </span>
+          )}
           <div className="h-8 w-full mb-2">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={m.spark}>
@@ -125,6 +143,11 @@ function ScreenerCard({ m, spread }: { m: Market; spread: number | null }) {
 export default function ScreenerPage() {
   const { markets, source, refreshing, lastFetched, error, retry } = useMarkets();
   const { disagreements } = useDisagreements();
+  const [insightsMap, setInsightsMap] = useState<Map<string, MarketInsight>>(new Map());
+
+  useEffect(() => {
+    getMarketInsights().then(setInsightsMap).catch(() => {});
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -324,7 +347,7 @@ export default function ScreenerPage() {
       {/* Grid */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} />)}
+          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} insight={insightsMap.get(m.id)} />)}
         </div>
       )}
 

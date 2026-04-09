@@ -331,10 +331,15 @@ function ArticleCard({ article }: { article: NewsArticle }) {
               title={tag.question || tag.market_id}
             >
               <span className="truncate">
-                {(tag.question || tag.market_id).slice(0, 55)}
-                {(tag.question || "").length > 55 ? "…" : ""}
+                {decodeHtmlEntities((tag.question || tag.market_id).slice(0, 50))}
+                {(tag.question || "").length > 50 ? "…" : ""}
               </span>
-              <PriceChange change={tag.change_24h} />
+              <div className="flex items-center gap-1.5 shrink-0">
+                {tag.price !== null && (
+                  <span className="font-mono text-[#e2e8f0] font-semibold tabular-nums">{tag.price}¢</span>
+                )}
+                <PriceChange change={tag.change_24h} />
+              </div>
             </Link>
           ))}
           {article.tags.length > 3 && (

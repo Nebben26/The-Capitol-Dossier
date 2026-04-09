@@ -17,6 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   GitCompareArrows,
@@ -29,9 +35,11 @@ import {
   Timer,
   LayoutGrid,
   List,
+  Target,
 } from "lucide-react";
 import { useDisagreements } from "@/hooks/useData";
 import { getSpreadHistory } from "@/lib/api";
+import { InlineSparkline } from "@/components/ui/inline-sparkline";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { Sparkline } from "@/components/ui/sparkline";
@@ -104,6 +112,14 @@ function DisagreeCard({ d, history }: { d: Disagreement; history: Array<{ t: num
             <div className="font-mono text-lg font-bold tabular-nums text-[#e2e8f0]">{d.kalshiPrice}¢</div>
             <div className="text-[8px] text-[#8892b0] mt-0.5">{d.kalshiVol}</div>
           </div>
+        </div>
+        {/* Implied trade line */}
+        <div className="flex items-center gap-1 mb-2.5 text-[10px] text-[#8892b0] italic">
+          <Target className="size-3 shrink-0 text-[#8892b0]" />
+          {d.direction === "poly-higher"
+            ? `Buy Kalshi YES at ${d.kalshiPrice}¢, sell Polymarket YES at ${d.polyPrice}¢ → ${d.spread}pt arb`
+            : `Buy Polymarket YES at ${d.polyPrice}¢, sell Kalshi YES at ${d.kalshiPrice}¢ → ${d.spread}pt arb`
+          }
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -229,14 +245,18 @@ export default function DisagreesPage() {
       {/* Summary stats */}
       {disagreements.length > 0 && <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Active Spreads", val: `${disagreements.length}`, color: "#f59e0b" },
+          { label: "Active Spreads", val: `${disagreements.length}`, color: "#f59e0b", sparkline: true },
           { label: "Avg Spread", val: `${Math.round(disagreements.reduce((s, d) => s + d.spread, 0) / disagreements.length)}pt`, color: "#ef4444" },
           { label: "Widest Spread", val: `${Math.max(...disagreements.map((d) => d.spread))}pt`, color: "#ec4899" },
           { label: "Combined Volume", val: "$" + (disagreements.reduce((s, d) => s + parseVol(d.polyVol) + parseVol(d.kalshiVol), 0) / 1000000).toFixed(0) + "M", color: "#57D7BA" },
         ].map((s) => (
           <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
             <CardContent className="p-3 text-center">
-              <div className="text-lg font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
+              <div className="flex items-center justify-center">
+                <div className="text-lg font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
+                {/* TODO: replace placeholder with real historical spread count data when available */}
+                {(s as any).sparkline && <InlineSparkline data={[10, 11, 10, 12, 11, 13, 12, 14]} positive={true} />}
+              </div>
               <div className="text-[9px] text-[#8892b0] uppercase tracking-wider">{s.label}</div>
             </CardContent>
           </Card>
@@ -270,7 +290,14 @@ export default function DisagreesPage() {
                     <span className="flex items-center gap-0.5">VOLUME <SortIcon col="polyVol" /></span>
                   </TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium hidden lg:table-cell">CAT</TableHead>
-                  <TableHead className="text-[10px] text-[#8892b0] font-medium hidden lg:table-cell">TREND</TableHead>
+                  <TableHead className="text-[10px] text-[#8892b0] font-medium hidden lg:table-cell">
+                    <span className="flex items-center gap-0.5">TREND
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="size-3 text-[#4a5168] cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="max-w-[200px] text-[11px]">Spread convergence — when two platforms&apos; prices get closer to each other over time.</TooltipContent>
+                      </Tooltip>
+                    </span>
+                  </TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden sm:table-cell" onClick={() => handleSort("daysLeft")}>
                     <span className="flex items-center gap-0.5">RESOLVES <SortIcon col="daysLeft" /></span>
                   </TableHead>

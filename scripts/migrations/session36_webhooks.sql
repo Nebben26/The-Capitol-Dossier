@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS webhooks (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  api_key_id UUID REFERENCES api_keys(id) ON DELETE CASCADE,
+  api_key_id BIGINT REFERENCES api_keys(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
   event_type TEXT NOT NULL,
   active BOOLEAN DEFAULT true,

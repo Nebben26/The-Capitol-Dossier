@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, ArrowRight, DollarSign, RefreshCw } from "lucide-react";
+import { InlineSparkline } from "@/components/ui/inline-sparkline";
 import { Card, CardContent } from "@/components/ui/card";
 import { getSmartMoneyFlow, getLastIngestTimestamp, type SmartMoneyFlowByCategory } from "@/lib/api";
 import { formatUsd } from "@/lib/format";
@@ -90,7 +91,7 @@ export default function SmartMoneyFlowPage() {
       {/* Summary strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Total Whale Capital", val: formatUsd(totalCapital), color: "#57D7BA" },
+          { label: "Total Whale Capital", val: formatUsd(totalCapital), color: "#57D7BA", sparkline: true },
           {
             label: "Net Position",
             val: `${totalFlow >= 0 ? "+" : ""}${formatUsd(totalFlow)}`,
@@ -102,8 +103,12 @@ export default function SmartMoneyFlowPage() {
           <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
             <CardContent className="p-4">
               <div className="text-[10px] text-[#8892b0] uppercase tracking-wide">{s.label}</div>
-              <div className="text-xl font-mono font-bold mt-1 tabular-nums" style={{ color: s.color }}>
-                {loading ? "—" : s.val}
+              <div className="flex items-center gap-1">
+                <div className="text-xl font-mono font-bold mt-1 tabular-nums" style={{ color: s.color }}>
+                  {loading ? "—" : s.val}
+                </div>
+                {/* TODO: replace placeholder with real historical capital data when available */}
+                {(s as any).sparkline && !loading && <InlineSparkline data={[10, 11, 10, 12, 11, 13, 12, 14]} positive={true} />}
               </div>
             </CardContent>
           </Card>

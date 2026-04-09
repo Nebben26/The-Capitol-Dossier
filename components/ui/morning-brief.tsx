@@ -126,9 +126,16 @@ export function MorningBriefCard() {
       {!collapsed && (
         <div className="px-4 py-3">
           {loading ? (
-            <div className="flex items-center gap-2 text-[#8892b0] text-xs">
-              <RefreshCw className="size-3.5 animate-spin text-[#57D7BA]" />
-              Loading brief…
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 px-6">
+              {[120, 90, 110].map((w, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f] shrink-0 animate-pulse" style={{ width: `${w}px` }}>
+                  <div className="size-3.5 rounded-full bg-[#2f374f]" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-1.5 rounded bg-[#2f374f] w-2/3" />
+                    <div className="h-2 rounded bg-[#2f374f] w-full" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="relative">

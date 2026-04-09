@@ -50,7 +50,13 @@ import {
   ChevronDown,
   Trash2,
   Users,
+  HelpCircle,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { whales } from "@/lib/mockData";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { TrialBanner, ProBadge } from "@/components/ui/pro-gate";
@@ -212,7 +218,19 @@ export default function CalibrationPage() {
             <Crosshair className="size-7 text-[#6366f1]" />
             Personal Calibration Audit
           </h1>
-          <p className="text-sm text-[#8892b0] mt-1">Track your prediction accuracy, Brier score, and calibration vs top whales</p>
+          <p className="text-sm text-[#8892b0] mt-1 flex items-center gap-1.5">
+            Track your prediction accuracy,{" "}
+            <Tooltip>
+              <TooltipTrigger><span className="underline decoration-dotted cursor-help">Brier score</span></TooltipTrigger>
+              <TooltipContent className="max-w-[220px] text-[11px]">A measure of how accurate a probability prediction is. Lower is better. A perfect score is 0, worst is 2.</TooltipContent>
+            </Tooltip>
+            , and{" "}
+            <Tooltip>
+              <TooltipTrigger><span className="underline decoration-dotted cursor-help">calibration</span></TooltipTrigger>
+              <TooltipContent className="max-w-[220px] text-[11px]">Whether your 70% predictions actually happen 70% of the time. Good calibration means your confidence matches reality.</TooltipContent>
+            </Tooltip>
+            {" "}vs top whales
+          </p>
         </div>
         <LastUpdated />
       </div>

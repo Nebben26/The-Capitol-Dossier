@@ -1505,6 +1505,88 @@ export async function getLastIngestTimestamp(): Promise<string | null> {
   }
 }
 
+// ─── MARKET INSIGHTS (context tags for screener) ─────────────────────────────
+
+export interface MarketInsight {
+  type: "signal" | "disagreement" | "catalyst" | "thesis";
+  label: string;
+}
+
+/**
+ * Batch-load insights for all markets and return a Map<marketId, insight>.
+ * O(1) lookups per screener card. Cached 60s.
+ */
+export async function getMarketInsights(): Promise<Map<string, MarketInsight>> {
+  const cacheKey = "market_insights";
+  const cached = getCached<Map<string, MarketInsight>>(cacheKey);
+  if (cached) return cached;
+
+  const result = new Map<string, MarketInsight>();
+  if (!isSupabaseConfigured()) return result;
+
+  try {
+    // Load signals, disagreements, and news tags in parallel
+    const [signalsRes, disagreementsRes, newsRes, thesesRes] = await Promise.all([
+      supabase
+        .from("signals")
+        .select("market_id, headline, type")
+        .order("detected_at", { ascending: false })
+        .limit(500),
+      supabase
+        .from("disagreements")
+        .select("poly_market_id, kalshi_market_id, spread, direction")
+        .gte("spread", 10),
+      supabase
+        .from("news_market_tags")
+        .select("market_id, news_articles(title, published_at)")
+        .gte("news_articles.published_at" as string, new Date(Date.now() - 48 * 3600 * 1000).toISOString())
+        .limit(500),
+      supabase
+        .from("market_theses")
+        .select("market_id")
+        .limit(500),
+    ]);
+
+    // Priority 4: thesis (lowest)
+    for (const t of thesesRes.data || []) {
+      if (!result.has(t.market_id)) {
+        result.set(t.market_id, { type: "thesis", label: "Has AI analysis" });
+      }
+    }
+
+    // Priority 3: news catalyst
+    for (const tag of newsRes.data || []) {
+      if (!tag.market_id) continue;
+      const art = (tag as any).news_articles;
+      if (!art) continue;
+      const title = art.title || "";
+      const words = title.split(/\s+/).slice(0, 5).join(" ");
+      result.set(tag.market_id, { type: "catalyst", label: `Breaking: ${words}…` });
+    }
+
+    // Priority 2: disagreement
+    for (const d of disagreementsRes.data || []) {
+      const platform = d.direction === "poly-higher" ? "Kalshi" : "Polymarket";
+      const insight: MarketInsight = { type: "disagreement", label: `Disagrees with ${platform} by ${Math.round(d.spread)}pt` };
+      if (d.poly_market_id) result.set(d.poly_market_id, insight);
+      if (d.kalshi_market_id) result.set(d.kalshi_market_id, insight);
+    }
+
+    // Priority 1: signal (highest — overwrites all)
+    for (const s of signalsRes.data || []) {
+      if (!s.market_id) continue;
+      const truncated = (s.headline || "").slice(0, 42) + ((s.headline?.length || 0) > 42 ? "…" : "");
+      result.set(s.market_id, { type: "signal", label: truncated });
+    }
+
+    setCache(cacheKey, result);
+  } catch (err) {
+    console.error("[getMarketInsights] failed:", err);
+  }
+
+  return result;
+}
+
 /**
  * Return the number of waitlist signups. Cached for 5 minutes.
  * If count < 10, caller should show "Be one of the first..." instead.

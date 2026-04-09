@@ -197,7 +197,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#22c55e]/10 text-[#22c55e] text-[10px] font-bold">
           <span className="relative flex size-2">
             <span className="absolute inline-flex size-full rounded-full bg-[#22c55e] opacity-75 animate-ping" />
-            <span className="relative inline-flex size-2 rounded-full bg-[#22c55e]" />
+            <span className="relative inline-flex size-2 rounded-full bg-[#22c55e] live-pulse" />
           </span>
           LIVE
         </div>

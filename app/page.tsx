@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
-import { getLastIngestTimestamp, getWaitlistCount } from "@/lib/api";
+import { getLastIngestTimestamp, getWaitlistCount, getSystemStats } from "@/lib/api";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -56,6 +56,7 @@ import { FirstVisitHero } from "@/components/ui/first-visit-hero";
 import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
 import { SearchBox } from "@/components/ui/search-box";
+import { SinceLastVisit } from "@/components/ui/since-last-visit";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -142,6 +143,7 @@ export default function HomePage() {
   const [isNarrow, setIsNarrow] = useState(false);
   const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number } | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -168,6 +170,7 @@ export default function HomePage() {
   useEffect(() => {
     getLastIngestTimestamp().then(setLastIngestAt);
     getWaitlistCount().then(setWaitlistCount);
+    getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount }));
   }, []);
 
   useEffect(() => {
@@ -262,6 +265,9 @@ export default function HomePage() {
 
       {/* ─── SEARCH BOX ──────────────────────────────────────── */}
       <SearchBox />
+
+      {/* ─── SINCE LAST VISIT ────────────────────────────────── */}
+      <SinceLastVisit />
 
       {/* ─── DASHBOARD ANCHOR ────────────────────────────────── */}
       <div id="dashboard-content" />
@@ -624,6 +630,15 @@ export default function HomePage() {
 
       {/* ─── FOOTER ──────────────────────────────────────────── */}
       <footer className="py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0] space-y-3">
+        {/* Platform track record */}
+        {sysStats && (sysStats.marketsCount > 0 || sysStats.signalsCount > 0) && (
+          <div className="flex flex-wrap items-center justify-center gap-3 py-2 px-4 rounded-lg bg-[#57D7BA]/5 border border-[#57D7BA]/10 text-[10px] font-mono tabular-nums">
+            <span className="text-[#8892b0]">Platform track record:</span>
+            {sysStats.marketsCount > 0 && <span className="text-[#57D7BA] font-semibold">{sysStats.marketsCount.toLocaleString()} markets tracked</span>}
+            {sysStats.signalsCount > 0 && <span className="text-[#f59e0b] font-semibold">{sysStats.signalsCount.toLocaleString()} signals generated</span>}
+            {sysStats.disagreementsCount > 0 && <span className="text-[#ef4444] font-semibold">{sysStats.disagreementsCount.toLocaleString()} spreads identified</span>}
+          </div>
+        )}
         {/* Trust signals */}
         <div className="text-center text-[#8892b0]/70">
           <span className="font-mono tabular-nums">
