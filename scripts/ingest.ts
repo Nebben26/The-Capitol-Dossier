@@ -566,10 +566,6 @@ async function ingestDisagreements(markets: any[]) {
       if (kmWords.length < 2) continue;
       const overlap = kmWords.filter((w: string) => pmWords.has(w)).length;
       if (overlap < 3) continue;
-      // TODO: Store match_confidence (score) in the disagreements table.
-      //       Low-confidence matches (score < 0.5) can produce false-positive arb signals.
-      //       Consider raising the threshold to 0.5 or adding a `match_confidence` column
-      //       so the UI can filter/warn on weak matches.
       const score = overlap / Math.max(pmWords.size, kmWords.length, 1);
       if (score > bestScore && score >= 0.4) {
         bestScore = score;
@@ -611,6 +607,7 @@ async function ingestDisagreements(markets: any[]) {
           category: pm.category,
           spread_trend: "stable",
           convergence_rate: 0,
+          match_confidence: parseFloat(bestScore.toFixed(3)),
         });
       }
     }

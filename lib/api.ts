@@ -720,6 +720,7 @@ export async function getDisagreements(): Promise<ApiResult<Disagreement[]>> {
       direction: row.direction || "poly-higher",
       spreadTrend: row.spread_trend || "stable",
       convergenceRate: row.convergence_rate || 0,
+      matchConfidence: typeof row.match_confidence === "number" ? row.match_confidence : 0.5,
     }));
 
     // Enrich with market data for volume and resolution
@@ -1501,6 +1502,31 @@ export async function getLastIngestTimestamp(): Promise<string | null> {
     return data?.updated_at || null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Return the number of waitlist signups. Cached for 5 minutes.
+ * If count < 10, caller should show "Be one of the first..." instead.
+ */
+export async function getWaitlistCount(): Promise<number> {
+  const cached = getCached<number>("waitlist_count");
+  if (cached !== null) return cached;
+
+  if (!isSupabaseConfigured()) return 0;
+
+  try {
+    const { count, error } = await supabase
+      .from("waitlist")
+      .select("*", { count: "exact", head: true });
+
+    if (error) throw error;
+    const result = count ?? 0;
+    setCache("waitlist_count", result);
+    return result;
+  } catch (err) {
+    console.error("[getWaitlistCount] failed:", err);
+    return 0;
   }
 }
 

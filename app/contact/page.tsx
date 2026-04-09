@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Check, ExternalLink } from "lucide-react";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
+import { getWaitlistCount } from "@/lib/api";
 
 const RESPONDS_TO = [
   "Feature requests and product feedback (we read every email)",
@@ -13,6 +14,9 @@ const RESPONDS_TO = [
 ];
 
 export default function ContactPage() {
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
+  useEffect(() => { getWaitlistCount().then(setWaitlistCount); }, []);
+
   return (
     <div className="max-w-xl mx-auto px-4 py-12 space-y-8">
       {/* Header */}
@@ -79,6 +83,11 @@ export default function ContactPage() {
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardContent className="p-5 space-y-4">
           <h2 className="text-sm font-semibold text-[#e2e8f0]">Join the founder cohort for $39/mo lifetime discount</h2>
+          <p className="text-sm text-[#8892b0]">
+            {waitlistCount !== null && waitlistCount >= 10
+              ? `Join ${waitlistCount.toLocaleString()} others who've locked in founder pricing.`
+              : "Be one of the first to lock in founder pricing."}
+          </p>
           <WaitlistForm source="contact" />
         </CardContent>
       </Card>

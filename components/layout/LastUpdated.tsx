@@ -30,6 +30,7 @@ export function LastUpdated({ lastFetched, refreshing, error, onRetry }: Props) 
     return (
       <button
         onClick={onRetry}
+        aria-label="Retry loading data"
         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ef4444]/10 border border-[#ef4444]/20 text-[10px] text-[#ef4444] hover:bg-[#ef4444]/20 transition-colors"
       >
         <AlertCircle className="size-2.5" />

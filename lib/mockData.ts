@@ -559,6 +559,7 @@ export interface Disagreement {
   spreadTrend?: "converging" | "diverging" | "stable";
   convergenceRate?: number;
   opportunityScore?: number;
+  matchConfidence?: number;
 }
 
 export const disagreements: Disagreement[] = [

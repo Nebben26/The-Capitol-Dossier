@@ -281,9 +281,16 @@ export default function DisagreesPage() {
                 {filtered.map((d) => (
                   <TableRow key={d.id} className="border-[#2f374f]/50 hover:bg-[#f59e0b]/5 transition-colors">
                     <TableCell className="pl-4 py-2.5 max-w-[220px]">
-                      <Link href={`/markets/${d.marketId}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors leading-snug line-clamp-2">
-                        {d.question}
-                      </Link>
+                      <div className="flex items-start gap-1.5">
+                        {(d.matchConfidence ?? 1) < 0.5 && (
+                          <span title="Low-confidence cross-platform match — verify before trading.">
+                            <AlertTriangle className="size-3 text-[#f59e0b] shrink-0 mt-0.5" />
+                          </span>
+                        )}
+                        <Link href={`/markets/${d.marketId}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors leading-snug line-clamp-2">
+                          {d.question}
+                        </Link>
+                      </div>
                     </TableCell>
                     <TableCell className="py-2.5">
                       <span className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{d.polyPrice}¢</span>

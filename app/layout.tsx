@@ -60,6 +60,21 @@ export default function RootLayout({
           <AppShell>{children}</AppShell>
         </TooltipProvider>
 
+        {/* Schema.org Organization structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Quiver Markets",
+              "url": "https://amazing-kitsune-139d51.netlify.app",
+              "description": "The intelligence layer for prediction markets",
+              "sameAs": ["https://twitter.com/quivermarkets"],
+            }),
+          }}
+        />
+
         {/* Cloudflare Web Analytics — privacy-first, no cookies */}
         <Script
           src="https://static.cloudflareinsights.com/beacon.min.js"

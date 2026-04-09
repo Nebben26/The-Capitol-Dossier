@@ -16,6 +16,7 @@ export function ErrorBanner({
       {onRetry && (
         <button
           onClick={onRetry}
+          aria-label="Retry loading data"
           className="flex items-center gap-1 text-xs text-[#57D7BA] hover:text-[#57D7BA]/80"
         >
           <RefreshCw className="size-3" /> Retry

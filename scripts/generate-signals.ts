@@ -14,6 +14,7 @@ config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 import { detectAllSignals } from "../lib/signals";
+import { fireWebhooks } from "../lib/webhooks";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -90,6 +91,15 @@ async function main() {
     } else {
       console.log(`  ✓ [${signal.type}] conf=${signal.confidence} — ${signal.headline.slice(0, 60)}`);
       successCount++;
+      // Fire webhooks for new signals (best-effort, non-blocking)
+      await fireWebhooks(supabase, "signal.created", {
+        signal_id: signal.signal_id,
+        type: signal.type,
+        confidence: signal.confidence,
+        market_id: signal.market_id,
+        headline: signal.headline,
+        detected_at: signal.detected_at,
+      });
     }
   }
 

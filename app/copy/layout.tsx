@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Whale Leaderboard — Quiver Markets",
-  description: "The most accurate prediction market whales, ranked by P&L and win rate.",
+  title: "Smart Money Watch — Quiver Markets",
+  description: "Smart Money Watch — track a custom portfolio of top whale positions in real time.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

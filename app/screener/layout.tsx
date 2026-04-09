@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Markets | Quiver Markets",
-  description: "Advanced prediction market screener. Filter markets by price, volume, category, platform, and resolution date.",
+  title: "Market Screener — Quiver Markets",
+  description: "Browse all 6,500+ prediction markets across Polymarket and Kalshi. Filter by category, volume, or price movement.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

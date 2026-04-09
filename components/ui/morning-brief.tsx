@@ -105,6 +105,7 @@ export function MorningBriefCard() {
         <div className="flex items-center gap-2">
           <button
             onClick={load}
+            aria-label="Refresh morning brief"
             className="flex items-center gap-1 px-2 py-1 rounded-md text-[#8892b0] hover:text-[#57D7BA] text-[10px] transition-colors"
           >
             <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
@@ -112,6 +113,7 @@ export function MorningBriefCard() {
           </button>
           <button
             onClick={toggleCollapsed}
+            aria-label={collapsed ? "Show morning brief" : "Hide morning brief"}
             className="flex items-center gap-1 px-2 py-1 rounded-md text-[#8892b0] hover:text-[#e2e8f0] text-[10px] transition-colors"
           >
             <ChevronUp className={`size-3.5 transition-transform ${collapsed ? "rotate-180" : ""}`} />

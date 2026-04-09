@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
-import { getLastIngestTimestamp } from "@/lib/api";
+import { getLastIngestTimestamp, getWaitlistCount } from "@/lib/api";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -141,6 +141,7 @@ export default function HomePage() {
   const [moversFallbackCategory, setMoversFallbackCategory] = useState<string | null>(null);
   const [isNarrow, setIsNarrow] = useState(false);
   const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -166,6 +167,7 @@ export default function HomePage() {
 
   useEffect(() => {
     getLastIngestTimestamp().then(setLastIngestAt);
+    getWaitlistCount().then(setWaitlistCount);
   }, []);
 
   useEffect(() => {
@@ -286,7 +288,13 @@ export default function HomePage() {
       <Card className="bg-[#222638] border-[#2f374f]">
         <CardContent className="p-5">
           <p className="text-xs font-semibold text-[#57D7BA] uppercase tracking-widest mb-1">Founder cohort</p>
+          <p className="text-sm text-[#8892b0] mb-3">
+            {waitlistCount !== null && waitlistCount >= 10
+              ? `Join ${waitlistCount.toLocaleString()} others who've locked in founder pricing.`
+              : "Be one of the first to lock in founder pricing."}
+          </p>
           <WaitlistForm source="homepage" />
+          <p className="text-[10px] text-[#4a5168] mt-3">Testimonials coming soon — be among the first to try Pro and share your feedback.</p>
         </CardContent>
       </Card>
 
@@ -636,6 +644,7 @@ export default function HomePage() {
             <Link href="/pricing" className="hover:text-[#57D7BA] transition-colors">Pricing</Link>
             <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
             <a href="https://twitter.com/quivermarkets" target="_blank" rel="noopener noreferrer" className="hover:text-[#57D7BA] transition-colors">Twitter</a>
+            <Link href="/blog" className="hover:text-[#57D7BA] transition-colors">Blog</Link>
             <Link href="/changelog" className="hover:text-[#57D7BA] transition-colors">Changelog</Link>
             <Link href="/status" className="hover:text-[#57D7BA] transition-colors">Status</Link>
             <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

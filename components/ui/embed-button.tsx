@@ -16,8 +16,9 @@ export function EmbedButton({
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
   const base = "https://amazing-kitsune-139d51.netlify.app";
-  const dims = type === "sparkline" ? 'width="300" height="140"' : 'width="500" height="300"';
-  const code = `<iframe src="${base}/embed/${type}?id=${id}" ${dims} frameborder="0" style="border-radius:12px;overflow:hidden;" loading="lazy"></iframe>`;
+  const src = type === "market" ? `${base}/embed/${id}` : `${base}/embed/${type}?id=${id}`;
+  const dims = type === "sparkline" ? 'width="300" height="140"' : 'width="600" height="300"';
+  const code = `<iframe src="${src}" ${dims} frameborder="0" style="border-radius:12px;overflow:hidden;" loading="lazy"></iframe>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);

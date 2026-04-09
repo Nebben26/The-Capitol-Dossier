@@ -19,6 +19,8 @@ import {
   Code,
   CreditCard,
   Server,
+  FileText,
+  BookOpen,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -37,6 +39,8 @@ const navItems = [
   { label: "Pricing", icon: CreditCard, href: "/pricing" },
   { label: "Alerts", icon: Bell, href: "/alerts" },
   { label: "Status", icon: Server, href: "/status" },
+  { label: "Changelog", icon: FileText, href: "/changelog" },
+  { label: "Blog", icon: BookOpen, href: "/blog" },
 ];
 
 export function Sidebar({

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Insights | Quiver Markets",
-  description: "Market-moving news and catalysts for prediction markets. Track events that impact probabilities across platforms.",
+  title: "News Catalysts — Quiver Markets",
+  description: "The latest news moving prediction markets — curated from Bloomberg, Reuters, AP, and more.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

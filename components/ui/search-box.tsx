@@ -53,6 +53,7 @@ export function SearchBox() {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => query.length >= 2 && setOpen(true)}
+        aria-label="Search markets"
         placeholder="Search 6,500+ markets — Trump, Bitcoin, World Cup..."
         className="w-full h-12 pl-12 pr-4 rounded-xl bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 focus:border-[#57D7BA]/50 transition-all shadow-lg shadow-black/20"
       />
@@ -63,6 +64,7 @@ export function SearchBox() {
             <button
               key={m.id}
               onClick={() => navigate(m.id)}
+              aria-label={`Go to market: ${m.question}`}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#57D7BA]/5 transition-colors text-left border-b border-[#2f374f]/50 last:border-0"
             >
               <div className="flex-1 min-w-0">

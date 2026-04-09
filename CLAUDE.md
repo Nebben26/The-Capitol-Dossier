@@ -88,6 +88,9 @@ Final build, OG images, deploy.
 8. **Volume fields:** Polymarket `volume` is lifetime USD volume as a number. Kalshi `volume` is contract count (multiply by 100 for rough USD equivalent, or use `dollar_volume`).
 9. **The site is statically exported.** No API routes. All fetching is client-side via hooks.
 
+## Backups
+Run `npx tsx scripts/backup.ts` weekly to dump all tables to backups/. Always run before risky schema changes or bulk deletes.
+
 ## Design System (DO NOT CHANGE)
 - Background: #1a1e2e | Cards: #222638 | Borders: #2f374f
 - Primary accent: Teal #57D7BA

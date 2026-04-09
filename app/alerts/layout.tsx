@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Live Signals | Quiver Markets",
-  description: "Real-time whale alerts, price movers, volume spikes, and market resolutions. Never miss a signal in prediction markets.",
+  title: "Smart Money Signals — Quiver Markets",
+  description: "Real-time smart money signals — whale consensus, concentration, and position spikes detected across 200+ tracked wallets.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -38,7 +38,7 @@ export function LoginModal() {
             </div>
             <span className="text-sm font-semibold">Sign in to Quiver Markets</span>
           </div>
-          <button onClick={() => setShowLogin(false)} className="text-[#8892b0] hover:text-[#e2e8f0] transition-colors">
+          <button onClick={() => setShowLogin(false)} aria-label="Close sign-in dialog" className="text-[#8892b0] hover:text-[#e2e8f0] transition-colors">
             <X className="size-4" />
           </button>
         </div>

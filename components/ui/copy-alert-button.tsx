@@ -42,7 +42,7 @@ export function CopyAlertButton({
   if (compact) {
     return (
       <div className="flex items-center gap-1">
-        <button onClick={handleCopy} className="p-1 rounded hover:bg-[#57D7BA]/10 text-[#8892b0] hover:text-[#57D7BA] transition-colors" title="Copy text">
+        <button onClick={handleCopy} aria-label="Copy signal text" className="p-1 rounded hover:bg-[#57D7BA]/10 text-[#8892b0] hover:text-[#57D7BA] transition-colors">
           {copied ? <Check className="size-3 text-[#22c55e]" /> : <Copy className="size-3" />}
         </button>
         <a href={tgHref} target="_blank" rel="noopener noreferrer" className="p-1 rounded hover:bg-[#2AABEE]/10 text-[#8892b0] hover:text-[#2AABEE] transition-colors" title="Send to Telegram">
