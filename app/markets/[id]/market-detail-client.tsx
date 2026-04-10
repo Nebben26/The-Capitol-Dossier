@@ -86,7 +86,7 @@ import { WatchlistButton } from "@/components/ui/watchlist-button";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
-import { RelatedMarkets } from "@/components/markets/RelatedMarkets";
+
 
 
 // ─── DEPTH CHART ──────────────────────────────────────────────────────
@@ -1168,7 +1168,7 @@ export default function MarketDetailPage() {
             </Card>
           </TabsContent>
         </Tabs>
-        <RelatedMarkets marketId={id} />
+
       </div>
     </>
   );

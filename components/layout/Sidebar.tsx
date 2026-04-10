@@ -32,7 +32,7 @@ const navItems = [
   { label: "Screener", icon: Target, href: "/screener" },
   { label: "Calendar", icon: CalendarDays, href: "/calendar" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
-  { label: "Correlations", icon: Network, href: "/correlations" },
+
   { label: "Insights", icon: Newspaper, href: "/insights" },
   { label: "Stories", icon: Sparkles, href: "/stories" },
   { label: "Flow", icon: DollarSign, href: "/flow" },
