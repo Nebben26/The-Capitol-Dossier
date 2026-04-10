@@ -366,7 +366,7 @@ async function main() {
 
   // Reload PostgREST schema cache before any queries — prevents "Could not find column"
   // errors on newly-added columns (category, poly_volume, kalshi_volume, etc.)
-  await supabase.rpc("notify_pgrst_reload").catch(() => null);
+  try { await supabase.rpc("notify_pgrst_reload"); } catch { /* ignore */ }
   await new Promise(r => setTimeout(r, 2000));
   console.log("[detect-story-events] schema cache reloaded (2s wait)");
 
