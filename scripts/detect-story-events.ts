@@ -66,31 +66,50 @@ function determineTier(qualityScore: number): "free" | "pro" {
 // ─── Event detection per template ────────────────────────────────────────────
 
 async function detectLargeSpreadEmerged(): Promise<number> {
-  const { data: disagreements } = await supabase
+  // Fetch top spreads — no volume filter in DB query since volumes may be 0
+  // until poly_volume/kalshi_volume columns are populated after session42 migration
+  const { data: disagreements, error } = await supabase
     .from("disagreements")
     .select("poly_market_id, kalshi_market_id, spread, poly_price, kalshi_price, poly_volume, kalshi_volume, direction, category, question")
-    .gte("spread", 8)
-    .gte("poly_volume", 50000)
-    .gte("kalshi_volume", 50000)
+    .gte("spread", 5)
     .order("spread", { ascending: false })
-    .limit(10);
+    .limit(20);
 
+  if (error) {
+    console.error("[detect-story-events] detectLargeSpreadEmerged query error:", error.message);
+    return 0;
+  }
+  console.log(`[detect-story-events] detectLargeSpreadEmerged: ${disagreements?.length ?? 0} rows with spread >= 5`);
   if (!disagreements?.length) return 0;
 
   const template = STORY_TEMPLATES.find(t => t.id === "large_spread_emerged")!;
   let count = 0;
 
   for (const d of disagreements) {
+    // Require spread >= 8 for quality threshold
+    if ((d.spread ?? 0) < 8) continue;
+
     const marketId = d.poly_market_id ?? d.kalshi_market_id;
     if (!marketId) continue;
     if (await isDuplicate(template.id, [marketId])) continue;
+
+    const polyVol = Number(d.poly_volume ?? 0);
+    const kalshiVol = Number(d.kalshi_volume ?? 0);
+
+    // Volume guard — only enforced if volumes are populated (> 0)
+    // If both are 0 (columns not yet populated), allow through
+    const volumesPopulated = polyVol > 0 || kalshiVol > 0;
+    if (volumesPopulated && (polyVol < 5_000 || kalshiVol < 5_000)) {
+      console.log(`[detect-story-events]   Skipping ${marketId} — low volume (poly=$${polyVol}, kalshi=$${kalshiVol})`);
+      continue;
+    }
 
     const causation = analyzeCausation({
       polymarketPrice: Math.round(d.poly_price ?? 50),
       kalshiPrice: Math.round(d.kalshi_price ?? 50),
       spread: Math.round(d.spread ?? 0),
-      polymarketVolume: d.poly_volume ?? 0,
-      kalshiVolume: d.kalshi_volume ?? 0,
+      polymarketVolume: polyVol,
+      kalshiVolume: kalshiVol,
       daysToResolution: null,
       spreadAgeHours: null,
       convergenceVelocity: null,
@@ -105,21 +124,25 @@ async function detectLargeSpreadEmerged(): Promise<number> {
       spread: Math.round(d.spread ?? 0),
       polyPrice: Math.round(d.poly_price ?? 50),
       kalshiPrice: Math.round(d.kalshi_price ?? 50),
-      polyVol: d.poly_volume ?? 0,
-      kalshiVol: d.kalshi_volume ?? 0,
+      polyVol: polyVol,
+      kalshiVol: kalshiVol,
       direction: d.direction as "poly-higher" | "kalshi-higher",
       causationLabel: getCausationLabel(causation.primaryCause).label,
       category: d.category ?? null,
     };
 
     const verified = template.buildContext(ctx);
-    if (!verified) continue;
+    if (!verified) {
+      console.log(`[detect-story-events]   Template rejected context for ${marketId}`);
+      continue;
+    }
 
     const headline = template.buildHeadline(verified);
     const summary = template.buildSummary(verified);
     const body = template.buildBody(verified);
     const qs = template.minQualityScore + Math.min(Math.round((verified.spread ?? 8) - 8) * 2, 20);
 
+    console.log(`[detect-story-events]   Creating story: "${headline}"`);
     const ok = await upsertStory({
       slug: slugify(headline, randomSuffix()),
       template_id: template.id,
@@ -140,26 +163,34 @@ async function detectLargeSpreadEmerged(): Promise<number> {
 }
 
 async function detectWidestSpreadsDaily(): Promise<number> {
-  const { data: disagreements } = await supabase
+  const { data: disagreements, error } = await supabase
     .from("disagreements")
     .select("poly_market_id, question, spread, poly_price, kalshi_price, poly_volume, kalshi_volume, direction, category")
     .gte("spread", 5)
     .order("spread", { ascending: false })
     .limit(5);
 
+  if (error) {
+    console.error("[detect-story-events] detectWidestSpreadsDaily query error:", error.message);
+    return 0;
+  }
+  console.log(`[detect-story-events] detectWidestSpreadsDaily: ${disagreements?.length ?? 0} rows with spread >= 5`);
   if (!disagreements || disagreements.length < 3) return 0;
 
   const template = STORY_TEMPLATES.find(t => t.id === "widest_spreads_daily")!;
   const marketIds = disagreements.map(d => d.poly_market_id).filter(Boolean);
-  if (await isDuplicate(template.id, [marketIds[0]])) return 0;
+  if (await isDuplicate(template.id, [marketIds[0]])) {
+    console.log(`[detect-story-events] detectWidestSpreadsDaily: duplicate (already published in last 24h)`);
+    return 0;
+  }
 
   const widestSpreads = disagreements.map(d => {
     const causation = analyzeCausation({
       polymarketPrice: Math.round(d.poly_price ?? 50),
       kalshiPrice: Math.round(d.kalshi_price ?? 50),
       spread: Math.round(d.spread ?? 0),
-      polymarketVolume: d.poly_volume ?? 0,
-      kalshiVolume: d.kalshi_volume ?? 0,
+      polymarketVolume: Number(d.poly_volume ?? 0),
+      kalshiVolume: Number(d.kalshi_volume ?? 0),
       daysToResolution: null,
       spreadAgeHours: null,
       convergenceVelocity: null,
@@ -176,6 +207,7 @@ async function detectWidestSpreadsDaily(): Promise<number> {
 
   const ctx: StoryContext = { widestSpreads, marketIds, category: null };
   const headline = template.buildHeadline(ctx);
+  console.log(`[detect-story-events]   Creating story: "${headline}"`);
   const ok = await upsertStory({
     slug: slugify(headline, randomSuffix()),
     template_id: template.id,
@@ -195,14 +227,19 @@ async function detectWidestSpreadsDaily(): Promise<number> {
 
 async function detectWhalePositions(): Promise<number> {
   const since = new Date(Date.now() - 3600 * 1000).toISOString();
-  const { data: positions } = await supabase
+  const { data: positions, error } = await supabase
     .from("whale_positions")
     .select("whale_id, market_id, outcome, current_value, pnl, updated_at")
     .gte("updated_at", since)
-    .gte("current_value", 100000)
+    .gte("current_value", 5000)   // lowered from 100k — most real positions are $5-50k
     .order("current_value", { ascending: false })
     .limit(5);
 
+  if (error) {
+    console.error("[detect-story-events] detectWhalePositions query error:", error.message);
+    return 0;
+  }
+  console.log(`[detect-story-events] detectWhalePositions: ${positions?.length ?? 0} large positions updated in last hour`);
   if (!positions?.length) return 0;
 
   const template = STORY_TEMPLATES.find(t => t.id === "whale_large_position")!;
@@ -242,6 +279,7 @@ async function detectWhalePositions(): Promise<number> {
     if (!verified) continue;
 
     const headline = template.buildHeadline(verified);
+    console.log(`[detect-story-events]   Creating story: "${headline}"`);
     const ok = await upsertStory({
       slug: slugify(headline, randomSuffix()),
       template_id: template.id,
@@ -262,13 +300,19 @@ async function detectWhalePositions(): Promise<number> {
 }
 
 async function detectResolutionNearing(): Promise<number> {
-  const { data: markets } = await supabase
+  // Markets table uses end_date (not close_time) — set by ingest.ts
+  const { data: markets, error } = await supabase
     .from("markets")
-    .select("id, question, close_time, category")
-    .not("close_time", "is", null)
-    .order("close_time", { ascending: true })
-    .limit(100);
+    .select("id, question, end_date, category")
+    .not("end_date", "is", null)
+    .order("end_date", { ascending: true })
+    .limit(200);
 
+  if (error) {
+    console.error("[detect-story-events] detectResolutionNearing query error:", error.message);
+    return 0;
+  }
+  console.log(`[detect-story-events] detectResolutionNearing: ${markets?.length ?? 0} markets with end_date`);
   if (!markets?.length) return 0;
 
   const template = STORY_TEMPLATES.find(t => t.id === "market_approaching_resolution")!;
@@ -277,7 +321,7 @@ async function detectResolutionNearing(): Promise<number> {
   const targets = [7, 3, 1];
 
   for (const m of markets) {
-    const msLeft = new Date(m.close_time).getTime() - now;
+    const msLeft = new Date(m.end_date).getTime() - now;
     const daysLeft = Math.round(msLeft / 86_400_000);
     if (!targets.includes(daysLeft)) continue;
     if (await isDuplicate(template.id, [m.id])) continue;
@@ -295,6 +339,7 @@ async function detectResolutionNearing(): Promise<number> {
     if (!verified) continue;
 
     const headline = template.buildHeadline(verified);
+    console.log(`[detect-story-events]   Creating story: "${headline}"`);
     const ok = await upsertStory({
       slug: slugify(headline, randomSuffix()),
       template_id: template.id,
@@ -318,6 +363,14 @@ async function detectResolutionNearing(): Promise<number> {
 
 async function main() {
   console.log("[detect-story-events] starting event detection…");
+
+  // Diagnostics — print row counts so we can see what's available
+  const [{ count: disagreeCount }, { count: snapCount }, { count: whaleCount }] = await Promise.all([
+    supabase.from("disagreements").select("*", { count: "exact", head: true }),
+    supabase.from("spread_snapshots").select("*", { count: "exact", head: true }),
+    supabase.from("whale_positions").select("*", { count: "exact", head: true }),
+  ]);
+  console.log(`[detect-story-events] DB state: ${disagreeCount ?? 0} disagreements, ${snapCount ?? 0} spread_snapshots, ${whaleCount ?? 0} whale_positions`);
 
   const results = await Promise.allSettled([
     detectLargeSpreadEmerged().then(n => ({ name: "large_spread_emerged", n })),

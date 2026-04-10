@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   AreaChart,
@@ -178,6 +178,8 @@ export default function ScreenerPage() {
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [category, setCategory] = useState("All");
   const [platform, setPlatform] = useState("All");
   const [sortBy, setSortBy] = useState<SortKey>("volume");
@@ -226,6 +228,21 @@ export default function ScreenerPage() {
     }
     return map;
   }, [disagreements]);
+
+  function handleSearchChange(val: string) {
+    setSearchInput(val);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      setSearchQuery(val);
+      setDisplayCount(60);
+    }, 250);
+  }
+
+  function clearSearch() {
+    setSearchInput("");
+    setSearchQuery("");
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+  }
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -292,27 +309,41 @@ export default function ScreenerPage() {
 
       {/* Search */}
       <div className="relative max-w-2xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-[#8892b0]" />
-        <input type="text" placeholder="Search by question, category, or keyword..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-11 pl-12 pr-4 rounded-xl bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 transition-all shadow-lg shadow-black/20" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-[#8892b0] pointer-events-none" />
+        <input
+          type="text"
+          placeholder="Search markets…"
+          value={searchInput}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="w-full h-11 pl-11 pr-10 rounded-xl bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 transition-all shadow-lg shadow-black/20"
+        />
+        {searchInput && (
+          <button
+            onClick={clearSearch}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="size-4" />
+          </button>
+        )}
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Categories */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-            {CATEGORIES.slice(0, 10).map((cat) => (
-              <button key={cat} onClick={() => setCategory(cat)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}>
-                {cat}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-col gap-2">
+        {/* Row 1: Categories — horizontal scroll on mobile */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+          {CATEGORIES.slice(0, 10).map((cat) => (
+            <button key={cat} onClick={() => setCategory(cat)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}>
+              {cat}
+            </button>
+          ))}
+        </div>
 
+        {/* Row 2: Platform + Sort + Controls */}
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Platform */}
-          <span className="text-[10px] text-[#2f374f] mx-0.5 hidden sm:inline">|</span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {PLATFORMS.map((p) => (
               <button key={p} onClick={() => setPlatform(p)}
                 className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${platform === p ? "bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
@@ -321,9 +352,10 @@ export default function ScreenerPage() {
             ))}
           </div>
 
+          <span className="text-[10px] text-[#2f374f]">|</span>
+
           {/* Sort */}
-          <span className="text-[10px] text-[#2f374f] mx-0.5 hidden sm:inline">|</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             {sortOptions.map((opt) => (
               <button key={opt.key} onClick={() => handleSort(opt.key)}
                 className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-medium transition-all border ${sortBy === opt.key ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
@@ -337,7 +369,8 @@ export default function ScreenerPage() {
             <button onClick={() => setShowAdvanced(!showAdvanced)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${showAdvanced ? "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
               <SlidersHorizontal className="size-3" />
-              Advanced{activeFilterCount > 0 && <span className="size-4 rounded-full bg-[#f59e0b] text-[#0f1119] text-[8px] font-bold flex items-center justify-center">{activeFilterCount}</span>}
+              <span className="hidden sm:inline">Advanced</span>
+              {activeFilterCount > 0 && <span className="size-4 rounded-full bg-[#f59e0b] text-[#0f1119] text-[8px] font-bold flex items-center justify-center">{activeFilterCount}</span>}
             </button>
             <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2f374f]">
               <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0]"}`}><LayoutGrid className="size-3.5" /></button>

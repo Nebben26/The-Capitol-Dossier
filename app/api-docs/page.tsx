@@ -125,6 +125,45 @@ const ENDPOINTS: Endpoint[] = [
   },
   {
     method: "GET",
+    path: "/api/v1/spread-history",
+    description: "Returns time-series spread snapshots for a specific market — shows how the gap between Polymarket and Kalshi prices has evolved over time. Useful for detecting trend direction (widening or narrowing) and building convergence models.",
+    params: [
+      { name: "market_id", type: "string", required: true, description: "Market ID to query (from /disagreements response)" },
+      { name: "hours", type: "number", required: false, description: "Hours of history to return. Pro: max 168 (7d), Quant: max 672 (28d)" },
+    ],
+    response: `{
+  "data": [
+    {
+      "market_id": "abc123",
+      "polymarket_price": 72,
+      "kalshi_price": 61,
+      "spread": 11,
+      "direction": "poly-higher",
+      "captured_at": "2026-04-10T12:00:00Z"
+    },
+    {
+      "market_id": "abc123",
+      "polymarket_price": 70,
+      "kalshi_price": 63,
+      "spread": 7,
+      "direction": "poly-higher",
+      "captured_at": "2026-04-10T11:30:00Z"
+    }
+  ],
+  "meta": {
+    "count": 336,
+    "market_id": "abc123",
+    "hours_requested": 168,
+    "hours_available": 168,
+    "generated_at": "2026-04-10T12:00:00Z",
+    "tier": "pro"
+  }
+}`,
+    tiers: ["pro", "enterprise"],
+    tierNote: "Free: blocked · Pro: 7-day window (168h) · Quant API: 28-day window (672h)",
+  },
+  {
+    method: "GET",
     path: "/api/v1/whales",
     description: "Returns tracked whale wallets sorted by P&L or accuracy.",
     params: [

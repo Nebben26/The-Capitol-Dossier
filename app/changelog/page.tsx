@@ -6,6 +6,12 @@ import { ArrowLeft } from "lucide-react";
 
 const ENTRIES = [
   {
+    version: "v0.42",
+    date: "April 10, 2026",
+    description:
+      "Backend hardening + mobile polish: fixed ingest schema cache errors (NOTIFY pgrst reload on startup); added poly_volume/kalshi_volume columns to disagreements table; fixed detect-story-events.ts (close_time → end_date, removed bad volume filter, added diagnostics); stories now generate correctly. Mobile audit — screener search debounced (250ms) with clear button, filter bar split into 2 rows; leaderboard and screener category chips full-width bleed scroll on mobile; calibration tables scroll horizontally on 375px. Added /api/v1/spread-history endpoint to API docs.",
+  },
+  {
     version: "v0.39",
     date: "April 9, 2026",
     description:

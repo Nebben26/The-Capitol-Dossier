@@ -266,36 +266,38 @@ export default function LeaderboardPage() {
             </div>
 
             {/* ─── FILTER BAR ──────────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              {/* Time range */}
-              <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2a2f45]">
-                {timeFilters.map((tf) => (
-                  <button
-                    key={tf}
-                    onClick={() => setTimeFilter(tf)}
-                    className={`px-3 py-1.5 rounded-md text-[10px] font-semibold transition-all ${
-                      timeFilter === tf
-                        ? "bg-[#57D7BA] text-[#0f1119] shadow-lg shadow-[#57D7BA]/20"
-                        : "text-[#8892b0] hover:text-[#e2e8f0]"
-                    }`}
-                  >
-                    {tf}
-                  </button>
-                ))}
+            <div className="flex flex-col gap-2">
+              {/* Row 1: Time range + search */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2a2f45]">
+                  {timeFilters.map((tf) => (
+                    <button
+                      key={tf}
+                      onClick={() => setTimeFilter(tf)}
+                      className={`px-2.5 py-1.5 rounded-md text-[10px] font-semibold transition-all whitespace-nowrap ${
+                        timeFilter === tf
+                          ? "bg-[#57D7BA] text-[#0f1119] shadow-lg shadow-[#57D7BA]/20"
+                          : "text-[#8892b0] hover:text-[#e2e8f0]"
+                      }`}
+                    >
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+                {/* Trader search */}
+                <div className="relative flex-1 sm:flex-none">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[#8892b0]" />
+                  <input
+                    type="text"
+                    placeholder="Search traders…"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-9 pl-8 pr-3 rounded-lg bg-[#222638] border border-[#2a2f45] text-xs text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all w-full sm:w-44"
+                  />
+                </div>
               </div>
-              {/* Trader search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[#8892b0]" />
-                <input
-                  type="text"
-                  placeholder="Search traders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-8 pl-8 pr-3 rounded-lg bg-[#222638] border border-[#2a2f45] text-xs text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all w-44"
-                />
-              </div>
-              {/* Category pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {/* Row 2: Category pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
                 {categories.map((cat) => (
                   <button
                     key={cat}

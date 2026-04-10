@@ -430,7 +430,7 @@ export default function CalibrationPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><Users className="size-4 text-[#8b5cf6]" /> You vs Top Whales</CardTitle>
               </CardHeader>
-              <CardContent className="px-0 pb-2">
+              <CardContent className="px-0 pb-2 overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#2f374f] hover:bg-transparent">
@@ -479,7 +479,7 @@ export default function CalibrationPage() {
                 <Button onClick={() => setShowForm(true)} size="xs" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80 gap-1"><Plus className="size-3" />Add</Button>
               </div>
             </CardHeader>
-            <CardContent className="px-0 pb-2">
+            <CardContent className="px-0 pb-2 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-[#2f374f] hover:bg-transparent">

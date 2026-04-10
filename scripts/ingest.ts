@@ -605,6 +605,8 @@ async function ingestDisagreements(markets: any[]) {
           spread,
           direction: pm.price > bestMatch.price ? "poly-higher" : "kalshi-higher",
           category: pm.category,
+          poly_volume: pm.volume || 0,
+          kalshi_volume: bestMatch.volume || 0,
           spread_trend: "stable",
           convergence_rate: 0,
           match_confidence: parseFloat(bestScore.toFixed(3)),
@@ -781,6 +783,15 @@ async function main() {
   console.log("╚══════════════════════════════════════════╝");
   console.log(`  Time: ${new Date().toISOString()}`);
   console.log(`  Supabase: ${SUPABASE_URL}`);
+
+  // Reload PostgREST schema cache — prevents "Could not find column" errors
+  // after migrations add new columns. Requires notify_pgrst_reload() function
+  // from scripts/migrations/session42_schema_fixes.sql to be applied.
+  try {
+    const { error: reloadErr } = await supabase.rpc("notify_pgrst_reload");
+    if (reloadErr) console.warn("  Schema reload warn (non-fatal):", reloadErr.message);
+    else console.log("  ✓ Schema cache reloaded");
+  } catch { console.warn("  Schema reload unavailable (run session42_schema_fixes.sql first)"); }
 
   const markets = await ingestMarkets();
   await ingestPriceHistory(markets);
