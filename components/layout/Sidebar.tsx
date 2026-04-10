@@ -22,12 +22,14 @@ import {
   FileText,
   BookOpen,
   Sparkles,
+  CalendarDays,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Screener", icon: Target, href: "/screener" },
+  { label: "Calendar", icon: CalendarDays, href: "/calendar" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Insights", icon: Newspaper, href: "/insights" },
   { label: "Stories", icon: Sparkles, href: "/stories" },
