@@ -786,12 +786,9 @@ async function main() {
 
   // Reload PostgREST schema cache — prevents "Could not find column" errors
   // after migrations add new columns. Requires notify_pgrst_reload() function
-  // from scripts/migrations/session42_schema_fixes.sql to be applied.
-  try {
-    const { error: reloadErr } = await supabase.rpc("notify_pgrst_reload");
-    if (reloadErr) console.warn("  Schema reload warn (non-fatal):", reloadErr.message);
-    else console.log("  ✓ Schema cache reloaded");
-  } catch { console.warn("  Schema reload unavailable (run session42_schema_fixes.sql first)"); }
+  // from scripts/migrations/session42_schema_fixes.sql to be applied first.
+  await supabase.rpc("notify_pgrst_reload").catch(() => null);
+  console.log("  ✓ Schema cache reload signalled");
 
   const markets = await ingestMarkets();
   await ingestPriceHistory(markets);

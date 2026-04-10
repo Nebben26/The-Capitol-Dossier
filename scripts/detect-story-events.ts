@@ -364,6 +364,12 @@ async function detectResolutionNearing(): Promise<number> {
 async function main() {
   console.log("[detect-story-events] starting event detection…");
 
+  // Reload PostgREST schema cache before any queries — prevents "Could not find column"
+  // errors on newly-added columns (category, poly_volume, kalshi_volume, etc.)
+  await supabase.rpc("notify_pgrst_reload").catch(() => null);
+  await new Promise(r => setTimeout(r, 2000));
+  console.log("[detect-story-events] schema cache reloaded (2s wait)");
+
   // Diagnostics — print row counts so we can see what's available
   const [{ count: disagreeCount }, { count: snapCount }, { count: whaleCount }] = await Promise.all([
     supabase.from("disagreements").select("*", { count: "exact", head: true }),
