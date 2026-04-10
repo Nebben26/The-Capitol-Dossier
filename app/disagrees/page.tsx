@@ -592,7 +592,7 @@ function DisagreesContent() {
       {/* Table view */}
       {viewMode === "table" && (
         <Card className="bg-[#222638] border-[#2f374f]">
-          <CardContent className="px-0 py-0">
+          <CardContent className="px-0 py-0 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-[#2f374f] hover:bg-transparent">
@@ -681,7 +681,7 @@ function DisagreesContent() {
                         ref={(el) => { rowRefs.current[d.id] = el; }}
                         className={`border-[#2f374f]/50 hover:bg-[#f59e0b]/5 transition-colors ${isExpanded ? "bg-[#57D7BA]/5" : ""}`}
                       >
-                        <TableCell className="pl-4 py-2.5 max-w-[220px]">
+                        <TableCell className="pl-4 py-2.5 max-w-[120px] sm:max-w-[220px]">
                           <div className="flex items-start gap-1.5">
                             {(d.matchConfidence ?? 1) < 0.5 && (
                               <span title="Low-confidence cross-platform match — verify before trading.">
