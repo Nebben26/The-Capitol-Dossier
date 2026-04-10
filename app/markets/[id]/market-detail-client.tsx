@@ -70,6 +70,10 @@ import { Sparkline } from "@/components/ui/sparkline";
 import { SpreadExecutionCalculator } from "@/components/ui/spread-execution-calculator";
 import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
 import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
+import { CausationTag } from "@/components/ui/causation-tag";
+import { ResolutionCriteriaDiff } from "@/components/ui/resolution-criteria-diff";
+import { analyzeCausation } from "@/lib/causation";
+import { analyzeResolutionDiff } from "@/lib/resolution-diff";
 import { getSpreadHistory, getMarketThesis, getMarketCandles, type MarketThesis, type Candle } from "@/lib/api";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { formatSignedPct, formatCents } from "@/lib/format";
@@ -168,6 +172,26 @@ export default function MarketDetailPage() {
   useEffect(() => {
     if (candles.length > 0) setChartMode("candle");
   }, [candles.length]);
+
+  // Pre-compute causation analysis for the cross-platform tab
+  const crossPlatformCausation = useMemo(() => {
+    if (!marketDisagreement) return null;
+    const polyVol = marketDisagreement.poly_volume ?? marketDisagreement.polyVolume ?? 0;
+    const kalshiVol = marketDisagreement.kalshi_volume ?? marketDisagreement.kalshiVolume ?? 0;
+    const parseV = (v: unknown) => typeof v === "number" ? v : parseFloat(String(v).replace(/[$KM,]/g, "")) || 0;
+    return analyzeCausation({
+      polymarketPrice: Math.round(marketDisagreement.poly_price ?? 50),
+      kalshiPrice: Math.round(marketDisagreement.kalshi_price ?? 50),
+      spread: Math.round(marketDisagreement.spread ?? 0),
+      polymarketVolume: parseV(polyVol),
+      kalshiVolume: parseV(kalshiVol),
+      daysToResolution: market?.daysLeft > 0 ? market.daysLeft : null,
+      spreadAgeHours: null,
+      convergenceVelocity: null,
+      category: market?.category ?? "Unknown",
+      resolutionCriteriaDiffer: null,
+    });
+  }, [marketDisagreement, market?.daysLeft, market?.category]);
 
   useEffect(() => {
     if (!market?.id || market.question === "Loading...") return;
@@ -840,12 +864,17 @@ export default function MarketDetailPage() {
                 )}
               </CardContent>
             </Card>
-            {/* Spread History Chart + Execution Calculator */}
-            {!dataLoading && marketDisagreement && (
+            {/* Spread History Chart + Resolution Diff + Execution Calculator */}
+            {!dataLoading && marketDisagreement && crossPlatformCausation && (
               <div className="space-y-3">
+                {/* Causation tag row */}
+                <div className="flex items-start gap-2 flex-wrap">
+                  <CausationTag analysis={crossPlatformCausation} compact={false} showExplanation={true} />
+                </div>
                 <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
                   <SpreadHistoryChart marketId={id} question={market.question} heightPx={240} />
                 </div>
+                <ResolutionCriteriaDiff result={analyzeResolutionDiff(null, null)} polymarketUrl={null} kalshiUrl={null} />
                 <SpreadExecutionCalculator
                   polymarketPrice={Math.round(marketDisagreement.poly_price ?? marketDisagreement.polyPrice ?? 50)}
                   kalshiPrice={Math.round(marketDisagreement.kalshi_price ?? marketDisagreement.kalshiPrice ?? 50)}

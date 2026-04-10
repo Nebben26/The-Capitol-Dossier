@@ -49,6 +49,11 @@ import { Sparkline } from "@/components/ui/sparkline";
 import { SpreadExecutionCalculator, calcAnnReturn } from "@/components/ui/spread-execution-calculator";
 import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
 import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
+import { CausationTag } from "@/components/ui/causation-tag";
+import { ResolutionCriteriaDiff } from "@/components/ui/resolution-criteria-diff";
+import { analyzeCausation } from "@/lib/causation";
+import { analyzeResolutionDiff } from "@/lib/resolution-diff";
+import type { CausationType, CausationAnalysis } from "@/lib/causation";
 import type { Disagreement } from "@/lib/mockData";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
@@ -56,6 +61,7 @@ const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolit
 type SortKey = "opportunity" | "spread" | "polyVol" | "daysLeft" | "annReturn";
 type SortDir = "asc" | "desc";
 type ViewMode = "grid" | "table";
+type CauseFilter = "all" | "information_lag" | "liquidity_gap" | "resolution_mismatch" | "structural";
 
 function parseVol(v: string): number {
   const n = parseFloat(v.replace(/[$KM,]/g, ""));
@@ -91,12 +97,13 @@ function sidesFor(d: Disagreement): { polymarketSide: "YES" | "NO"; kalshiSide: 
 
 // ─── Grid card ────────────────────────────────────────────────────────────
 function DisagreeCard({
-  d, history, expanded, onToggleExpand,
+  d, history, expanded, onToggleExpand, causationAnalysis,
 }: {
   d: Disagreement;
   history: Array<{ t: number; spread: number }>;
   expanded: boolean;
   onToggleExpand: () => void;
+  causationAnalysis: CausationAnalysis;
 }) {
   const { polymarketSide, kalshiSide } = sidesFor(d);
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
@@ -155,6 +162,10 @@ function DisagreeCard({
               : `Buy Polymarket YES at ${d.polyPrice}¢, sell Kalshi YES at ${d.kalshiPrice}¢ → ${d.spread}pt arb`
             }
           </div>
+          {/* Causation tag */}
+          <div className="mb-1.5">
+            <CausationTag analysis={causationAnalysis} compact={true} />
+          </div>
           {/* Velocity indicator */}
           <div className="mb-2.5">
             <SpreadVelocityIndicator marketId={d.marketId} compact={false} />
@@ -193,15 +204,20 @@ function DisagreeCard({
           </div>
         </CardContent>
       </Card>
-      {/* Expandable chart + calculator */}
+      {/* Expandable chart + resolution diff + calculator */}
       <div
         className="overflow-hidden transition-all duration-300"
-        style={{ maxHeight: expanded ? "900px" : "0px", opacity: expanded ? 1 : 0 }}
+        style={{ maxHeight: expanded ? "1200px" : "0px", opacity: expanded ? 1 : 0 }}
       >
         <div className="pt-2 space-y-2">
           <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
             <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
           </div>
+          <ResolutionCriteriaDiff
+            result={analyzeResolutionDiff(null, null)}
+            polymarketUrl={null}
+            kalshiUrl={null}
+          />
           <SpreadExecutionCalculator
             polymarketPrice={d.polyPrice}
             kalshiPrice={d.kalshiPrice}
@@ -224,6 +240,7 @@ function DisagreesContent() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory]       = useState("All");
+  const [causeFilter, setCauseFilter] = useState<CauseFilter>("all");
   const [sortBy, setSortBy]           = useState<SortKey>("opportunity");
   const [sortDir, setSortDir]         = useState<SortDir>("desc");
   const [viewMode, setViewMode]       = useState<ViewMode>("grid");
@@ -269,10 +286,45 @@ function DisagreesContent() {
     return map;
   }, [disagreements]);
 
+  // Pre-compute causation analysis for each disagreement
+  const causationMap = useMemo(() => {
+    const map = new Map<string, CausationAnalysis>();
+    for (const d of disagreements) {
+      map.set(d.id, analyzeCausation({
+        polymarketPrice: d.polyPrice,
+        kalshiPrice: d.kalshiPrice,
+        spread: d.spread,
+        polymarketVolume: parseVol(d.polyVol),
+        kalshiVolume: parseVol(d.kalshiVol),
+        daysToResolution: d.daysLeft > 0 ? d.daysLeft : null,
+        spreadAgeHours: null,
+        convergenceVelocity: null,
+        category: d.category,
+        resolutionCriteriaDiffer: null,
+      }));
+    }
+    return map;
+  }, [disagreements]);
+
+  const actionableCount = useMemo(
+    () => [...causationMap.values()].filter((a) => a.actionable).length,
+    [causationMap]
+  );
+
   const filtered = useMemo(() => {
     let result = disagreements;
     if (category !== "All") result = result.filter((d) => d.category === category);
     if (searchQuery) result = result.filter((d) => d.question.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Causation filter
+    if (causeFilter !== "all") {
+      result = result.filter((d) => {
+        const cause = causationMap.get(d.id)?.primaryCause;
+        if (causeFilter === "structural") {
+          return cause === "structural_persistent" || cause === "fee_differential" || cause === "user_base_bias";
+        }
+        return cause === causeFilter;
+      });
+    }
     return [...result].sort((a, b) => {
       let av: number, bv: number;
       if (sortBy === "opportunity")    { av = a.opportunityScore ?? 0; bv = b.opportunityScore ?? 0; }
@@ -285,7 +337,7 @@ function DisagreesContent() {
       else { av = a.daysLeft; bv = b.daysLeft; }
       return sortDir === "desc" ? bv - av : av - bv;
     });
-  }, [disagreements, category, searchQuery, sortBy, sortDir, annReturnMap]);
+  }, [disagreements, category, causeFilter, searchQuery, sortBy, sortDir, annReturnMap, causationMap]);
 
   // Top opportunities strip (Part 6)
   const topOpportunities = useMemo(() => {
@@ -410,16 +462,44 @@ function DisagreesContent() {
             className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
           />
         </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {catFilters.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex flex-col gap-1.5">
+          {/* Category chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            {catFilters.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          {/* Causation filter chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            {(
+              [
+                { key: "all",                 label: "All causes" },
+                { key: "information_lag",     label: "Info Lag",         color: "#22c55e" },
+                { key: "liquidity_gap",       label: "Liquidity Gap",    color: "#f59e0b" },
+                { key: "resolution_mismatch", label: "Resolution Risk",  color: "#ef4444" },
+                { key: "structural",          label: "Structural",       color: "#6b7280" },
+              ] as { key: CauseFilter; label: string; color?: string }[]
+            ).map(({ key, label, color }) => (
+              <button
+                key={key}
+                onClick={() => setCauseFilter(key)}
+                className={`shrink-0 px-2.5 py-1 rounded-full text-[9px] font-medium transition-all border ${
+                  causeFilter === key
+                    ? "text-[#0f1119] border-transparent"
+                    : "bg-[#1a1e2e] text-[#8892b0] hover:text-[#e2e8f0] border-[#2f374f]"
+                }`}
+                style={causeFilter === key ? { backgroundColor: color ?? "#f59e0b", borderColor: "transparent" } : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {/* Sort toggle */}
@@ -448,12 +528,13 @@ function DisagreesContent() {
 
       {/* Summary stats */}
       {disagreements.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
             { label: "Active Spreads", val: `${disagreements.length}`, color: "#f59e0b", sparkline: true },
             { label: "Avg Spread", val: `${Math.round(disagreements.reduce((s, d) => s + d.spread, 0) / disagreements.length)}pt`, color: "#ef4444" },
             { label: "Widest Spread", val: `${Math.max(...disagreements.map((d) => d.spread))}pt`, color: "#ec4899" },
             { label: "Combined Volume", val: "$" + (disagreements.reduce((s, d) => s + parseVol(d.polyVol) + parseVol(d.kalshiVol), 0) / 1000000).toFixed(0) + "M", color: "#57D7BA" },
+            { label: "Actionable", val: `${actionableCount}`, color: "#22c55e" },
           ].map((s) => (
             <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
               <CardContent className="p-3 text-center">
@@ -479,6 +560,7 @@ function DisagreesContent() {
               history={historyMap[d.marketId] || []}
               expanded={expandedId === d.id}
               onToggleExpand={() => toggleExpand(d.id)}
+              causationAnalysis={causationMap.get(d.id)!}
             />
           ))}
         </div>
@@ -508,6 +590,17 @@ function DisagreesContent() {
                   </TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium hidden md:table-cell">
                     VELOCITY
+                  </TableHead>
+                  <TableHead className="text-[10px] text-[#8892b0] font-medium hidden xl:table-cell">
+                    <span className="flex items-center gap-0.5">
+                      CAUSE
+                      <Tooltip>
+                        <TooltipTrigger><HelpCircle className="size-3 text-[#4a5168] cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="max-w-[220px] text-[11px]">
+                          Diagnosed reason this spread exists. Green = actionable information lag. Red = resolution mismatch risk. Gray = structural, unlikely to profit.
+                        </TooltipContent>
+                      </Tooltip>
+                    </span>
                   </TableHead>
                   <TableHead
                     className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden md:table-cell"
@@ -554,9 +647,10 @@ function DisagreesContent() {
                   const { polymarketSide, kalshiSide } = sidesFor(d);
                   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
                   const annReturn = annReturnMap.get(d.id) ?? null;
+                  const causationAnalysis = causationMap.get(d.id)!;
                   const isExpanded = expandedId === d.id;
                   const isProfit = annReturn !== null && annReturn > 0;
-                  const colSpan = 12;
+                  const colSpan = 13;
 
                   return (
                     <React.Fragment key={d.id}>
@@ -596,6 +690,9 @@ function DisagreesContent() {
                         </TableCell>
                         <TableCell className="py-2.5 hidden md:table-cell">
                           <SpreadVelocityIndicator marketId={d.marketId} compact={true} />
+                        </TableCell>
+                        <TableCell className="py-2.5 hidden xl:table-cell">
+                          <CausationTag analysis={causationAnalysis} compact={true} />
                         </TableCell>
                         <TableCell className="py-2.5 hidden md:table-cell">
                           <div className="text-[10px] text-[#8892b0] font-mono tabular-nums">
@@ -640,7 +737,7 @@ function DisagreesContent() {
                           </button>
                         </TableCell>
                       </TableRow>
-                      {/* Expanded calculator row */}
+                      {/* Expanded chart + resolution diff + calculator row */}
                       {isExpanded && (
                         <TableRow className="border-[#57D7BA]/20 bg-[#57D7BA]/5">
                           <TableCell colSpan={colSpan} className="p-4">
@@ -648,6 +745,11 @@ function DisagreesContent() {
                               <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
                                 <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
                               </div>
+                              <ResolutionCriteriaDiff
+                                result={analyzeResolutionDiff(null, null)}
+                                polymarketUrl={null}
+                                kalshiUrl={null}
+                              />
                               <SpreadExecutionCalculator
                                 polymarketPrice={d.polyPrice}
                                 kalshiPrice={d.kalshiPrice}

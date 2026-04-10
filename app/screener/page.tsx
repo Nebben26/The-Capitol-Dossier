@@ -54,6 +54,7 @@ import { LastUpdated } from "@/components/layout/LastUpdated";
 import { ProBadge } from "@/components/ui/pro-gate";
 import { formatPct, formatCents } from "@/lib/format";
 import { getMarketInsights, type MarketInsight } from "@/lib/api";
+import { analyzeCausation, getCausationLabel } from "@/lib/causation";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -91,8 +92,15 @@ function InsightIcon({ type }: { type: MarketInsight["type"] }) {
   return <Brain className="size-2.5 shrink-0" />;
 }
 
-function ScreenerCard({ m, spread, insight }: { m: Market; spread: number | null; insight?: MarketInsight }) {
+function ScreenerCard({ m, spread, insight, causeType }: {
+  m: Market;
+  spread: number | null;
+  insight?: MarketInsight;
+  causeType?: ReturnType<typeof getCausationLabel> | null;
+}) {
   const positive = m.change >= 0;
+  const isInfoLag = causeType?.label === "Information Lag";
+  const isResMismatch = causeType?.label === "Resolution Mismatch";
   return (
     <Link href={`/markets/${m.id}`} className="block group">
       <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200 h-full">
@@ -110,10 +118,19 @@ function ScreenerCard({ m, spread, insight }: { m: Market; spread: number | null
               <Link
                 href={`/disagrees?highlight=${m.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#f59e0b] bg-[#f59e0b]/10 mb-2 max-w-full truncate hover:bg-[#f59e0b]/20 transition-colors"
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] mb-2 max-w-full truncate transition-colors ${
+                  isResMismatch
+                    ? "text-[#ef4444] bg-[#ef4444]/10 hover:bg-[#ef4444]/20"
+                    : "text-[#f59e0b] bg-[#f59e0b]/10 hover:bg-[#f59e0b]/20"
+                }`}
               >
+                {isInfoLag && (
+                  <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse shrink-0" />
+                )}
                 <InsightIcon type={insight.type} />
-                <span className="truncate">{insight.label}</span>
+                <span className="truncate">
+                  {insight.label}{causeType ? ` · ${causeType.label}` : ""}
+                </span>
               </Link>
             ) : (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#57D7BA] bg-[#57D7BA]/10 mb-2 max-w-full truncate">
@@ -176,10 +193,37 @@ export default function ScreenerPage() {
   const [spreadOnly, setSpreadOnly] = useState(false);
   const [resolvingSoon, setResolvingSoon] = useState(false);
 
-  // Build spread lookup
+  // Build spread lookup and causation map
   const spreadMap = useMemo(() => {
     const map: Record<string, number> = {};
     disagreements.forEach((d) => { map[d.marketId] = d.spread; });
+    return map;
+  }, [disagreements]);
+
+  function parseVolStr(v: string): number {
+    const n = parseFloat(v.replace(/[$KM,]/g, ""));
+    if (v.includes("M")) return n * 1_000_000;
+    if (v.includes("K")) return n * 1_000;
+    return n || 0;
+  }
+
+  const causationLabelMap = useMemo(() => {
+    const map: Record<string, ReturnType<typeof getCausationLabel>> = {};
+    for (const d of disagreements) {
+      const analysis = analyzeCausation({
+        polymarketPrice: d.polyPrice,
+        kalshiPrice: d.kalshiPrice,
+        spread: d.spread,
+        polymarketVolume: parseVolStr(d.polyVol),
+        kalshiVolume: parseVolStr(d.kalshiVol),
+        daysToResolution: d.daysLeft > 0 ? d.daysLeft : null,
+        spreadAgeHours: null,
+        convergenceVelocity: null,
+        category: d.category,
+        resolutionCriteriaDiffer: null,
+      });
+      map[d.marketId] = getCausationLabel(analysis.primaryCause);
+    }
     return map;
   }, [disagreements]);
 
@@ -358,7 +402,7 @@ export default function ScreenerPage() {
       {/* Grid */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} insight={insightsMap.get(m.id)} />)}
+          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} insight={insightsMap.get(m.id)} causeType={causationLabelMap[m.id] ?? null} />)}
         </div>
       )}
 

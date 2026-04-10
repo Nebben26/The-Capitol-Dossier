@@ -6,6 +6,12 @@ import { ArrowLeft } from "lucide-react";
 
 const ENTRIES = [
   {
+    version: "v0.38",
+    date: "April 9, 2026",
+    description:
+      "Spread Diagnostics: Every disagreement now shows WHY it exists (Information Lag, Liquidity Gap, Fee Differential, Resolution Mismatch, User Base Bias, or Structural) and resolution criteria verification catches pseudo-arbitrage where platforms define markets differently. Filter disagreements by cause type to find only actionable spreads. The screener now shows causation tags inline on cross-platform markets.",
+  },
+  {
     version: "v0.37",
     date: "April 9, 2026",
     description:
