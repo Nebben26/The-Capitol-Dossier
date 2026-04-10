@@ -5,6 +5,8 @@
  * Do NOT run this script directly; let it be called by the ingest cron.
  */
 
+import { config } from "dotenv";
+config({ path: ".env.local" });
 import { createClient } from "@supabase/supabase-js";
 import { STORY_TEMPLATES, slugify } from "../lib/story-templates";
 import type { StoryContext } from "../lib/story-templates";
