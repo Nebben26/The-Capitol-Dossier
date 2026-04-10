@@ -11,16 +11,23 @@ export const PRICING = {
   },
   pro: {
     name: "Pro",
-    price: 60,
+    price: 49,
     period: "month" as const,
-    priceLabel: "$60",
-    annualLabel: "$600/year (save $120)",
+    priceLabel: "$49",
+    annualLabel: "$490/year (save $98)",
   },
-  enterprise: {
-    name: "Enterprise",
-    price: 500,
+  trader: {
+    name: "Trader",
+    price: 149,
     period: "month" as const,
-    priceLabel: "$500",
-    annualLabel: "$5,000/year (save $1,000)",
+    priceLabel: "$149",
+    annualLabel: "$1,490/year (save $298)",
+  },
+  quant: {
+    name: "Quant API",
+    price: 299,
+    period: "month" as const,
+    priceLabel: "$299",
+    annualLabel: "$2,990/year (save $598)",
   },
 } as const;

@@ -74,7 +74,8 @@ import { CausationTag } from "@/components/ui/causation-tag";
 import { ResolutionCriteriaDiff } from "@/components/ui/resolution-criteria-diff";
 import { analyzeCausation } from "@/lib/causation";
 import { analyzeResolutionDiff } from "@/lib/resolution-diff";
-import { getSpreadHistory, getMarketThesis, getMarketCandles, type MarketThesis, type Candle } from "@/lib/api";
+import { getSpreadHistory, getMarketThesis, getMarketCandles, getWalletLabels, type MarketThesis, type Candle, type WalletLabel } from "@/lib/api";
+import { formatWallet } from "@/lib/format-wallet";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { formatSignedPct, formatCents } from "@/lib/format";
 import { genPriceHistory } from "@/lib/mockData";
@@ -159,6 +160,7 @@ export default function MarketDetailPage() {
 
   // ─── Real data for tabs ───────────────────────────────────────────────
   const [marketWhales, setMarketWhales] = useState<any[]>([]);
+  const [walletLabels, setWalletLabels] = useState<Record<string, WalletLabel>>({});
   const [marketDisagreement, setMarketDisagreement] = useState<any | null>(null);
   const [marketNews, setMarketNews] = useState<any[]>([]);
   const [spreadHistory, setSpreadHistory] = useState<Array<{ t: number; spread: number }>>([]);
@@ -197,14 +199,16 @@ export default function MarketDetailPage() {
     if (!market?.id || market.question === "Loading...") return;
     (async () => {
       try {
-        const [whalesRes, disagreeRes, newsRes, thesisData, candleData] = await Promise.all([
+        const [whalesRes, disagreeRes, newsRes, thesisData, candleData, labelsData] = await Promise.all([
           supabase.from("whale_positions").select("whale_id, outcome, current_value, pnl, updated_at").eq("market_id", market.id).order("current_value", { ascending: false }).limit(50),
           supabase.from("disagreements").select("*").or(`poly_market_id.eq.${market.id},kalshi_market_id.eq.${market.id}`).limit(1),
           supabase.from("news_market_tags").select("market_id, score, news_articles(id, title, url, source, published_at)").eq("market_id", market.id).order("score", { ascending: false }).limit(3),
           getMarketThesis(market.id),
           getMarketCandles(market.id, 30),
+          getWalletLabels(),
         ]);
         setMarketWhales(whalesRes.data || []);
+        setWalletLabels(labelsData);
         const d = disagreeRes.data?.[0] || null;
         setMarketDisagreement(d);
         setMarketNews(newsRes.data || []);
@@ -548,7 +552,7 @@ export default function MarketDetailPage() {
                       const pnl = Number(w.pnl || 0);
                       const fmtUsd = (n: number) => n >= 1e6 ? `$${(n/1e6).toFixed(2)}M` : n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
                       const addr = w.whale_id || "";
-                      const label = addr.length > 10 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
+                      const label = formatWallet(addr, walletLabels);
                       return (
                         <div key={i} className="flex items-center gap-3 py-2 border-b border-[#2f374f]/40 last:border-0">
                           <span className="text-[10px] font-mono font-bold text-[#4a5168] w-4 shrink-0">{i + 1}</span>
@@ -765,11 +769,11 @@ export default function MarketDetailPage() {
                         const isYes = w.outcome?.toLowerCase().startsWith("y");
                         const elapsed = w.updated_at ? Math.floor((Date.now() - new Date(w.updated_at).getTime()) / 1000) : 0;
                         const timeStr = elapsed < 3600 ? `${Math.floor(elapsed/60)}m ago` : elapsed < 86400 ? `${Math.floor(elapsed/3600)}h ago` : `${Math.floor(elapsed/86400)}d ago`;
-                        const short = `${w.whale_id?.slice(0,6)}…${w.whale_id?.slice(-4)}`;
+                        const displayName = formatWallet(w.whale_id ?? "", walletLabels);
                         return (
                           <TableRow key={i} className="border-[#2a2f45]/50 hover:bg-[#57D7BA]/5 transition-colors">
                             <TableCell className="pl-4 py-2.5">
-                              <Link href={`/whales/${w.whale_id}`} className="font-mono text-xs text-[#ccd6f6] hover:text-[#57D7BA] transition-colors">{short}</Link>
+                              <Link href={`/whales/${w.whale_id}`} className="font-mono text-xs text-[#ccd6f6] hover:text-[#57D7BA] transition-colors">{displayName}</Link>
                             </TableCell>
                             <TableCell className="py-2.5">
                               <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${isYes ? "bg-[#22c55e]/10 text-[#22c55e]" : "bg-[#ef4444]/10 text-[#ef4444]"}`}>

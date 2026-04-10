@@ -6,6 +6,12 @@ import { ArrowLeft } from "lucide-react";
 
 const ENTRIES = [
   {
+    version: "v0.39",
+    date: "April 9, 2026",
+    description:
+      "Insight Engine + Polish: Auto-generated Market Insights stories from live events (spread moves, whale activity, resolution alerts) — 10 templates, quality scoring, free/pro tiers, RSS feed, and methodology page. Annualized return capped at 999%+ with SHORT-TERM badge for ≤3-day windows; Capital Efficiency strip now filters out short-duration and low-volume positions. 4-tier pricing (Free $0, Pro $49, Trader $149 NEW, Quant API $299). Whale wallet labels with display-name resolution throughout the site.",
+  },
+  {
     version: "v0.38",
     date: "April 9, 2026",
     description:

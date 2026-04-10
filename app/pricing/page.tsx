@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2 } from "lucide-react";
 import { PRICING } from "@/lib/pricing";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
 
@@ -15,7 +14,8 @@ interface Feature {
   label: string;
   free: TierVal;
   pro: TierVal;
-  enterprise: TierVal;
+  trader: TierVal;
+  quant: TierVal;
 }
 
 interface FeatureSection {
@@ -29,46 +29,57 @@ const COMPARISON: FeatureSection[] = [
   {
     heading: "INTELLIGENCE",
     rows: [
-      { label: "Cross-platform arbitrage scanner", free: true, pro: true, enterprise: true },
-      { label: "AI Market Thesis (preview)", free: true, pro: true, enterprise: true },
-      { label: "AI Market Thesis (full)", free: false, pro: true, enterprise: true },
-      { label: "Smart Signal Alerts (top 5)", free: true, pro: true, enterprise: true },
-      { label: "Smart Signal Alerts (all 180+)", free: false, pro: true, enterprise: true },
-      { label: "Whale leaderboard", free: true, pro: true, enterprise: true },
-      { label: "Whale position history", free: false, pro: true, enterprise: true },
-      { label: "Smart Money Watch", free: true, pro: true, enterprise: true },
-      { label: "Smart Money Flow", free: true, pro: true, enterprise: true },
+      { label: "Cross-platform arbitrage scanner", free: true, pro: true, trader: true, quant: true },
+      { label: "AI Market Thesis (preview)", free: true, pro: true, trader: true, quant: true },
+      { label: "AI Market Thesis (full)", free: false, pro: true, trader: true, quant: true },
+      { label: "Smart Signal Alerts (top 5)", free: true, pro: true, trader: true, quant: true },
+      { label: "Smart Signal Alerts (all 180+)", free: false, pro: true, trader: true, quant: true },
+      { label: "Whale leaderboard", free: true, pro: true, trader: true, quant: true },
+      { label: "Whale position history", free: false, pro: true, trader: true, quant: true },
+      { label: "Smart Money Watch", free: true, pro: true, trader: true, quant: true },
+      { label: "Market Insights stories", free: "Free only", pro: true, trader: true, quant: true },
+    ],
+  },
+  {
+    heading: "EXECUTION",
+    rows: [
+      { label: "Spread execution calculator", free: true, pro: true, trader: true, quant: true },
+      { label: "Causation analysis", free: true, pro: true, trader: true, quant: true },
+      { label: "Resolution criteria diff", free: false, pro: true, trader: true, quant: true },
+      { label: "Spread velocity indicator", free: false, pro: true, trader: true, quant: true },
+      { label: "Spread history", free: false, pro: "7d", trader: "30d", quant: "90d" },
+      { label: "Capital efficiency ranker", free: false, pro: true, trader: true, quant: true },
+      { label: "Best annualized return strip", free: false, pro: true, trader: true, quant: true },
     ],
   },
   {
     heading: "DATA",
     rows: [
-      { label: "6,500+ markets", free: true, pro: true, enterprise: true },
-      { label: "300+ disagreements", free: true, pro: true, enterprise: true },
-      { label: "200+ whale wallets", free: true, pro: true, enterprise: true },
-      { label: "News catalysts", free: true, pro: true, enterprise: true },
-      { label: "Spread history", free: false, pro: "7d", enterprise: "30d" },
-      { label: "Historical archive", free: false, pro: false, enterprise: "Full" },
+      { label: "6,500+ markets", free: true, pro: true, trader: true, quant: true },
+      { label: "300+ disagreements", free: true, pro: true, trader: true, quant: true },
+      { label: "200+ whale wallets", free: true, pro: true, trader: true, quant: true },
+      { label: "News catalysts", free: true, pro: true, trader: true, quant: true },
+      { label: "Historical archive", free: false, pro: false, trader: "90d", quant: "Full" },
+      { label: "CSV export", free: false, pro: true, trader: true, quant: true },
     ],
   },
   {
     heading: "API",
     rows: [
-      { label: "REST endpoints", free: false, pro: true, enterprise: true },
-      { label: "Rate limit / minute", free: false, pro: "20", enterprise: "60" },
-      { label: "Rate limit / day", free: false, pro: "1,000", enterprise: "5,000" },
-      { label: "Webhooks", free: false, pro: false, enterprise: "Soon" },
-      { label: "CSV export", free: false, pro: true, enterprise: true },
+      { label: "REST endpoints", free: false, pro: false, trader: false, quant: true },
+      { label: "Rate limit / minute", free: false, pro: false, trader: false, quant: "60" },
+      { label: "Rate limit / day", free: false, pro: false, trader: false, quant: "5,000" },
+      { label: "Webhooks", free: false, pro: false, trader: false, quant: "Soon" },
     ],
   },
   {
     heading: "SUPPORT",
     rows: [
-      { label: "Email support", free: true, pro: true, enterprise: true },
-      { label: "Priority support", free: false, pro: true, enterprise: true },
-      { label: "Slack channel", free: false, pro: false, enterprise: true },
-      { label: "Custom data requests", free: false, pro: false, enterprise: true },
-      { label: "Weekly Smart Money Report", free: false, pro: false, enterprise: true },
+      { label: "Email support", free: true, pro: true, trader: true, quant: true },
+      { label: "Priority support", free: false, pro: true, trader: true, quant: true },
+      { label: "Slack channel", free: false, pro: false, trader: true, quant: true },
+      { label: "Custom data requests", free: false, pro: false, trader: false, quant: true },
+      { label: "Weekly Smart Money Report", free: false, pro: false, trader: true, quant: true },
     ],
   },
 ];
@@ -79,8 +90,12 @@ const FAQS = [
     a: "Yes. Cancel from your account settings any time and you'll keep access until the end of your billing period. No questions asked.",
   },
   {
+    q: "What's the difference between Pro and Trader?",
+    a: "Pro gives you full intelligence and execution tools — ideal for active market followers. Trader adds 30-day spread history, resolution criteria diff, Slack access, and the Weekly Smart Money Report — built for professionals who execute regularly.",
+  },
+  {
     q: "What payment methods do you accept?",
-    a: "We accept all major credit cards via Stripe. Bank transfer and crypto payment available for Enterprise on request.",
+    a: "We accept all major credit cards via Stripe. Bank transfer available for Quant API on request.",
   },
   {
     q: "Do you offer a free trial?",
@@ -88,19 +103,19 @@ const FAQS = [
   },
   {
     q: "Is there a discount for annual billing?",
-    a: "Pro gets 2 months free when billed annually ($600/year). Enterprise is $5,000/year (save $1,000).",
+    a: "Yes — 2 months free when billed annually on any paid tier. Pro: $490/yr, Trader: $1,490/yr, Quant API: $2,990/yr.",
   },
   {
-    q: "What does Pro include for API access?",
-    a: "Pro includes REST API access at 20 requests/minute and 1,000 requests/day with 7 days of spread history and CSV export. Enterprise steps up to 60 req/min and 5,000/day with 30-day history and webhooks.",
+    q: "What does the Quant API tier include?",
+    a: "REST API access at 60 req/min and 5,000 req/day, 90-day spread history, full historical archive, CSV export, and webhooks (coming soon). Built for teams who want to feed Quiver data into their own systems.",
   },
   {
-    q: "What if my API usage exceeds my tier limit?",
-    a: "We'll send you a notification at 80% of your daily limit. If you go over, requests pause until the next day OR you upgrade. We never charge overage fees.",
+    q: "What if my API usage exceeds my limit?",
+    a: "We'll notify you at 80% of your daily limit. Requests pause until the next day or you upgrade — we never charge overage fees.",
   },
   {
     q: "Where does the data come from?",
-    a: "Polymarket and Kalshi public APIs. We refresh every 30 minutes via cron jobs. AI theses are generated weekly for the top 100 markets by volume. Whale data is computed from on-chain Polymarket positions.",
+    a: "Polymarket and Kalshi public APIs, refreshed every 30 minutes. AI theses are generated weekly for top-100 markets by volume. Whale data is computed from on-chain Polymarket positions.",
   },
 ];
 
@@ -127,18 +142,17 @@ export default function PricingPage() {
       price: PRICING.free.priceLabel,
       period: "/month",
       annual: null,
-      description: "Everything you need to scan the prediction market landscape",
+      description: "Scan the prediction market landscape",
       featured: false,
       features: [
-        { label: "All 6,500+ markets across Polymarket and Kalshi", included: true },
-        { label: "Cross-platform arbitrage detection (300+ opportunities)", included: true },
-        { label: "Smart Money Flow by category", included: true },
+        { label: "All 6,500+ markets (Polymarket + Kalshi)", included: true },
+        { label: "300+ cross-platform arbitrage opportunities", included: true },
         { label: "Whale leaderboard (200+ tracked wallets)", included: true },
+        { label: "Smart Money Flow by category", included: true },
         { label: "Morning Brief overnight summary", included: true },
-        { label: "News catalysts tagged to markets", included: true },
-        { label: "AI thesis bull case (free preview)", included: true },
-        { label: "Bear case, catalysts, whale read, historical context", included: false },
-        { label: "Smart Signal Alerts beyond top 5", included: false },
+        { label: "AI thesis bull case (preview)", included: true },
+        { label: "Execution calculator", included: true },
+        { label: "Full AI thesis + spread history", included: false },
         { label: "REST API access", included: false },
       ],
       cta: "Start free",
@@ -154,49 +168,68 @@ export default function PricingPage() {
       price: PRICING.pro.priceLabel,
       period: "/month",
       annual: `or ${PRICING.pro.annualLabel}`,
-      description: "Full intelligence layer plus REST API access",
+      description: "Full intelligence layer for active traders",
       featured: true,
       features: [
         { label: "Everything in Free", included: true },
-        { label: "Full AI Market Thesis (bull/bear/catalysts/whale read/historical)", included: true },
-        { label: "All Smart Signal Alerts (180+ active signals)", included: true },
-        { label: "Spread convergence history (7-day window)", included: true },
-        { label: "Smart Money Watch — unlimited portfolios", included: true },
-        { label: "Whale position history", included: true },
-        { label: "Personal calibration tracking", included: true },
-        { label: "REST API: 20 req/min, 1,000 req/day", included: true },
-        { label: "CSV export", included: true },
-        { label: "Priority support", included: true },
+        { label: "Full AI Market Thesis (all sections)", included: true },
+        { label: "All 180+ Smart Signal Alerts", included: true },
+        { label: "Spread history (7-day window)", included: true },
+        { label: "Spread velocity indicator", included: true },
+        { label: "Resolution criteria diff", included: true },
+        { label: "Capital efficiency ranker", included: true },
+        { label: "Market Insights stories (all tiers)", included: true },
+        { label: "Priority support + CSV export", included: true },
       ],
       cta: "Join the waitlist",
       ctaHref: "#waitlist",
       ctaStyle: "bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/90 font-bold",
     },
     {
-      id: "enterprise",
-      badge: "Enterprise",
+      id: "trader",
+      badge: "For Professionals",
+      badgeColor: "#f59e0b",
+      badgeBg: "#f59e0b18",
+      icon: <BarChart2 className="size-3 text-[#f59e0b]" />,
+      price: PRICING.trader.priceLabel,
+      period: "/month",
+      annual: `or ${PRICING.trader.annualLabel}`,
+      description: "For professionals who execute regularly",
+      featured: false,
+      isNew: true,
+      features: [
+        { label: "Everything in Pro", included: true },
+        { label: "30-day spread history", included: true },
+        { label: "Slack channel access", included: true },
+        { label: "Weekly Smart Money Report PDF", included: true },
+        { label: "Priority Slack support", included: true },
+        { label: "REST API access (coming soon)", included: false },
+      ],
+      cta: "Join the waitlist",
+      ctaHref: "#waitlist",
+      ctaStyle: "bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30 hover:bg-[#f59e0b]/20 font-semibold",
+    },
+    {
+      id: "quant",
+      badge: "Quant API",
       badgeColor: "#8b5cf6",
       badgeBg: "#8b5cf618",
       icon: <Building2 className="size-3 text-[#8b5cf6]" />,
-      price: PRICING.enterprise.priceLabel,
+      price: PRICING.quant.priceLabel,
       period: "/month",
-      annual: `or ${PRICING.enterprise.annualLabel}`,
-      description: "For quants, hedge funds, and institutional traders",
+      annual: `or ${PRICING.quant.annualLabel}`,
+      description: "For quants, hedge funds, and system builders",
       featured: false,
       features: [
-        { label: "Everything in Pro", included: true },
-        { label: "REST API: 60 req/min, 5,000 req/day", included: true },
-        { label: "30-day spread history", included: true },
-        { label: "Full historical archive (90+ days)", included: true },
+        { label: "Everything in Trader", included: true },
+        { label: "REST API: 60 req/min, 5,000/day", included: true },
+        { label: "90-day spread history", included: true },
+        { label: "Full historical archive", included: true },
         { label: "Webhooks (coming soon)", included: true },
-        { label: "Custom data exports on request", included: true },
-        { label: "Weekly Smart Money Report PDF", included: true },
-        { label: "Direct Slack channel with founder", included: true },
-        { label: "SLA: 99.9% uptime", included: true },
-        { label: "White-glove onboarding", included: true },
+        { label: "Custom data exports", included: true },
       ],
       cta: "Talk to Sales",
-      ctaHref: "mailto:hello@quivermarkets.com?subject=Enterprise%20Tier%20Inquiry",
+      ctaHref: "mailto:hello@quivermarkets.com?subject=Quant%20API%20Inquiry",
       ctaStyle: "bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/20",
     },
   ];
@@ -212,7 +245,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
+    <div className="max-w-6xl mx-auto px-4 py-10 space-y-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* ─── HEADER ─────────────────────────────────────────────────────── */}
@@ -222,38 +255,45 @@ export default function PricingPage() {
         </div>
         <h1 className="text-4xl font-bold tracking-tight">Pricing</h1>
         <p className="text-[#8892b0] max-w-xl mx-auto">
-          Three tiers, no hidden fees. Pro now includes REST API access.
+          Four tiers, no hidden fees. Start free, upgrade when you see the alpha.
         </p>
         <p className="text-[11px] text-[#4a5168]">
-          All prices in USD · Cancel anytime · No hidden fees
+          All prices in USD · Cancel anytime · No overage charges
         </p>
       </div>
 
-      {/* ─── PRICING CARDS — 1 col mobile, 3 desktop ─────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+      {/* ─── PRICING CARDS ────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         {tiers.map((tier) => (
           <div
             key={tier.id}
             className={`rounded-2xl bg-[#222638] border flex flex-col transition-all ${
               tier.featured
-                ? "border-[#57D7BA] ring-1 ring-[#57D7BA]/20 shadow-lg shadow-[#57D7BA]/10 sm:-mt-2 sm:-mb-2"
+                ? "border-[#57D7BA] ring-1 ring-[#57D7BA]/20 shadow-lg shadow-[#57D7BA]/10 lg:-mt-2 lg:-mb-2"
                 : "border-[#2f374f]"
             }`}
           >
             <div className="p-5 flex flex-col gap-3 flex-1">
               {/* Badge */}
-              <div
-                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full self-start text-[9px] font-bold uppercase tracking-wide"
-                style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
-              >
-                {tier.icon}
-                {tier.badge}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <div
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide"
+                  style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
+                >
+                  {tier.icon}
+                  {tier.badge}
+                </div>
+                {"isNew" in tier && tier.isNew && (
+                  <span className="text-[8px] font-bold uppercase tracking-wide text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">
+                    NEW
+                  </span>
+                )}
               </div>
 
               {/* Price */}
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-[#e2e8f0]">{tier.price}</span>
+                  <span className="text-3xl font-bold text-[#e2e8f0]">{tier.price}</span>
                   <span className="text-xs text-[#8892b0]">{tier.period}</span>
                 </div>
                 {tier.annual && (
@@ -288,13 +328,15 @@ export default function PricingPage() {
                 {tier.cta}
               </a>
 
-              {/* Pro tier — waitlist form */}
-              {tier.id === "pro" && (
-                <div id="waitlist" className="pt-3 border-t border-[#2f374f] space-y-2">
+              {/* Pro / Trader waitlist form */}
+              {(tier.id === "pro" || tier.id === "trader") && (
+                <div id={tier.id === "pro" ? "waitlist" : undefined} className="pt-3 border-t border-[#2f374f] space-y-2">
                   <p className="text-[10px] text-[#8892b0] text-center">
-                    Waitlist members get $39/mo founder pricing (35% off regular Pro).
+                    {tier.id === "pro"
+                      ? "Waitlist members get $39/mo founder pricing (20% off)."
+                      : "Waitlist members get $119/mo founder pricing (20% off)."}
                   </p>
-                  <WaitlistForm compact source="pricing-pro-tier" />
+                  <WaitlistForm compact source={`pricing-${tier.id}-tier`} />
                 </div>
               )}
             </div>
@@ -308,20 +350,21 @@ export default function PricingPage() {
         <p className="text-[#8892b0] text-sm text-center mb-6">See exactly what&apos;s included in every tier</p>
 
         <div className="overflow-x-auto rounded-2xl border border-[#2f374f]">
-          <table className="w-full text-sm min-w-[600px]">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-[#2f374f] bg-[#1a1e2e]">
-                <th className="text-left px-4 py-3 text-[#8892b0] text-xs font-semibold w-[44%]">Feature</th>
-                <th className="text-center px-3 py-3 text-[#8892b0] text-[11px] font-semibold uppercase tracking-wider w-[18%] border-l border-[#2f374f]">Free</th>
-                <th className="text-center px-3 py-3 text-[#57D7BA] text-[11px] font-semibold uppercase tracking-wider w-[18%] border-l border-[#2f374f]">Pro</th>
-                <th className="text-center px-3 py-3 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider w-[20%] border-l border-[#2f374f]">Enterprise</th>
+                <th className="text-left px-4 py-3 text-[#8892b0] text-xs font-semibold w-[36%]">Feature</th>
+                <th className="text-center px-3 py-3 text-[#8892b0] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Free</th>
+                <th className="text-center px-3 py-3 text-[#57D7BA] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Pro</th>
+                <th className="text-center px-3 py-3 text-[#f59e0b] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Trader</th>
+                <th className="text-center px-3 py-3 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Quant API</th>
               </tr>
             </thead>
             <tbody>
               {COMPARISON.map((section) => (
                 <React.Fragment key={section.heading}>
                   <tr className="bg-[#1a1e2e]/60">
-                    <td colSpan={4} className="px-4 py-2 text-[10px] font-bold tracking-widest text-[#4a5168] uppercase">
+                    <td colSpan={5} className="px-4 py-2 text-[10px] font-bold tracking-widest text-[#4a5168] uppercase">
                       {section.heading}
                     </td>
                   </tr>
@@ -333,7 +376,8 @@ export default function PricingPage() {
                       <td className="px-4 py-2.5 text-[#8892b0] text-xs">{row.label}</td>
                       <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.free} /></td>
                       <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.pro} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.enterprise} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.trader} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.quant} /></td>
                     </tr>
                   ))}
                 </React.Fragment>

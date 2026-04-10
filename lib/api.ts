@@ -1736,3 +1736,111 @@ export async function getSystemStats(): Promise<{
     return empty;
   }
 }
+
+// ─── STORIES ─────────────────────────────────────────────────────────
+
+export interface Story {
+  id: number;
+  slug: string;
+  template_id: string;
+  event_type: string;
+  headline: string;
+  summary: string;
+  body: string;
+  category: string | null;
+  quality_score: number;
+  tier: "free" | "pro" | "trader";
+  source_market_ids: string[];
+  source_whale_ids: string[];
+  metadata: Record<string, unknown> | null;
+  published_at: string;
+  expires_at: string | null;
+}
+
+export async function getStories(opts: {
+  tier?: "free" | "pro" | "trader";
+  category?: string;
+  limit?: number;
+  offset?: number;
+} = {}): Promise<Story[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    let q = supabase
+      .from("stories")
+      .select("*")
+      .order("published_at", { ascending: false })
+      .limit(opts.limit ?? 20);
+    if (opts.tier) q = q.eq("tier", opts.tier);
+    if (opts.category) q = q.eq("category", opts.category);
+    if (opts.offset) q = q.range(opts.offset, opts.offset + (opts.limit ?? 20) - 1);
+    const { data, error } = await q;
+    if (error) { console.error("[getStories] failed:", error.message); return []; }
+    return (data ?? []) as Story[];
+  } catch (err) {
+    console.error("[getStories] error:", err);
+    return [];
+  }
+}
+
+export async function getStoryBySlug(slug: string): Promise<Story | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data, error } = await supabase
+      .from("stories")
+      .select("*")
+      .eq("slug", slug)
+      .single();
+    if (error) { console.error("[getStoryBySlug] failed:", error.message); return null; }
+    return data as Story;
+  } catch (err) {
+    console.error("[getStoryBySlug] error:", err);
+    return null;
+  }
+}
+
+export async function getLatestStory(templateId?: string): Promise<Story | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    let q = supabase
+      .from("stories")
+      .select("*")
+      .order("published_at", { ascending: false })
+      .limit(1);
+    if (templateId) q = q.eq("template_id", templateId);
+    const { data, error } = await q;
+    if (error) { console.error("[getLatestStory] failed:", error.message); return null; }
+    return (data?.[0] ?? null) as Story | null;
+  } catch (err) {
+    console.error("[getLatestStory] error:", err);
+    return null;
+  }
+}
+
+// ─── WALLET LABELS ────────────────────────────────────────────────────
+
+export interface WalletLabel {
+  wallet_address: string;
+  display_name: string;
+  description: string | null;
+  verified: boolean;
+}
+
+export async function getWalletLabels(): Promise<Record<string, WalletLabel>> {
+  const cacheKey = "wallet_labels_all";
+  const cached = getCached<Record<string, WalletLabel>>(cacheKey, WHALE_CACHE_TTL);
+  if (cached) return cached;
+  if (!isSupabaseConfigured()) return {};
+  try {
+    const { data, error } = await supabase
+      .from("wallet_labels")
+      .select("wallet_address, display_name, description, verified");
+    if (error) { console.error("[getWalletLabels] failed:", error.message); return {}; }
+    const map: Record<string, WalletLabel> = {};
+    for (const row of data ?? []) map[row.wallet_address] = row as WalletLabel;
+    setCache(cacheKey, map);
+    return map;
+  } catch (err) {
+    console.error("[getWalletLabels] error:", err);
+    return {};
+  }
+}

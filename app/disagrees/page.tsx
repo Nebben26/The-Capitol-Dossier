@@ -46,7 +46,7 @@ import { InlineSparkline } from "@/components/ui/inline-sparkline";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { Sparkline } from "@/components/ui/sparkline";
-import { SpreadExecutionCalculator, calcAnnReturn } from "@/components/ui/spread-execution-calculator";
+import { SpreadExecutionCalculator, calcAnnReturn, formatAnnReturn } from "@/components/ui/spread-execution-calculator";
 import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
 import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
 import { CausationTag } from "@/components/ui/causation-tag";
@@ -81,10 +81,21 @@ function SpreadBadge({ spread }: { spread: number }) {
   );
 }
 
-function AnnReturnCell({ value }: { value: number | null }) {
+function AnnReturnCell({ value, daysLeft }: { value: number | null; daysLeft?: number }) {
+  const formatted = formatAnnReturn(value, daysLeft ?? null);
   if (value === null) return <span className="text-[10px] text-[#8892b0] font-mono">—</span>;
-  const color = value < 0 ? "#ef4444" : value < 20 ? "#8892b0" : value < 50 ? "#22c55e" : "#fbbf24";
-  return <span className="font-mono text-xs font-bold tabular-nums" style={{ color }}>{value.toFixed(1)}%</span>;
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="font-mono text-xs font-bold tabular-nums" style={{ color: formatted.color }}>
+        {formatted.text}
+      </span>
+      {formatted.isShortTerm && (
+        <span className="text-[7px] font-bold uppercase tracking-wide text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/20 px-1 py-0.5 rounded-full">
+          ST
+        </span>
+      )}
+    </span>
+  );
 }
 
 function sidesFor(d: Disagreement): { polymarketSide: "YES" | "NO"; kalshiSide: "YES" | "NO" } {
@@ -339,11 +350,18 @@ function DisagreesContent() {
     });
   }, [disagreements, category, causeFilter, searchQuery, sortBy, sortDir, annReturnMap, causationMap]);
 
-  // Top opportunities strip (Part 6)
+  // Top opportunities strip (Part 6) — exclude shorts (≤3d) and tiny positions
   const topOpportunities = useMemo(() => {
     return [...disagreements]
       .map((d) => ({ d, annReturn: annReturnMap.get(d.id) ?? null }))
-      .filter(({ annReturn }) => annReturn !== null && annReturn > 0)
+      .filter(({ d, annReturn }) => {
+        if (annReturn === null || annReturn <= 0) return false;
+        if (d.daysLeft > 0 && d.daysLeft <= 3) return false; // exclude short-term
+        // Rough min position check: need enough volume for $500+
+        const minVol = Math.min(parseVol(d.polyVol), parseVol(d.kalshiVol));
+        if (minVol < 500) return false;
+        return true;
+      })
       .sort((a, b) => (b.annReturn ?? 0) - (a.annReturn ?? 0))
       .slice(0, 3);
   }, [disagreements, annReturnMap]);
@@ -401,9 +419,14 @@ function DisagreesContent() {
                       </div>
                       <div className="text-right">
                         <div className="text-[9px] text-[#8892b0] uppercase tracking-wide">Ann. Return</div>
-                        <div className="font-mono font-bold text-2xl tabular-nums text-[#fbbf24]">
-                          {annReturn!.toFixed(1)}%
-                        </div>
+                        {(() => {
+                          const fmt = formatAnnReturn(annReturn, d.daysLeft > 0 ? d.daysLeft : null);
+                          return (
+                            <div className="font-mono font-bold text-2xl tabular-nums" style={{ color: fmt.color }}>
+                              {fmt.text}
+                            </div>
+                          );
+                        })()}
                       </div>
                       <div className="text-right">
                         <div className="text-[9px] text-[#8892b0] uppercase tracking-wide">Resolves</div>
@@ -718,7 +741,7 @@ function DisagreesContent() {
                           <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{d.daysLeft > 0 ? `${d.daysLeft}d` : "—"}</span>
                         </TableCell>
                         <TableCell className="py-2.5 hidden xl:table-cell">
-                          <AnnReturnCell value={annReturn} />
+                          <AnnReturnCell value={annReturn} daysLeft={d.daysLeft > 0 ? d.daysLeft : undefined} />
                         </TableCell>
                         <TableCell className="pr-4 py-2.5 text-right">
                           <button

@@ -21,6 +21,7 @@ import {
   Server,
   FileText,
   BookOpen,
+  Sparkles,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -29,6 +30,7 @@ const navItems = [
   { label: "Screener", icon: Target, href: "/screener" },
   { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
   { label: "Insights", icon: Newspaper, href: "/insights" },
+  { label: "Stories", icon: Sparkles, href: "/stories" },
   { label: "Flow", icon: DollarSign, href: "/flow" },
   { label: "Whales", icon: Users, href: "/whales" },
   { label: "Smart Money", icon: Copy, href: "/copy" },

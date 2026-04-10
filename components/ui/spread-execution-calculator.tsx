@@ -61,6 +61,19 @@ function annColor(v: number | null) {
   return "#fbbf24";
 }
 
+/** Format annualized return with cap and short-term awareness. */
+export function formatAnnReturn(
+  ann: number | null,
+  daysToResolution: number | null,
+): { text: string; color: string; isShortTerm: boolean; isCapped: boolean } {
+  if (ann === null) return { text: "N/A", color: "#4a5168", isShortTerm: false, isCapped: false };
+  const isShortTerm = daysToResolution !== null && daysToResolution <= 3;
+  const isCapped = ann > 999;
+  const text = isCapped ? "999%+" : fmtPct(ann);
+  const color = annColor(ann);
+  return { text, color, isShortTerm, isCapped };
+}
+
 // ─── Component ────────────────────────────────────────────────────────────
 export interface SpreadExecutionCalculatorProps {
   polymarketPrice: number;    // cents
@@ -221,26 +234,36 @@ export function SpreadExecutionCalculator({
                 )}
 
                 {/* Annualized return */}
-                <div className="p-3 rounded-lg bg-[#222638] border border-[#2f374f] flex items-center justify-between">
-                  <div>
-                    <div className="text-[9px] text-[#8892b0] mb-0.5 flex items-center gap-1">
-                      <TrendingUp className="size-3" /> Annualized Return
-                    </div>
-                    {result.annReturn === null ? (
-                      <div className="text-[11px] text-[#8892b0] italic">Annualized return unavailable (resolution date unknown)</div>
-                    ) : (
-                      <div className="font-mono font-bold text-lg tabular-nums" style={{ color: annColor(result.annReturn) }}>
-                        {fmtPct(result.annReturn)}
+                {(() => {
+                  const formatted = formatAnnReturn(result.annReturn, daysToResolution);
+                  return (
+                    <div className="p-3 rounded-lg bg-[#222638] border border-[#2f374f] flex items-center justify-between">
+                      <div>
+                        <div className="text-[9px] text-[#8892b0] mb-0.5 flex items-center gap-1">
+                          <TrendingUp className="size-3" /> Annualized Return
+                          {formatted.isShortTerm && (
+                            <span className="ml-1 text-[8px] font-bold uppercase tracking-wide text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/20 px-1 py-0.5 rounded-full">
+                              SHORT-TERM
+                            </span>
+                          )}
+                        </div>
+                        {result.annReturn === null ? (
+                          <div className="text-[11px] text-[#8892b0] italic">Annualized return unavailable (resolution date unknown)</div>
+                        ) : (
+                          <div className="font-mono font-bold text-lg tabular-nums" style={{ color: formatted.color }}>
+                            {formatted.text}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  {daysToResolution && (
-                    <div className="text-right">
-                      <div className="text-[9px] text-[#8892b0]">Days to resolution</div>
-                      <div className="font-mono font-bold text-[#e2e8f0] tabular-nums">{daysToResolution}d</div>
+                      {daysToResolution && (
+                        <div className="text-right">
+                          <div className="text-[9px] text-[#8892b0]">Days to resolution</div>
+                          <div className="font-mono font-bold text-[#e2e8f0] tabular-nums">{daysToResolution}d</div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
               </div>
             ) : null}
           </>

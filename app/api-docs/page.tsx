@@ -348,8 +348,8 @@ export default function ApiDocsPage() {
             featured: true,
           },
           {
-            tier: PRICING.enterprise.name,
-            price: PRICING.enterprise.priceLabel,
+            tier: PRICING.quant.name,
+            price: PRICING.quant.priceLabel,
             sub: "per month",
             color: "#8b5cf6",
             limits: ["60 req/min", "5,000 req/day"],
