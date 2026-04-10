@@ -106,10 +106,21 @@ function ScreenerCard({ m, spread, insight }: { m: Market; spread: number | null
           </div>
           <p className="text-xs font-semibold leading-snug group-hover:text-[#57D7BA] transition-colors line-clamp-2 mb-2 flex-1">{m.question}</p>
           {insight && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#57D7BA] bg-[#57D7BA]/10 mb-2 max-w-full truncate">
-              <InsightIcon type={insight.type} />
-              <span className="truncate">{insight.label}</span>
-            </span>
+            insight.type === "disagreement" ? (
+              <Link
+                href={`/disagrees?highlight=${m.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#f59e0b] bg-[#f59e0b]/10 mb-2 max-w-full truncate hover:bg-[#f59e0b]/20 transition-colors"
+              >
+                <InsightIcon type={insight.type} />
+                <span className="truncate">{insight.label}</span>
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] text-[#57D7BA] bg-[#57D7BA]/10 mb-2 max-w-full truncate">
+                <InsightIcon type={insight.type} />
+                <span className="truncate">{insight.label}</span>
+              </span>
+            )
           )}
           <div className="h-8 w-full mb-2">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>

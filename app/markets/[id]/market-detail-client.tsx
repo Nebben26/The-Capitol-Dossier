@@ -67,6 +67,7 @@ import {
 import { useMarketDetail } from "@/hooks/useData";
 import { supabase } from "@/lib/supabase";
 import { Sparkline } from "@/components/ui/sparkline";
+import { SpreadExecutionCalculator } from "@/components/ui/spread-execution-calculator";
 import { getSpreadHistory, getMarketThesis, getMarketCandles, type MarketThesis, type Candle } from "@/lib/api";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { formatSignedPct, formatCents } from "@/lib/format";
@@ -836,6 +837,17 @@ export default function MarketDetailPage() {
                 )}
               </CardContent>
             </Card>
+            {/* Spread Execution Calculator */}
+            {!dataLoading && marketDisagreement && (
+              <SpreadExecutionCalculator
+                polymarketPrice={Math.round(marketDisagreement.poly_price ?? marketDisagreement.polyPrice ?? 50)}
+                kalshiPrice={Math.round(marketDisagreement.kalshi_price ?? marketDisagreement.kalshiPrice ?? 50)}
+                spread={Math.round(marketDisagreement.spread ?? 0)}
+                daysToResolution={market.daysLeft > 0 ? market.daysLeft : null}
+                polymarketSide={marketDisagreement.direction === "poly-higher" ? "NO" : "YES"}
+                kalshiSide={marketDisagreement.direction === "poly-higher" ? "YES" : "NO"}
+              />
+            )}
           </TabsContent>
 
           {/* ─── ORDERBOOK TAB ─────────────────────────────────────── */}
