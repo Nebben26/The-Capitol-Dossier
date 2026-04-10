@@ -6,6 +6,18 @@ import { ArrowLeft } from "lucide-react";
 
 const ENTRIES = [
   {
+    version: "v0.37",
+    date: "April 9, 2026",
+    description:
+      "Historical Spread Charts + Velocity Indicator: lightweight-charts spread history (24H/3D/7D windows) on all arbitrage opportunities, real-time velocity signal (widening/narrowing/stable with confidence rating), velocity column in table view, spread-history API endpoint for Pro+ subscribers.",
+  },
+  {
+    version: "v0.36",
+    date: "April 9, 2026",
+    description:
+      "Spread Execution Planner + Capital Efficiency Ranker: interactive capital slider with 4 fee regimes, gross/net profit, annualized return after fees, Execute panel on all disagree rows/cards, Best Capital Efficiency strip (top-3 by annualized return), annualized return sort column.",
+  },
+  {
     version: "v0.35",
     date: "April 8, 2026",
     description:

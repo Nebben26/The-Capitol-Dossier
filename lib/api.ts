@@ -553,6 +553,93 @@ async function _getSpreadHistoryPair(polyId: string, kalshiId: string): Promise<
   }
 }
 
+// ─── SPREAD SNAPSHOTS (Session 39) ───────────────────────────────────────
+
+export interface SpreadSnapshot {
+  market_id: string;
+  polymarket_price: number;
+  kalshi_price: number;
+  spread: number;
+  polymarket_volume: number | null;
+  kalshi_volume: number | null;
+  direction: "poly-higher" | "kalshi-higher";
+  captured_at: string;
+}
+
+export async function getSpreadSnapshots(marketId: string, hours = 168): Promise<SpreadSnapshot[]> {
+  if (!isSupabaseConfigured()) return [];
+  const since = new Date(Date.now() - hours * 3600 * 1000).toISOString();
+  try {
+    // Primary: spread_snapshots (populated after Session 39 migration is applied)
+    const { data, error } = await supabase
+      .from("spread_snapshots")
+      .select("*")
+      .eq("market_id", marketId)
+      .gte("captured_at", since)
+      .order("captured_at", { ascending: true });
+
+    if (!error && data && data.length > 0) {
+      return data as SpreadSnapshot[];
+    }
+
+    // Fallback: disagreement_snapshots (existing table with same underlying data)
+    const { data: fallback, error: fbErr } = await supabase
+      .from("disagreement_snapshots")
+      .select("poly_market_id, poly_price, kalshi_price, spread, poly_volume, kalshi_volume, captured_at")
+      .eq("poly_market_id", marketId)
+      .gte("captured_at", since)
+      .order("captured_at", { ascending: true });
+
+    if (fbErr || !fallback) return [];
+
+    return fallback.map((row: any) => ({
+      market_id: row.poly_market_id,
+      polymarket_price: Math.round(Number(row.poly_price ?? 0)),
+      kalshi_price: Math.round(Number(row.kalshi_price ?? 0)),
+      spread: Math.round(Number(row.spread ?? 0)),
+      polymarket_volume: row.poly_volume ?? null,
+      kalshi_volume: row.kalshi_volume ?? null,
+      direction: (Number(row.poly_price) >= Number(row.kalshi_price) ? "poly-higher" : "kalshi-higher") as "poly-higher" | "kalshi-higher",
+      captured_at: row.captured_at,
+    }));
+  } catch (err) {
+    console.error("[getSpreadSnapshots] failed:", err);
+    return [];
+  }
+}
+
+export interface SpreadVelocity {
+  direction: "widening" | "narrowing" | "stable";
+  changeInCents: number;
+  changeOverHours: number;
+  confidence: "high" | "low";
+}
+
+export function calculateSpreadVelocity(snapshots: SpreadSnapshot[], hoursWindow = 4): SpreadVelocity | null {
+  if (snapshots.length < 2) return null;
+  const now = Date.now();
+  const cutoff = now - hoursWindow * 3600 * 1000;
+  const windowSnapshots = snapshots.filter((s) => new Date(s.captured_at).getTime() >= cutoff);
+  if (windowSnapshots.length < 2) return null;
+  const oldest = windowSnapshots[0];
+  const newest = windowSnapshots[windowSnapshots.length - 1];
+  const changeInCents = newest.spread - oldest.spread;
+  const actualHours = (new Date(newest.captured_at).getTime() - new Date(oldest.captured_at).getTime()) / 3_600_000;
+  const absChange = Math.abs(changeInCents);
+  let direction: "widening" | "narrowing" | "stable";
+  if (absChange < 1) direction = "stable";
+  else if (changeInCents > 0) direction = "widening";
+  else direction = "narrowing";
+  return {
+    direction,
+    changeInCents,
+    changeOverHours: Math.round(actualHours * 10) / 10,
+    confidence: windowSnapshots.length >= 3 ? "high" : "low",
+  };
+}
+
+// ─── END SPREAD SNAPSHOTS ─────────────────────────────────────────────────
+
 /**
  * Fetch recent whale trades from Supabase.
  */

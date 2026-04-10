@@ -751,6 +751,27 @@ async function snapshotDisagreements() {
   const { error } = await supabase.from("disagreement_snapshots").insert(snapshots);
   if (error) console.error("  Snapshot insert error:", error.message);
   else console.log(`  Inserted ${snapshots.length} disagreement snapshots`);
+
+  // Also write to spread_snapshots (Session 39) — structured table for
+  // historical convergence charts and velocity indicators.
+  const spreadSnapshots = disagreements.map((d: any) => ({
+    market_id: d.poly_market_id,
+    polymarket_price: Math.round(Number(d.poly_price)),
+    kalshi_price: Math.round(Number(d.kalshi_price)),
+    spread: Math.round(Number(d.spread)),
+    polymarket_volume: null,
+    kalshi_volume: null,
+    direction: d.direction || (Number(d.poly_price) > Number(d.kalshi_price) ? "poly-higher" : "kalshi-higher"),
+  }));
+  const { error: ssError } = await supabase.from("spread_snapshots").insert(spreadSnapshots);
+  if (ssError) {
+    // Graceful degradation — table may not exist yet until migration is applied
+    if (!ssError.message.includes("does not exist")) {
+      console.error("  spread_snapshots insert error:", ssError.message);
+    }
+  } else {
+    console.log(`  Inserted ${spreadSnapshots.length} spread snapshots`);
+  }
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────────

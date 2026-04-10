@@ -47,6 +47,8 @@ import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { Sparkline } from "@/components/ui/sparkline";
 import { SpreadExecutionCalculator, calcAnnReturn } from "@/components/ui/spread-execution-calculator";
+import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
+import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
 import type { Disagreement } from "@/lib/mockData";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
@@ -146,12 +148,16 @@ function DisagreeCard({
             </div>
           </div>
           {/* Implied trade line */}
-          <div className="flex items-center gap-1 mb-2.5 text-[10px] text-[#8892b0] italic">
+          <div className="flex items-center gap-1 mb-1.5 text-[10px] text-[#8892b0] italic">
             <Target className="size-3 shrink-0 text-[#8892b0]" />
             {d.direction === "poly-higher"
               ? `Buy Kalshi YES at ${d.kalshiPrice}¢, sell Polymarket YES at ${d.polyPrice}¢ → ${d.spread}pt arb`
               : `Buy Polymarket YES at ${d.polyPrice}¢, sell Kalshi YES at ${d.kalshiPrice}¢ → ${d.spread}pt arb`
             }
+          </div>
+          {/* Velocity indicator */}
+          <div className="mb-2.5">
+            <SpreadVelocityIndicator marketId={d.marketId} compact={false} />
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
@@ -187,12 +193,15 @@ function DisagreeCard({
           </div>
         </CardContent>
       </Card>
-      {/* Expandable calculator */}
+      {/* Expandable chart + calculator */}
       <div
         className="overflow-hidden transition-all duration-300"
-        style={{ maxHeight: expanded ? "600px" : "0px", opacity: expanded ? 1 : 0 }}
+        style={{ maxHeight: expanded ? "900px" : "0px", opacity: expanded ? 1 : 0 }}
       >
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
+          <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+            <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
+          </div>
           <SpreadExecutionCalculator
             polymarketPrice={d.polyPrice}
             kalshiPrice={d.kalshiPrice}
@@ -497,6 +506,9 @@ function DisagreesContent() {
                   >
                     <span className="flex items-center gap-0.5">SPREAD <SortIcon col="spread" /></span>
                   </TableHead>
+                  <TableHead className="text-[10px] text-[#8892b0] font-medium hidden md:table-cell">
+                    VELOCITY
+                  </TableHead>
                   <TableHead
                     className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden md:table-cell"
                     onClick={() => handleSort("polyVol")}
@@ -544,7 +556,7 @@ function DisagreesContent() {
                   const annReturn = annReturnMap.get(d.id) ?? null;
                   const isExpanded = expandedId === d.id;
                   const isProfit = annReturn !== null && annReturn > 0;
-                  const colSpan = 11;
+                  const colSpan = 12;
 
                   return (
                     <React.Fragment key={d.id}>
@@ -581,6 +593,9 @@ function DisagreesContent() {
                         </TableCell>
                         <TableCell className="py-2.5">
                           <SpreadBadge spread={d.spread} />
+                        </TableCell>
+                        <TableCell className="py-2.5 hidden md:table-cell">
+                          <SpreadVelocityIndicator marketId={d.marketId} compact={true} />
                         </TableCell>
                         <TableCell className="py-2.5 hidden md:table-cell">
                           <div className="text-[10px] text-[#8892b0] font-mono tabular-nums">
@@ -629,14 +644,19 @@ function DisagreesContent() {
                       {isExpanded && (
                         <TableRow className="border-[#57D7BA]/20 bg-[#57D7BA]/5">
                           <TableCell colSpan={colSpan} className="p-4">
-                            <SpreadExecutionCalculator
-                              polymarketPrice={d.polyPrice}
-                              kalshiPrice={d.kalshiPrice}
-                              spread={d.spread}
-                              daysToResolution={daysToRes}
-                              polymarketSide={polymarketSide}
-                              kalshiSide={kalshiSide}
-                            />
+                            <div className="space-y-3">
+                              <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+                                <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
+                              </div>
+                              <SpreadExecutionCalculator
+                                polymarketPrice={d.polyPrice}
+                                kalshiPrice={d.kalshiPrice}
+                                spread={d.spread}
+                                daysToResolution={daysToRes}
+                                polymarketSide={polymarketSide}
+                                kalshiSide={kalshiSide}
+                              />
+                            </div>
                           </TableCell>
                         </TableRow>
                       )}

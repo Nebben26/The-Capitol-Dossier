@@ -68,6 +68,8 @@ import { useMarketDetail } from "@/hooks/useData";
 import { supabase } from "@/lib/supabase";
 import { Sparkline } from "@/components/ui/sparkline";
 import { SpreadExecutionCalculator } from "@/components/ui/spread-execution-calculator";
+import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
+import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
 import { getSpreadHistory, getMarketThesis, getMarketCandles, type MarketThesis, type Candle } from "@/lib/api";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { formatSignedPct, formatCents } from "@/lib/format";
@@ -815,8 +817,8 @@ export default function MarketDetailPage() {
                         </div>
                       ))}
                     </div>
-                    {/* Direction + trend */}
-                    <div className="flex items-center gap-3 text-xs text-[#8892b0]">
+                    {/* Direction + trend + velocity */}
+                    <div className="flex items-center gap-3 text-xs text-[#8892b0] flex-wrap">
                       <span className={`font-semibold ${marketDisagreement.direction === "poly-higher" ? "text-[#6366f1]" : "text-[#22c55e]"}`}>
                         {marketDisagreement.direction === "poly-higher" ? "Poly prices higher" : "Kalshi prices higher"}
                       </span>
@@ -825,6 +827,7 @@ export default function MarketDetailPage() {
                           {marketDisagreement.spread_trend === "converging" ? "Converging" : "Diverging"}
                         </span>
                       )}
+                      <SpreadVelocityIndicator marketId={id} compact={false} />
                     </div>
                     {/* Sparkline */}
                     {spreadHistory.length >= 2 && (
@@ -837,16 +840,21 @@ export default function MarketDetailPage() {
                 )}
               </CardContent>
             </Card>
-            {/* Spread Execution Calculator */}
+            {/* Spread History Chart + Execution Calculator */}
             {!dataLoading && marketDisagreement && (
-              <SpreadExecutionCalculator
-                polymarketPrice={Math.round(marketDisagreement.poly_price ?? marketDisagreement.polyPrice ?? 50)}
-                kalshiPrice={Math.round(marketDisagreement.kalshi_price ?? marketDisagreement.kalshiPrice ?? 50)}
-                spread={Math.round(marketDisagreement.spread ?? 0)}
-                daysToResolution={market.daysLeft > 0 ? market.daysLeft : null}
-                polymarketSide={marketDisagreement.direction === "poly-higher" ? "NO" : "YES"}
-                kalshiSide={marketDisagreement.direction === "poly-higher" ? "YES" : "NO"}
-              />
+              <div className="space-y-3">
+                <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+                  <SpreadHistoryChart marketId={id} question={market.question} heightPx={240} />
+                </div>
+                <SpreadExecutionCalculator
+                  polymarketPrice={Math.round(marketDisagreement.poly_price ?? marketDisagreement.polyPrice ?? 50)}
+                  kalshiPrice={Math.round(marketDisagreement.kalshi_price ?? marketDisagreement.kalshiPrice ?? 50)}
+                  spread={Math.round(marketDisagreement.spread ?? 0)}
+                  daysToResolution={market.daysLeft > 0 ? market.daysLeft : null}
+                  polymarketSide={marketDisagreement.direction === "poly-higher" ? "NO" : "YES"}
+                  kalshiSide={marketDisagreement.direction === "poly-higher" ? "YES" : "NO"}
+                />
+              </div>
             )}
           </TabsContent>
 
