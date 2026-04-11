@@ -58,7 +58,7 @@ import { LastUpdated } from "@/components/layout/LastUpdated";
 import { HomepageSkeleton } from "@/components/ui/skeleton-loaders";
 import { MorningBriefCard } from "@/components/ui/morning-brief";
 import { FirstVisitHero } from "@/components/ui/first-visit-hero";
-import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
+import { formatSignedPct, formatPct, formatCents, formatSignedPt, formatPt } from "@/lib/format";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
 import { SearchBox } from "@/components/ui/search-box";
 import { SinceLastVisit } from "@/components/ui/since-last-visit";
@@ -96,7 +96,7 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
           </text>
           {width > 80 && height > 40 && (
             <text x={x + width / 2} y={y + height / 2 + (width > 100 && height > 55 ? 8 : 12)} textAnchor="middle" fill="#ffffff" fontSize={12} fontWeight={700} opacity={0.95}>
-              {formatSignedPct(change)}
+              {formatSignedPt(change)}
             </text>
           )}
           {width > 110 && height > 60 && (
@@ -700,7 +700,7 @@ export default function HomePage() {
                       <TableCell className="py-2.5 whitespace-nowrap">
                         <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${(m.change + (priceOffsets[m.id] || 0)) >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
                           {(m.change + (priceOffsets[m.id] || 0)) >= 0 ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-                          {formatPct(Math.abs(m.change + (priceOffsets[m.id] || 0)))}
+                          {formatPt(Math.abs(m.change + (priceOffsets[m.id] || 0)))}
                         </span>
                       </TableCell>
                       <TableCell className="pr-4 py-2.5 hidden md:table-cell">
@@ -807,7 +807,7 @@ export default function HomePage() {
                     <div className="w-1.5 h-8 rounded-full shrink-0" style={{ backgroundColor: t.change >= 0 ? "#22c55e" : "#ef4444" }} />
                     <span className="flex-1 text-xs text-[#e2e8f0] truncate">{t.name}</span>
                     <span className={`font-mono text-xs font-bold tabular-nums whitespace-nowrap ${t.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                      {formatSignedPct(t.change)}
+                      {formatSignedPt(t.change)}
                     </span>
                   </div>
                 ))}

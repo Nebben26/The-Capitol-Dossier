@@ -478,9 +478,11 @@ export default function LeaderboardPage() {
                             <span className={`font-mono text-sm font-bold ${t.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
                               {t.totalPnl}
                             </span>
-                            <span className={`block text-[9px] font-mono ${t.change24h >= 0 ? "text-[#22c55e]/60" : "text-[#ef4444]/60"}`}>
-                              {t.change24h >= 0 ? "+" : ""}{t.change24h}% 24h
-                            </span>
+                            {t.change24h !== 0 && (
+                              <span className={`block text-[9px] font-mono ${t.change24h >= 0 ? "text-[#22c55e]/60" : "text-[#ef4444]/60"}`}>
+                                {t.change24h >= 0 ? "+" : ""}{t.change24h}pt 24h
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="py-3 hidden xl:table-cell">

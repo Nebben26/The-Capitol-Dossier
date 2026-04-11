@@ -131,13 +131,15 @@ function dbWhaleToFrontend(row: any, idx: number): Whale {
     bestCategory: bestCat,
     bestCatColor: CATEGORY_COLORS[bestCat] || "#57D7BA",
     worstCategory: "Sports",
-    streak: pnlNum > 1_000_000 ? Math.floor(Math.random() * 10) + 5 : Math.floor(Math.random() * 5),
+    // streak and change24h cannot be computed without resolved-position history.
+    // Hardcoded to 0 so UI guards (streak >= 5, change24h !== 0) suppress display.
+    streak: 0,
     bio: `Polymarket trader ranked #${rank} by P&L.${row.positions_count > 0 ? ` ${row.positions_count} active positions.` : ""}`,
     verified: rank <= 10,
     smart: pnlNum > 500_000,
     brier: Math.round(realBrier * 100) / 100,
     activeMarkets: (row.markets_traded > 1 ? row.markets_traded : null) || row.positions_count || 0,
-    change24h: Math.round((Math.random() - 0.3) * 6 * 10) / 10,
+    change24h: 0, // No prior snapshot available; displayed as "—" in UI
     spark: sparkGen(Math.max(5, pnlNum / 50000), pnlNum > 0 ? 3 : -1),
     calibration: calibGen(),
     topMarkets: [],

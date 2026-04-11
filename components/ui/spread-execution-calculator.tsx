@@ -34,8 +34,12 @@ function computeArb(
   if (nContracts === 0) return { tooSmall: true } as const;
 
   const grossProfit = nContracts * (spread / 100);
-  // Fees split evenly across both legs (expected-value approach)
-  const totalFees   = grossProfit * (regime.polyRate + regime.kalshiRate) / 2;
+  // Polymarket and Kalshi charge fees on the settlement payout ($1 per contract),
+  // NOT on the gross profit. One side wins and pays fee_rate × $1 × nContracts.
+  // Expected cost (averaged over both outcome scenarios) = (polyRate + kalshiRate)/2 × nContracts.
+  // Previous formula `grossProfit * rates` was wrong — it underestimated fees by
+  // 100/spread (e.g. ×20 for a 5pt spread), making trades look far more profitable.
+  const totalFees   = nContracts * (regime.polyRate + regime.kalshiRate) / 2;
   const netProfit   = grossProfit - totalFees;
   const annReturn   = (daysToResolution && daysToResolution > 0)
     ? (netProfit / capital) * (365 / daysToResolution) * 100

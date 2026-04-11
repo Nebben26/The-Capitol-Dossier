@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { clampPercent } from "@/lib/clamp";
 
 export interface MarketPulse {
   score: number; // 0–100
@@ -103,9 +104,8 @@ export async function computeMarketPulse(): Promise<MarketPulse> {
     spreadScore === 50 && volumeScore === 50 && whaleScore === 50 && movementScore === 50;
 
   // Weighted average: spread 30%, volume 25%, whale 20%, movement 25%
-  const score = allDefault
-    ? -1 // signal "unknown"
-    : Math.round(spreadScore * 0.3 + volumeScore * 0.25 + whaleScore * 0.2 + movementScore * 0.25);
+  const rawScore = spreadScore * 0.3 + volumeScore * 0.25 + whaleScore * 0.2 + movementScore * 0.25;
+  const score = allDefault ? -1 : clampPercent(Math.round(rawScore));
 
   let label: MarketPulse["label"] = "neutral";
   if (score >= 0) {

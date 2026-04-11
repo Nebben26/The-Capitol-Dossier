@@ -17,7 +17,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { getMorningBrief, type MorningBrief } from "@/lib/api";
-import { formatSignedPct, formatUsd as fmtUsdLib } from "@/lib/format";
+import { formatSignedPct, formatSignedPt, formatUsd as fmtUsdLib } from "@/lib/format";
 
 function fmtUsd(n: number): string { return fmtUsdLib(n); }
 
@@ -177,7 +177,7 @@ export function MorningBriefCard() {
                 <Chip
                   icon={brief.biggestMover.change24h >= 0 ? TrendingUp : TrendingDown}
                   label="Biggest Mover"
-                  value={formatSignedPct(brief.biggestMover.change24h)}
+                  value={formatSignedPt(brief.biggestMover.change24h)}
                   color={brief.biggestMover.change24h >= 0 ? "#22c55e" : "#ef4444"}
                   href={`/markets/${brief.biggestMover.id}`}
                 />

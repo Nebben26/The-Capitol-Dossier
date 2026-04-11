@@ -8,6 +8,7 @@
 // in spread-execution-calculator.tsx for the honest user-facing display).
 
 import { calcAnnReturn } from "@/components/ui/spread-execution-calculator";
+import { clamp } from "@/lib/clamp";
 
 export interface OpportunityScore {
   score: number;         // 0–100
@@ -68,7 +69,7 @@ export function scoreOpportunity(d: {
   else if (d.spreadTrend === "converging") trendScore = 2;
   else if (d.spreadTrend === "stable") trendScore = 5;
 
-  const score = spreadScore + returnScore + volumeScore + timeScore + trendScore;
+  const score = clamp(spreadScore + returnScore + volumeScore + timeScore + trendScore, 0, 100);
 
   let verdict: OpportunityScore["verdict"];
   if (score >= 75) verdict = "elite";
