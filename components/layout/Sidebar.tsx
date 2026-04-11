@@ -74,6 +74,7 @@ const navGroups = [
       { label: "Status", icon: Server, href: "/status" },
       { label: "Changelog", icon: FileText, href: "/changelog" },
       { label: "Blog", icon: BookOpen, href: "/blog" },
+      { label: "Methodology", icon: BookOpen, href: "/methodology" },
       { label: "About", icon: Info, href: "/about" },
     ],
   },

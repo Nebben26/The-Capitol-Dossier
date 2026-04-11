@@ -1,6 +1,11 @@
 // ─── Opportunity Score ────────────────────────────────────────────────────────
 // Scores a cross-platform disagreement on a 0–100 scale based on:
-//   spread size, annualized return, volume, days to resolution, trend direction
+//   spread size, relative return (internal), volume, days to resolution, trend direction
+//
+// NOTE: calcAnnReturn is used here ONLY as a relative ranking signal — a higher
+// annualized return means the spread is larger relative to the time remaining,
+// which is a valid relative measure. It is NOT displayed to users (see formatReturn
+// in spread-execution-calculator.tsx for the honest user-facing display).
 
 import { calcAnnReturn } from "@/components/ui/spread-execution-calculator";
 

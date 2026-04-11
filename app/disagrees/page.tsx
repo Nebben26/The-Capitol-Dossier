@@ -48,7 +48,7 @@ import { InlineSparkline } from "@/components/ui/inline-sparkline";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
 import { Sparkline } from "@/components/ui/sparkline";
-import { SpreadExecutionCalculator, calcAnnReturn, formatAnnReturn } from "@/components/ui/spread-execution-calculator";
+import { SpreadExecutionCalculator, calcAnnReturn, formatReturn } from "@/components/ui/spread-execution-calculator";
 import { SpreadHistoryChart } from "@/components/ui/spread-history-chart";
 import { SpreadVelocityIndicator } from "@/components/ui/spread-velocity-indicator";
 import { CausationTag } from "@/components/ui/causation-tag";
@@ -66,7 +66,7 @@ import { Sparkles } from "lucide-react";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
-type SortKey = "opportunity" | "spread" | "polyVol" | "daysLeft" | "annReturn";
+type SortKey = "opportunity" | "spread" | "polyVol" | "daysLeft" | "rawReturn";
 type SortDir = "asc" | "desc";
 type ViewMode = "grid" | "table";
 type CauseFilter = "all" | "information_lag" | "liquidity_gap" | "resolution_mismatch" | "structural";
@@ -89,19 +89,15 @@ function SpreadBadge({ spread }: { spread: number }) {
   );
 }
 
-function AnnReturnCell({ value, daysLeft }: { value: number | null; daysLeft?: number }) {
-  const formatted = formatAnnReturn(value, daysLeft ?? null);
-  if (value === null) return <span className="text-[10px] text-[#8892b0] font-mono">—</span>;
+function ReturnCell({ spread, daysLeft }: { spread: number; daysLeft?: number }) {
+  const r = formatReturn(spread, daysLeft ?? null);
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className="font-mono text-xs font-bold tabular-nums" style={{ color: formatted.color }}>
-        {formatted.text}
-      </span>
-      {formatted.isShortTerm && (
-        <span className="text-[7px] font-bold uppercase tracking-wide text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/20 px-1 py-0.5 rounded-full">
-          ST
-        </span>
-      )}
+    <span
+      className="font-mono text-xs font-bold tabular-nums"
+      style={{ color: r.color }}
+      title={r.tooltip}
+    >
+      {r.text}
     </span>
   );
 }
@@ -127,8 +123,7 @@ function DisagreeCard({
 }) {
   const { polymarketSide, kalshiSide } = sidesFor(d);
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
-  const annReturn = calcAnnReturn(d.polyPrice, d.kalshiPrice, d.spread, daysToRes);
-  const isProfit = annReturn !== null && annReturn > 0;
+  const isProfit = d.spread > 0;
   const urgencyBorderColor = d.spread > 30 ? "#f85149" : d.spread > 15 ? "#d29922" : "#57D7BA";
 
   return (
@@ -335,10 +330,12 @@ function DisagreesContent() {
     else { setSortBy(key); setSortDir("desc"); }
   };
 
-  // Pre-compute annualized returns for each disagreement
-  const annReturnMap = useMemo(() => {
+  // Pre-compute annualized returns for each disagreement (internal ranking only — not displayed directly)
+  const rawReturnMap = useMemo(() => {
     const map = new Map<string, number | null>();
     for (const d of disagreements) {
+      // Use annReturn internally for ranking (higher ann = relatively better opportunity)
+      // but we display raw % to users via formatReturn()
       map.set(d.id, calcAnnReturn(d.polyPrice, d.kalshiPrice, d.spread, d.daysLeft > 0 ? d.daysLeft : null));
     }
     return map;
@@ -397,30 +394,27 @@ function DisagreesContent() {
       if (sortBy === "opportunity")    { av = a.opportunityScore ?? 0; bv = b.opportunityScore ?? 0; }
       else if (sortBy === "spread")    { av = a.spread; bv = b.spread; }
       else if (sortBy === "polyVol")   { av = parseVol(a.polyVol); bv = parseVol(b.polyVol); }
-      else if (sortBy === "annReturn") {
-        av = annReturnMap.get(a.id) ?? -Infinity;
-        bv = annReturnMap.get(b.id) ?? -Infinity;
+      else if (sortBy === "rawReturn") {
+        av = rawReturnMap.get(a.id) ?? -Infinity;
+        bv = rawReturnMap.get(b.id) ?? -Infinity;
       }
       else { av = a.daysLeft; bv = b.daysLeft; }
       return sortDir === "desc" ? bv - av : av - bv;
     });
-  }, [disagreements, category, causeFilter, searchQuery, sortBy, sortDir, annReturnMap, causationMap]);
+  }, [disagreements, category, causeFilter, searchQuery, sortBy, sortDir, rawReturnMap, causationMap]);
 
-  // Top opportunities strip (Part 6) — exclude shorts (≤3d) and tiny positions
+  // Top opportunities strip — biggest spreads with enough liquidity
   const topOpportunities = useMemo(() => {
     return [...disagreements]
-      .map((d) => ({ d, annReturn: annReturnMap.get(d.id) ?? null }))
-      .filter(({ d, annReturn }) => {
-        if (annReturn === null || annReturn <= 0) return false;
-        if (d.daysLeft > 0 && d.daysLeft <= 3) return false; // exclude short-term
-        // Rough min position check: need enough volume for $500+
+      .filter((d) => {
+        if (d.spread < 10) return false;
         const minVol = Math.min(parseVol(d.polyVol), parseVol(d.kalshiVol));
         if (minVol < 500) return false;
         return true;
       })
-      .sort((a, b) => (b.annReturn ?? 0) - (a.annReturn ?? 0))
+      .sort((a, b) => b.spread - a.spread)
       .slice(0, 3);
-  }, [disagreements, annReturnMap]);
+  }, [disagreements]);
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortBy !== col) return <ChevronDown className="size-3 opacity-30" />;
@@ -479,7 +473,8 @@ function DisagreesContent() {
             The Market Disagrees
           </h1>
           <p className="text-sm text-[#8892b0] mt-1">
-            Cross-platform price spreads — where Polymarket and Kalshi see the world differently
+            Cross-platform price spreads — where Polymarket and Kalshi see the world differently ·{" "}
+            <Link href="/methodology" className="text-[#57D7BA] hover:underline text-xs">How is this computed?</Link>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -515,13 +510,13 @@ function DisagreesContent() {
           <div className="flex items-baseline gap-2 mb-2">
             <h2 className="text-sm font-bold text-[#e2e8f0] flex items-center gap-1.5">
               <TrendingUp className="size-4 text-[#fbbf24]" />
-              Best Capital Efficiency Right Now
+              Biggest Spreads Right Now
             </h2>
-            <span className="text-[10px] text-[#8892b0]">Ranked by annualized return after fees — not raw spread size</span>
+            <span className="text-[10px] text-[#8892b0]">Ranked by raw return on capital — not annualized, not net of fees</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {topOpportunities.map(({ d, annReturn }) => {
-              const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
+            {topOpportunities.map((d) => {
+              const r = formatReturn(d.spread, d.daysLeft > 0 ? d.daysLeft : null);
               return (
                 <Card key={d.id} className="bg-[#161b27] border-[#fbbf24]/20 hover:border-[#fbbf24]/40 transition-all">
                   <CardContent className="p-4">
@@ -534,20 +529,19 @@ function DisagreesContent() {
                         <div className="font-mono font-bold text-[#f59e0b] tabular-nums">{d.spread}pt</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[9px] text-[#8892b0] uppercase tracking-wide">Ann. Return</div>
-                        {(() => {
-                          const fmt = formatAnnReturn(annReturn, d.daysLeft > 0 ? d.daysLeft : null);
-                          return (
-                            <div className="font-mono font-bold text-2xl tabular-nums" style={{ color: fmt.color }}>
-                              {fmt.text}
-                            </div>
-                          );
-                        })()}
+                        <div className="text-[9px] text-[#8892b0] uppercase tracking-wide">Return</div>
+                        <div
+                          className="font-mono font-bold text-2xl tabular-nums"
+                          style={{ color: r.color }}
+                          title={r.tooltip}
+                        >
+                          {r.text}
+                        </div>
                       </div>
                       <div className="text-right">
                         <div className="text-[9px] text-[#8892b0] uppercase tracking-wide">Resolves</div>
                         <div className="font-mono font-bold text-[#e2e8f0] tabular-nums">
-                          {daysToRes ? `${daysToRes}d` : "—"}
+                          {d.daysLeft > 0 ? `${d.daysLeft}d` : "—"}
                         </div>
                       </div>
                     </div>
@@ -658,11 +652,10 @@ function DisagreesContent() {
               Score ↓
             </button>
             <button
-              onClick={() => handleSort("annReturn")}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "annReturn" ? "bg-[#fbbf24] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"}`}
+              onClick={() => handleSort("rawReturn")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "rawReturn" ? "bg-[#fbbf24] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"}`}
             >
-              Ann. Return ↓
-              {sortBy !== "annReturn" && <span className="px-1 py-0.5 rounded text-[7px] font-bold bg-[#fbbf24]/20 text-[#fbbf24]">NEW</span>}
+              Return ↓
             </button>
           </div>
           <span className="text-[10px] text-[#8892b0] font-mono">{filtered.length} results</span>
@@ -822,18 +815,18 @@ function DisagreesContent() {
                   >
                     <span className="flex items-center gap-0.5">RESOLVES <SortIcon col="daysLeft" /></span>
                   </TableHead>
-                  {/* Annualized return column (Part 5) */}
+                  {/* Raw return column */}
                   <TableHead
                     className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell"
-                    onClick={() => handleSort("annReturn")}
+                    onClick={() => handleSort("rawReturn")}
                   >
                     <span className="flex items-center gap-0.5">
-                      ANN. RETURN
-                      <SortIcon col="annReturn" />
+                      RETURN
+                      <SortIcon col="rawReturn" />
                       <Tooltip>
                         <TooltipTrigger><HelpCircle className="size-3 text-[#4a5168] cursor-help ml-0.5" /></TooltipTrigger>
                         <TooltipContent className="max-w-[260px] text-[11px]">
-                          Net return after fees on a $1,000 position, annualized using days to resolution. A 2¢ spread resolving tomorrow can beat a 7¢ spread resolving in 90 days.
+                          Raw return if the spread converges fully at resolution. Not annualized — prediction market arbs are one-shot trades. Actual return will be lower after fees.
                         </TooltipContent>
                       </Tooltip>
                     </span>
@@ -845,10 +838,9 @@ function DisagreesContent() {
                 {filtered.map((d) => {
                   const { polymarketSide, kalshiSide } = sidesFor(d);
                   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
-                  const annReturn = annReturnMap.get(d.id) ?? null;
                   const causationAnalysis = causationMap.get(d.id)!;
                   const isExpanded = expandedId === d.id;
-                  const isProfit = annReturn !== null && annReturn > 0;
+                  const isProfit = d.spread > 0;
                   const colSpan = 13;
 
                   const tableUrgencyColor = d.spread > 30 ? "#f85149" : d.spread > 15 ? "#d29922" : "#57D7BA";
@@ -920,7 +912,7 @@ function DisagreesContent() {
                           <span className="text-[10px] text-[#8892b0] font-mono tabular-nums">{d.daysLeft > 0 ? `${d.daysLeft}d` : "—"}</span>
                         </TableCell>
                         <TableCell className="py-2.5 hidden xl:table-cell">
-                          <AnnReturnCell value={annReturn} daysLeft={d.daysLeft > 0 ? d.daysLeft : undefined} />
+                          <ReturnCell spread={d.spread} daysLeft={d.daysLeft > 0 ? d.daysLeft : undefined} />
                         </TableCell>
                         <TableCell className="pr-4 py-2.5 text-right">
                           <button

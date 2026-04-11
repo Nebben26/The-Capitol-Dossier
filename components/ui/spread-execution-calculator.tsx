@@ -52,26 +52,59 @@ function fmtPct(n: number) {
   return n.toFixed(1) + "%";
 }
 
-// ─── Annualized return color ───────────────────────────────────────────────
-function annColor(v: number | null) {
-  if (v === null) return "#8892b0";
-  if (v < 0)   return "#ef4444";
-  if (v < 20)  return "#8892b0";
-  if (v < 50)  return "#22c55e";
-  return "#fbbf24";
+// ─── Raw return color (based on attractiveness of spread) ─────────────────
+function rawReturnColor(v: number): string {
+  if (v >= 20) return "#3fb950"; // exceptional
+  if (v >= 10) return "#57D7BA"; // strong
+  if (v >= 5)  return "#d29922"; // decent
+  if (v >= 2)  return "#8d96a0"; // marginal
+  return "#484f58";              // skip
 }
 
-/** Format annualized return with cap and short-term awareness. */
+/**
+ * Format raw return for display. Shows "X% in Nd" for one-shot arbs.
+ * rawReturn = spread in percent points (what you make if the spread
+ * converges fully; does NOT annualize — prediction market arbs are
+ * one-shot trades that cannot be compounded.)
+ */
+export function formatReturn(
+  spread: number,
+  daysToResolution: number | null,
+): { text: string; color: string; tooltip: string } {
+  const rawReturn = spread; // spread pts ≈ raw % return before fees
+  const color = rawReturnColor(rawReturn);
+
+  if (!daysToResolution || daysToResolution <= 0) {
+    return {
+      text: `${rawReturn.toFixed(1)}%`,
+      color,
+      tooltip: `Raw return if the spread converges fully at resolution. Resolution date unknown. Actual return will be lower after fees.`,
+    };
+  }
+
+  const dayLabel = daysToResolution === 1 ? "1d" : `${Math.round(daysToResolution)}d`;
+  return {
+    text: `${rawReturn.toFixed(1)}% in ${dayLabel}`,
+    color,
+    tooltip: `Raw return if the spread converges at resolution (${dayLabel} away). This is a one-shot trade — the return cannot be compounded. Actual return will be lower after fees and slippage.`,
+  };
+}
+
+// NOTE: calcAnnReturn / formatAnnReturn are used INTERNALLY for relative ranking only.
+// DO NOT display these values to users directly — annualizing one-shot arbs produces
+// meaningless numbers (e.g. a 48pt spread in 4 days → 4380% "annualized").
+// Use formatReturn() for all user-facing display.
+
+/** @internal Use formatReturn() for display. */
 export function formatAnnReturn(
   ann: number | null,
   daysToResolution: number | null,
 ): { text: string; color: string; isShortTerm: boolean; isCapped: boolean } {
   if (ann === null) return { text: "N/A", color: "#4a5168", isShortTerm: false, isCapped: false };
   const isShortTerm = daysToResolution !== null && daysToResolution <= 3;
-  const isCapped = ann > 999;
-  const text = isCapped ? "999%+" : fmtPct(ann);
-  const color = annColor(ann);
-  return { text, color, isShortTerm, isCapped };
+  // No cap — just show the real number (internal use only)
+  const color = ann < 0 ? "#ef4444" : ann < 50 ? "#8892b0" : ann < 200 ? "#22c55e" : "#fbbf24";
+  return { text: fmtPct(ann), color, isShortTerm, isCapped: false };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -233,31 +266,28 @@ export function SpreadExecutionCalculator({
                   </div>
                 )}
 
-                {/* Annualized return */}
+                {/* Raw return — not annualized */}
                 {(() => {
-                  const formatted = formatAnnReturn(result.annReturn, daysToResolution);
+                  const rawNetPct = (result.netProfit / capital) * 100;
+                  const rawGrossPct = spread;
+                  const retColor = rawReturnColor(rawGrossPct);
                   return (
                     <div className="p-3 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] flex items-center justify-between">
                       <div>
                         <div className="text-[9px] text-[#8892b0] mb-0.5 flex items-center gap-1">
-                          <TrendingUp className="size-3" /> Annualized Return
-                          {formatted.isShortTerm && (
-                            <span className="ml-1 text-[8px] font-bold uppercase tracking-wide text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/20 px-1 py-0.5 rounded-full">
-                              SHORT-TERM
-                            </span>
-                          )}
+                          <TrendingUp className="size-3" /> Return on Capital
+                          <span className="ml-1 text-[8px] text-[#484f58] font-medium">(net after fees)</span>
                         </div>
-                        {result.annReturn === null ? (
-                          <div className="text-[11px] text-[#8892b0] italic">Annualized return unavailable (resolution date unknown)</div>
-                        ) : (
-                          <div className="font-mono font-bold text-lg tabular-nums" style={{ color: formatted.color }}>
-                            {formatted.text}
-                          </div>
-                        )}
+                        <div className="font-mono font-bold text-lg tabular-nums" style={{ color: retColor }}>
+                          {rawNetPct >= 0 ? "+" : ""}{rawNetPct.toFixed(1)}%
+                        </div>
+                        <div className="text-[9px] text-[#484f58] mt-0.5">
+                          One-shot trade — not annualized
+                        </div>
                       </div>
                       {daysToResolution && (
                         <div className="text-right">
-                          <div className="text-[9px] text-[#8892b0]">Days to resolution</div>
+                          <div className="text-[9px] text-[#8892b0]">Resolves in</div>
                           <div className="font-mono font-bold text-[#e2e8f0] tabular-nums">{daysToResolution}d</div>
                         </div>
                       )}

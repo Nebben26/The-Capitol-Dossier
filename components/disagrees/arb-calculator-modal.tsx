@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calculator, TrendingUp, TrendingDown, X } from "lucide-react";
 import type { Disagreement } from "@/lib/mockData";
-import { calcAnnReturn, formatAnnReturn } from "@/components/ui/spread-execution-calculator";
 
 interface Props {
   d: Disagreement;
@@ -28,9 +27,6 @@ export function ArbCalculatorModal({ d, open, onClose }: Props) {
   const capitalNum = parseFloat(capital) || 0;
   const { polymarketSide, kalshiSide } = sidesFor(d);
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
-  const annReturn = calcAnnReturn(d.polyPrice, d.kalshiPrice, d.spread, daysToRes);
-  const formatted = formatAnnReturn(annReturn, daysToRes);
-
   const polyLeg = capitalNum / 2;
   const kalshiLeg = capitalNum / 2;
   const spreadPct = d.spread / 100;
@@ -38,9 +34,6 @@ export function ArbCalculatorModal({ d, open, onClose }: Props) {
   const fees = capitalNum * 0.01;
   const netProfit = grossProfit - fees;
   const netPct = capitalNum > 0 ? (netProfit / capitalNum) * 100 : 0;
-  const annNetPct = daysToRes && daysToRes > 0
-    ? (netPct / daysToRes) * 365
-    : null;
   const isProfit = netProfit > 0;
 
   return (
@@ -161,13 +154,15 @@ export function ArbCalculatorModal({ d, open, onClose }: Props) {
                   {isProfit ? "+" : ""}{netProfit.toFixed(2)} ({netPct.toFixed(1)}%)
                 </span>
               </div>
-              {annNetPct !== null && (
+              {daysToRes !== null && (
                 <div className="flex justify-between items-center px-3 py-2 bg-[#0d1117]/50">
                   <div className="flex items-center gap-1">
-                    {annNetPct > 0 ? <TrendingUp className="size-3 text-[#3fb950]" /> : <TrendingDown className="size-3 text-[#f85149]" />}
-                    <span className="text-[11px] text-[#8d96a0]">Annualized ({daysToRes}d)</span>
+                    {isProfit ? <TrendingUp className="size-3 text-[#3fb950]" /> : <TrendingDown className="size-3 text-[#f85149]" />}
+                    <span className="text-[11px] text-[#8d96a0]">Return in {daysToRes}d</span>
                   </div>
-                  <span className="text-sm font-mono font-bold" style={{ color: formatted.color }}>{formatted.text}</span>
+                  <span className="text-sm font-mono font-bold" style={{ color: isProfit ? "#3fb950" : "#f85149" }}>
+                    {netPct >= 0 ? "+" : ""}{netPct.toFixed(1)}%
+                  </span>
                 </div>
               )}
             </div>
