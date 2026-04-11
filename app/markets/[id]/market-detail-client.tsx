@@ -91,6 +91,7 @@ import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 import { useRecentMarkets } from "@/hooks/useRecentMarkets";
+import { PredictionModal } from "@/components/predictions/prediction-modal";
 
 
 
@@ -145,6 +146,7 @@ export default function MarketDetailPage() {
   }, [loadedMarket?.id]);
   const [timeRange, setTimeRange] = useState<"1D" | "7D" | "30D" | "90D" | "ALL">("30D");
   const [chartMode, setChartMode] = useState<"area" | "candle">("area");
+  const [showPredictionModal, setShowPredictionModal] = useState(false);
 
   // If market not found after data loads, show not-found state
   useEffect(() => {
@@ -378,10 +380,17 @@ export default function MarketDetailPage() {
                   <TradeButton side="NO" price={market.price} url={market.platformUrl} />
                 </div>
               )}
-              <div className="mt-3 flex justify-center gap-2">
+              <div className="mt-3 flex justify-center gap-2 flex-wrap">
                 <ShareCardButton title={market.question} price={market.price} change={market.change} />
                 <WatchlistButton type="market" itemId={market.id} name={market.question} />
                 <EmbedButton type="market" id={market.id} label="Embed" />
+                <button
+                  onClick={() => setShowPredictionModal(true)}
+                  className="inline-flex items-center gap-1.5 bg-[#0d1117] border border-[#21262d] text-[#8d96a0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  Predict
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -1219,6 +1228,15 @@ export default function MarketDetailPage() {
         )}
 
       </div>
+
+      {showPredictionModal && (
+        <PredictionModal
+          marketId={market.id}
+          marketQuestion={market.question}
+          currentPrice={market.price}
+          onClose={() => setShowPredictionModal(false)}
+        />
+      )}
     </>
   );
 }

@@ -229,7 +229,16 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
-### 23. `backfill-resolved.sql`
+### 23. `session21-profiles.sql`
+**What it does:** Creates `user_profiles` (public prediction profiles with username, bio, social links), `user_predictions` (per-user market calls with probability, conviction, reasoning, and resolution tracking), and `profile_followers` tables. Powers the /p/[username] public profile pages and prediction logging system.
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS`, `CREATE OR REPLACE FUNCTION`)
+**Dependencies:** Supabase `auth.users`
+**Tables created:** `user_profiles`, `user_predictions`, `profile_followers`
+**RLS:** Public profiles/predictions are readable by anyone; owners can write their own rows; service role has full access
+
+---
+
+### 24. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
 **Dependencies:** `markets` table must exist with `resolved`, `resolves_at`, `end_date`, `change_24h` columns
@@ -259,13 +268,13 @@ Mark each migration as ✅ once applied to production.
 | 16 | `session41_stories.sql` | ☐ |
 | 17 | `session42_schema_fixes.sql` | ☐ |
 | 18 | `session44.sql` | ☐ |
-| 19 | `backfill-resolved.sql` *(run last)* | ☐ |
-| 20 | `whales-schema.sql` *(skip if whales table exists)* | ☐ |
-| 21 | `session15-ingestion-runs.sql` | ☐ |
-| 22 | `session15-stripe-events.sql` | ☐ |
-| 23 | `backfill-resolved.sql` *(run last)* | ☐ |
-| 24 | `session18-telegram.sql` | ☐ |
-| 25 | `session19-waitlist-tier.sql` | ☐ |
-| 26 | `session20-portfolio.sql` | ☐ |
+| 19 | `whales-schema.sql` *(skip if whales table exists)* | ☐ |
+| 20 | `session15-ingestion-runs.sql` | ☐ |
+| 21 | `session15-stripe-events.sql` | ☐ |
+| 22 | `session18-telegram.sql` | ☐ |
+| 23 | `session19-waitlist-tier.sql` | ☐ |
+| 24 | `session20-portfolio.sql` | ☐ |
+| 25 | `session21-profiles.sql` | ☐ |
+| 26 | `backfill-resolved.sql` *(run last)* | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

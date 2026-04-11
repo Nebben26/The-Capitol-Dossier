@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useUserTier } from "@/hooks/useUserTier";
 import { TIER_LABELS, TIER_COLORS } from "@/lib/tiers";
 import { TierBadge } from "@/components/layout/tier-badge";
-import { CreditCard, User, LogOut, ExternalLink, Settings, Send, Wallet } from "lucide-react";
+import { CreditCard, User, LogOut, ExternalLink, Settings, Send, Wallet, Target } from "lucide-react";
 import { trackEvent, resetAnalytics, AnalyticsEvents } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 import { TestModeBanner } from "@/components/ui/test-mode-banner";
@@ -169,6 +169,29 @@ export default function SettingsPage() {
             Upgrade to Pro for full AI theses, spread history, and CSV export. Cancel anytime.
           </p>
         )}
+      </div>
+
+      {/* Public prediction profile card */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#57D7BA]/10 flex items-center justify-center">
+            <Target className="w-4 h-4 text-[#57D7BA]" />
+          </div>
+          <h2 className="text-sm font-semibold text-[#f0f6fc]">My Prediction Profile</h2>
+        </div>
+
+        <p className="text-xs text-[#8d96a0] leading-relaxed">
+          Build a verifiable public track record. Log your market calls, track your accuracy and
+          Brier score, and share your profile page as social proof.
+        </p>
+
+        <Link
+          href="/profile/claim"
+          className="inline-flex items-center gap-2 bg-[#57D7BA]/10 border border-[#57D7BA]/30 text-[#57D7BA] hover:bg-[#57D7BA]/20 text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+        >
+          <Target className="w-3.5 h-3.5" />
+          Claim or edit your profile
+        </Link>
       </div>
 
       {/* My Quiver portfolio card */}

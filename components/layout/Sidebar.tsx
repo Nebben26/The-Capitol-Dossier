@@ -66,6 +66,7 @@ const navGroups = [
     label: "My Account",
     items: [
       { label: "My Quiver", icon: Wallet, href: "/my", badge: "NEW" },
+      { label: "My Profile", icon: Target, href: "/profile/claim" },
       { label: "Watchlist", icon: Star, href: "/watchlist" },
       { label: "Calibration", icon: Crosshair, href: "/calibration" },
       { label: "Alerts", icon: Bell, href: "/alerts" },
