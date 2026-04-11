@@ -259,3 +259,54 @@
 .live-pulse {
   animation: pulse-live 1.8s ease-in-out infinite;
 }
+
+/* ── Legal page typography ── */
+.legal-content h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f0f6fc;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.legal-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0f6fc;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.legal-content p {
+  margin-bottom: 12px;
+}
+
+.legal-content ul,
+.legal-content ol {
+  margin-left: 20px;
+  margin-bottom: 12px;
+}
+
+.legal-content li {
+  margin-bottom: 6px;
+  list-style-type: disc;
+}
+
+.legal-content ol li {
+  list-style-type: decimal;
+}
+
+.legal-content a {
+  color: #57D7BA;
+  text-decoration: underline;
+}
+
+.legal-content a:hover {
+  opacity: 0.8;
+}
+
+.legal-content strong {
+  color: #f0f6fc;
+  font-weight: 600;
+}

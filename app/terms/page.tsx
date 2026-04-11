@@ -1,182 +1,196 @@
-"use client";
+// LEGAL DISCLAIMER: This content was generated as a starting template.
+// Ben should have it reviewed by a qualified attorney before launching to the public,
+// especially the data processing, payment, and dispute resolution clauses.
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { LegalPageLayout } from "@/components/legal/legal-page-layout";
+import type { Metadata } from "next";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "The rules for using Quiver Markets.",
+};
+
+export default function TermsOfServicePage() {
   return (
-    <div className="space-y-2">
-      <h2 className="text-xl font-bold text-[#e2e8f0]">{title}</h2>
-      <div className="text-sm text-[#8892b0] leading-relaxed space-y-2">{children}</div>
-    </div>
-  );
-}
-
-export default function TermsPage() {
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-[#8892b0] hover:text-[#57D7BA] transition-colors"
-      >
-        <ArrowLeft className="size-4" /> Back to Dashboard
-      </Link>
-
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-[#e2e8f0]">Terms of Service</h1>
-        <p className="text-sm text-[#4a5168]">Last updated: April 8, 2026</p>
-      </div>
-
-      <Section title="1. Acceptance of terms">
-        <p>
-          By accessing or using Quiver Markets (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of
-          Service. If you do not agree, do not use the Service.
-        </p>
-      </Section>
-
-      <Section title="2. Description of the Service">
-        <p>
-          Quiver Markets is an intelligence platform that aggregates publicly available data from prediction markets
-          including Polymarket and Kalshi. We provide analytics, AI-generated commentary, signal detection, and
-          cross-platform comparison tools.
-        </p>
-      </Section>
-
-      <Section title="3. Not financial advice">
-        <p className="font-semibold text-[#e2e8f0]">
-          QUIVER MARKETS DOES NOT PROVIDE FINANCIAL, INVESTMENT, LEGAL, OR TAX ADVICE.
-        </p>
-        <p>
-          All information, signals, AI-generated theses, whale tracking data, and analysis provided by the Service
-          are for informational and educational purposes only. Nothing on Quiver Markets constitutes a
-          recommendation, solicitation, or offer to buy or sell any financial instrument or to participate in any
-          prediction market.
-        </p>
-        <p>
-          Prediction markets and event contracts involve substantial risk of loss. Past performance does not
-          guarantee future results. You should consult qualified financial, legal, and tax professionals before
-          making any decisions based on information from this Service. You are solely responsible for your own
-          trading decisions.
-        </p>
-      </Section>
-
-      <Section title="4. Eligibility">
-        <p>
-          You must be at least 18 years old and legally able to enter into binding contracts in your jurisdiction
-          to use the Service. You are responsible for ensuring that your use of the Service complies with all laws
-          applicable to you.
-        </p>
-      </Section>
-
-      <Section title="5. Account and access">
-        <p>
-          Some features require an account. You agree to provide accurate information and to keep your credentials
-          secure. You are responsible for all activity under your account. We reserve the right to suspend or
-          terminate accounts that violate these Terms.
-        </p>
-      </Section>
-
-      <Section title="6. Subscriptions and payment">
-        <p>
-          Paid tiers are billed in advance on a recurring basis. Subscriptions automatically renew unless
-          cancelled. You can cancel anytime from your account settings. Refunds are at our sole discretion. All
-          payments are processed by Stripe under their terms.
-        </p>
-      </Section>
-
-      <Section title="7. API usage">
-        <p>
-          Access to the Quiver Markets API is governed by the rate limits and usage tiers described on our{" "}
-          <Link href="/pricing" className="text-[#57D7BA] hover:underline">
-            pricing page
-          </Link>
-          . You may not share API keys, abuse the rate limiting, or use the API in any way that interferes with the
-          Service for other users. We reserve the right to revoke API access for any abuse.
-        </p>
-      </Section>
-
-      <Section title="8. Acceptable use">
-        <p>You agree not to:</p>
-        <ul className="list-disc list-inside space-y-1 pl-2">
-          <li>Use the Service for any unlawful purpose</li>
-          <li>Scrape, copy, or republish substantial portions of our data without permission</li>
-          <li>Reverse engineer, decompile, or disassemble any part of the Service</li>
-          <li>Attempt to gain unauthorized access to any part of the Service or its infrastructure</li>
-          <li>Use the Service to harass, abuse, or harm others</li>
-          <li>Misrepresent your identity or affiliation</li>
-        </ul>
-      </Section>
-
-      <Section title="9. Intellectual property">
-        <p>
-          The Service, including all text, graphics, logos, software, and content, is owned by Quiver Markets or
-          its licensors and is protected by copyright and other intellectual property laws. Aggregated public data
-          from Polymarket and Kalshi remains the property of their respective owners.
-        </p>
-      </Section>
-
-      <Section title="10. Disclaimers">
-        <p className="uppercase font-semibold text-[#e2e8f0]">
-          THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF ANY
-          KIND, EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT
-          THE DATA WILL BE ACCURATE, COMPLETE, OR TIMELY. WE EXPLICITLY DISCLAIM ALL WARRANTIES OF
-          MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-        </p>
-      </Section>
-
-      <Section title="11. Limitation of liability">
-        <p className="uppercase font-semibold text-[#e2e8f0]">
-          TO THE MAXIMUM EXTENT PERMITTED BY LAW, QUIVER MARKETS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
-          SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOSS OF PROFITS, DATA, OR USE,
-          ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE SERVICE. OUR TOTAL LIABILITY FOR ANY CLAIM SHALL NOT
-          EXCEED THE AMOUNT YOU PAID US IN THE TWELVE MONTHS PRECEDING THE CLAIM.
-        </p>
-      </Section>
-
-      <Section title="12. Indemnification">
-        <p>
-          You agree to indemnify and hold Quiver Markets harmless from any claims, damages, or expenses arising
-          from your use of the Service, your violation of these Terms, or your violation of any third-party rights.
-        </p>
-      </Section>
-
-      <Section title="13. Termination">
-        <p>
-          We may suspend or terminate your access to the Service at any time, with or without notice, for any
-          reason including violation of these Terms. Upon termination, your right to use the Service immediately
-          ceases.
-        </p>
-      </Section>
-
-      <Section title="14. Governing law">
-        <p>
-          These Terms are governed by the laws of the State of Missouri, United States, without regard to its
-          conflict of laws principles. Any disputes arising out of these Terms or your use of the Service shall be
-          resolved in the state or federal courts located in Missouri.
-        </p>
-      </Section>
-
-      <Section title="15. Changes to these Terms">
-        <p>
-          We may modify these Terms at any time. Material changes will be posted on this page with an updated
-          &ldquo;Last updated&rdquo; date. Continued use of the Service after changes constitutes acceptance of the
-          new Terms.
-        </p>
-      </Section>
-
-      <Section title="16. Contact">
-        <p>
-          Questions about these Terms? Email{" "}
-          <a href="mailto:hello@quivermarkets.com" className="text-[#57D7BA] hover:underline">
-            hello@quivermarkets.com
-          </a>
-          .
-        </p>
-      </Section>
-
-      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#21262d]">
-        © 2026 Quiver Markets. Not financial advice.
+    <LegalPageLayout
+      title="Terms of Service"
+      subtitle="Please read these terms carefully before using Quiver Markets."
+      lastUpdated="April 11, 2026"
+    >
+      <h2>1. Acceptance of Terms</h2>
+      <p>
+        By accessing or using Quiver Markets (&ldquo;the Service&rdquo;) at quivermarkets.com, you agree to be bound
+        by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree to all of these Terms, do not use the
+        Service. These Terms constitute a legally binding agreement between you and Quiver Markets.
       </p>
-    </div>
+
+      <h2>2. Description of Service</h2>
+      <p>
+        Quiver Markets is an analytics and intelligence platform that aggregates publicly available data from
+        prediction market platforms including Polymarket and Kalshi. We provide tools for analyzing cross-platform
+        price spreads, tracking market participants, monitoring price movements, and understanding market dynamics.
+      </p>
+      <p>
+        Quiver Markets does not operate a prediction market, accept bets or wagers, hold user funds, or execute trades
+        on your behalf. We are an information and analytics service only.
+      </p>
+
+      <h2>3. Account Registration</h2>
+      <p>
+        Some features require creating an account. To register, you must be at least 18 years old and legally capable
+        of entering into binding contracts in your jurisdiction. You agree to:
+      </p>
+      <ul>
+        <li>Provide accurate, current, and complete information during registration</li>
+        <li>Keep your account credentials confidential and not share them with others</li>
+        <li>Notify us immediately of any unauthorized access to your account</li>
+        <li>Be responsible for all activity that occurs under your account</li>
+      </ul>
+      <p>
+        We reserve the right to refuse registration or terminate accounts at our discretion, including for violation of
+        these Terms.
+      </p>
+
+      <h2>4. Subscription Terms</h2>
+      <p>
+        Quiver Markets offers free and paid subscription tiers. Paid subscriptions are billed in advance on a monthly
+        or annual cycle, depending on the plan you select. Key terms:
+      </p>
+      <ul>
+        <li><strong>Automatic renewal:</strong> Paid subscriptions automatically renew at the end of each billing period unless you cancel before the renewal date.</li>
+        <li><strong>Price changes:</strong> We may change subscription prices with 30 days&rsquo; notice. Your continued use of the Service after a price change constitutes acceptance of the new price.</li>
+        <li><strong>Cancellation:</strong> You may cancel at any time from your account settings at <a href="/settings">/settings</a>. Cancellation stops future billing but does not refund the current period.</li>
+        <li><strong>Payment processing:</strong> All payments are processed by Stripe. By subscribing, you agree to Stripe&rsquo;s Terms of Service.</li>
+      </ul>
+
+      <h2>5. Refund Policy</h2>
+      <p>
+        We offer a 14-day money-back guarantee on initial purchases of paid plans. For full details, see our{" "}
+        <a href="/refunds">Refund Policy</a>.
+      </p>
+
+      <h2>6. Acceptable Use</h2>
+      <p>You agree not to use the Service to:</p>
+      <ul>
+        <li>Violate any applicable law, regulation, or third-party rights</li>
+        <li>Scrape, crawl, or systematically download data from the Service beyond what the API tier permits</li>
+        <li>Reverse engineer, decompile, or disassemble any part of the Service</li>
+        <li>Attempt to gain unauthorized access to the Service, its servers, or any connected systems</li>
+        <li>Transmit malware, spam, or other harmful code</li>
+        <li>Misrepresent your identity or affiliation with any person or entity</li>
+        <li>Use the Service in any manner that could damage, overload, or impair its operation</li>
+        <li>Share API keys or account access with unauthorized parties</li>
+      </ul>
+
+      <h2>7. Intellectual Property</h2>
+      <p>
+        The Service, including its design, software, text, graphics, logos, and proprietary analytics (opportunity
+        scores, whale accuracy metrics, market categorization, and similar computed data), is owned by Quiver Markets
+        and protected by copyright and other intellectual property laws.
+      </p>
+      <p>
+        Raw market data sourced from Polymarket and Kalshi through their public APIs remains subject to their
+        respective terms of service. We make no claim of ownership over that underlying data.
+      </p>
+
+      <h2>8. User Content</h2>
+      <p>
+        If you submit feedback, bug reports, feature requests, or other communications to us, you grant Quiver Markets
+        a non-exclusive, royalty-free, perpetual license to use that feedback to improve the Service. We will not
+        attribute public statements to you without your permission.
+      </p>
+
+      <h2>9. Third-Party Services and Data</h2>
+      <p>
+        The Service integrates data from third-party platforms (Polymarket, Kalshi) and uses third-party service
+        providers (Stripe, Supabase, Resend, PostHog, Sentry). These third parties operate under their own terms and
+        privacy policies, which we encourage you to review.
+      </p>
+      <p>
+        Data sourced from third-party APIs may be delayed, incomplete, or inaccurate. Quiver Markets does not warrant
+        the accuracy of data sourced from external platforms. For real-time pricing, always check the source platform
+        directly before trading.
+      </p>
+
+      <h2>10. Disclaimer of Warranties</h2>
+      <p>
+        THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF ANY KIND,
+        EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY LAW, QUIVER MARKETS EXPRESSLY DISCLAIMS ALL WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND ACCURACY. WE DO NOT WARRANT THAT
+        THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS, OR THAT ANY DATA WILL BE
+        ACCURATE, COMPLETE, OR TIMELY.
+      </p>
+
+      <h2>11. Not Financial Advice</h2>
+      <p>
+        <strong>Quiver Markets is not a registered investment advisor, broker-dealer, or financial planner.</strong>{" "}
+        The information provided on the Service is for informational and educational purposes only. It does not
+        constitute financial advice, investment advice, trading advice, or any other sort of advice.
+      </p>
+      <p>
+        Prediction markets carry risk of total loss. Spreads, opportunity scores, whale positions, and historical
+        accuracy data displayed on the Service are computed from public market data and are not predictions of future
+        performance. You should consult with a qualified financial advisor before making any financial decision based
+        on information you find on the Service.
+      </p>
+      <p>
+        You acknowledge that all trading decisions you make are your own. Quiver Markets is not liable for any losses
+        you incur as a result of using the Service.
+      </p>
+
+      <h2>12. Limitation of Liability</h2>
+      <p>
+        To the maximum extent permitted by law, Quiver Markets and its operators shall not be liable for any indirect,
+        incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data,
+        or use, arising from your use of the Service.
+      </p>
+      <p>
+        Our total liability to you for any claim arising from the Service shall not exceed the greater of (a) the
+        total amount you paid to Quiver Markets in the 12 months preceding the claim, or (b) one hundred US dollars
+        ($100).
+      </p>
+
+      <h2>13. Indemnification</h2>
+      <p>
+        You agree to indemnify, defend, and hold harmless Quiver Markets and its operators from any claims, damages,
+        liabilities, costs, and expenses (including reasonable attorneys&rsquo; fees) arising from: (a) your use of
+        the Service; (b) your violation of these Terms; (c) your violation of any third-party rights; or (d) any
+        content you submit to the Service.
+      </p>
+
+      <h2>14. Termination</h2>
+      <p>
+        We may suspend or terminate your access to the Service at any time, with or without notice, for any reason
+        including violation of these Terms, non-payment, or extended inactivity. Upon termination, your right to use
+        the Service ceases immediately. Provisions of these Terms that by their nature should survive termination will
+        survive, including ownership provisions, disclaimers, and limitations of liability.
+      </p>
+
+      <h2>15. Dispute Resolution and Governing Law</h2>
+      <p>
+        These Terms are governed by the laws of the State of Missouri, United States, without regard to its conflict
+        of law provisions. Any dispute arising from these Terms or the Service shall be resolved in the state or
+        federal courts located in Polk County, Missouri, and you consent to the jurisdiction of those courts.
+      </p>
+      <p>
+        You and Quiver Markets agree to attempt to resolve any dispute informally before initiating legal action.
+        Contact us at <a href="mailto:hello@quivermarkets.com">hello@quivermarkets.com</a> to begin the informal
+        resolution process. If informal resolution fails after 30 days, either party may pursue formal legal remedies.
+      </p>
+
+      <h2>16. Changes to Terms</h2>
+      <p>
+        We may modify these Terms at any time. For material changes, we will provide notice by email (to active
+        subscribers) and by posting an updated version on this page. Your continued use of the Service after changes
+        constitutes acceptance of the revised Terms. If you do not agree with changes to the Terms, you must stop
+        using the Service.
+      </p>
+
+      <h2>17. Contact</h2>
+      <p>
+        If you have questions about these Terms, contact us at{" "}
+        <a href="mailto:hello@quivermarkets.com">hello@quivermarkets.com</a>.
+      </p>
+    </LegalPageLayout>
   );
 }
