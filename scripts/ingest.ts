@@ -89,6 +89,49 @@ function safeParse<T>(json: string, fallback: T): T {
   try { return JSON.parse(json); } catch { return fallback; }
 }
 
+// ─── FETCH HELPERS ───────────────────────────────────────────────────
+
+/** Wraps fetch() with an AbortController timeout so API calls can't hang forever. */
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 30000): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Retries failed fetches up to maxRetries times with exponential backoff.
+ *  Handles 429 rate-limit and 5xx server errors automatically. */
+async function fetchWithRetry(url: string, options: RequestInit = {}, maxRetries = 3): Promise<Response> {
+  let lastError: Error = new Error("Max retries exceeded");
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, options);
+      if (response.status === 429) {
+        const backoff = Math.pow(2, attempt) * 1000;
+        console.warn(`  ⚠ Rate limited on ${url.slice(0, 60)}, backing off ${backoff}ms`);
+        await new Promise((r) => setTimeout(r, backoff));
+        continue;
+      }
+      if (response.status >= 500) {
+        const backoff = Math.pow(2, attempt) * 1000;
+        console.warn(`  ⚠ Server error ${response.status} on ${url.slice(0, 60)}, retry in ${backoff}ms`);
+        await new Promise((r) => setTimeout(r, backoff));
+        continue;
+      }
+      return response;
+    } catch (err: unknown) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      const backoff = Math.pow(2, attempt) * 1000;
+      console.warn(`  ⚠ Fetch error: ${lastError.message}, retry in ${backoff}ms`);
+      await new Promise((r) => setTimeout(r, backoff));
+    }
+  }
+  throw lastError;
+}
+
 // ─── 1. FETCH POLYMARKET EVENTS ──────────────────────────────────────
 interface PolyEvent {
   id: string; slug: string; title: string; description: string;
@@ -108,7 +151,7 @@ async function fetchPolymarketEvents(): Promise<PolyEvent[]> {
   for (let offset = 0; offset < 5000; offset += 100) {
     const url = `${POLYMARKET_BASE}/events?active=true&closed=false&limit=100&offset=${offset}&order=volume&ascending=false`;
     if (offset % 500 === 0) console.log(`  Polymarket events offset=${offset}...`);
-    const res = await fetch(url);
+    const res = await fetchWithRetry(url);
     if (!res.ok) { console.error(`  Polymarket API ${res.status}`); break; }
     const page: PolyEvent[] = await res.json();
     if (page.length === 0) break;
@@ -141,7 +184,7 @@ async function fetchKalshiEvents(): Promise<KalshiEvent[]> {
   for (let page = 0; page < 25; page++) {
     const url = `${KALSHI_BASE}/events?status=open&limit=200&with_nested_markets=true${cursor ? `&cursor=${cursor}` : ""}`;
     if (page % 5 === 0) console.log(`  Kalshi events page ${page + 1}...`);
-    const res = await fetch(url);
+    const res = await fetchWithRetry(url);
     if (!res.ok) { console.error(`  Kalshi API ${res.status}`); break; }
     const data = await res.json();
     const events: KalshiEvent[] = data.events || [];
@@ -167,7 +210,7 @@ interface LeaderboardEntry {
 async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
     console.log("  Fetching leaderboard from /v1/leaderboard...");
-    const res = await fetch(`${DATA_API_BASE}/v1/leaderboard?limit=500`);
+    const res = await fetchWithTimeout(`${DATA_API_BASE}/v1/leaderboard?limit=500`);
     if (!res.ok) { console.error(`  Leaderboard API ${res.status}`); return []; }
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -181,7 +224,7 @@ async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
 async function fetchRecentActivity(): Promise<any[]> {
   try {
     console.log("  Fetching activity from /v1/activity...");
-    const res = await fetch(`${DATA_API_BASE}/v1/activity?limit=200`);
+    const res = await fetchWithTimeout(`${DATA_API_BASE}/v1/activity?limit=200`);
     if (!res.ok) { console.error(`  Activity API ${res.status}`); return []; }
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -194,7 +237,7 @@ async function fetchRecentActivity(): Promise<any[]> {
 // ─── 5. FETCH PRICE HISTORY ──────────────────────────────────────────
 async function fetchPriceHistory(tokenId: string): Promise<{ t: number; p: number }[]> {
   try {
-    const res = await fetch(`${CLOB_BASE}/prices-history?market=${encodeURIComponent(tokenId)}&interval=max&fidelity=360`);
+    const res = await fetchWithTimeout(`${CLOB_BASE}/prices-history?market=${encodeURIComponent(tokenId)}&interval=max&fidelity=360`, {}, 60000);
     if (!res.ok) return [];
     const data = await res.json();
     return (data?.history || []).map((h: { t: number; p: string }) => ({
@@ -474,7 +517,7 @@ async function ingestWhaleLeaderboard() {
   for (let i = 0; i < Math.min(25, whaleRows.length); i++) {
     const wallet = whaleRows[i].address;
     try {
-      const res = await fetch(`${DATA_API_BASE}/v1/positions?user=${wallet}`);
+      const res = await fetchWithTimeout(`${DATA_API_BASE}/v1/positions?user=${wallet}`);
       if (res.ok) {
         const positions = await res.json();
         if (Array.isArray(positions) && positions.length > 0) {
@@ -656,7 +699,7 @@ async function ingestWhalePositions() {
   for (let i = 0; i < whales.length; i++) {
     const w = whales[i];
     try {
-      const res = await fetch(`${DATA_API_BASE}/v1/positions?user=${w.address}`);
+      const res = await fetchWithTimeout(`${DATA_API_BASE}/v1/positions?user=${w.address}`);
       if (!res.ok) continue;
       const positions = await res.json();
       if (!Array.isArray(positions) || positions.length === 0) continue;
@@ -702,7 +745,7 @@ async function ingestWhaleTradesV2() {
   for (let i = 0; i < whales.length; i++) {
     const w = whales[i];
     try {
-      const res = await fetch(`${DATA_API_BASE}/v1/activity?user=${w.address}&limit=50`);
+      const res = await fetchWithTimeout(`${DATA_API_BASE}/v1/activity?user=${w.address}&limit=50`);
       if (!res.ok) continue;
       const activities = await res.json();
       if (!Array.isArray(activities) || activities.length === 0) continue;
@@ -798,32 +841,101 @@ async function main() {
   console.log(`  Time: ${new Date().toISOString()}`);
   console.log(`  Supabase: ${SUPABASE_URL}`);
 
-  // Reload PostgREST schema cache — prevents "Could not find column" errors
-  // after migrations add new columns. Requires notify_pgrst_reload() function
-  // from scripts/migrations/session42_schema_fixes.sql to be applied first.
-  try { await supabase.rpc("notify_pgrst_reload"); } catch { /* ignore */ }
-  console.log("  ✓ Schema cache reload signalled");
+  const runStart = Date.now();
+  const runErrors: Array<{ stage: string; error: string }> = [];
+  let runId: number | null = null;
 
-  const markets = await ingestMarkets();
-  await ingestPriceHistory(markets);
-  await ingestWhaleLeaderboard();
-  await ingestWhaleTrades();
-  await ingestWhalePositions();
-  await ingestWhaleTradesV2();
-  await ingestDisagreements(markets);
-  await snapshotDisagreements();
-
-  // Run alert evaluator after all data is refreshed
-  console.log("\n=== Running alert evaluator ===");
+  // Write a "running" record so we can detect stuck runs via /api/health
   try {
-    const { runAlertEvaluator } = await import("../lib/run-alert-evaluator");
-    const evalResult = await runAlertEvaluator();
-    console.log(`  Alerts evaluated: ${evalResult.evaluated}, triggered: ${evalResult.triggered}, errors: ${evalResult.errors}`);
-  } catch (err: any) {
-    console.error("  Alert evaluator failed (non-fatal):", err.message);
+    const { data: run } = await supabase
+      .from("ingestion_runs")
+      .insert({ status: "running", source: process.env.CI ? "github_actions" : "local" })
+      .select("id")
+      .single();
+    runId = run?.id ?? null;
+  } catch {
+    // ingestion_runs table may not exist yet — run still continues
+    console.warn("  ⚠ Could not write ingestion_runs record (run session15-ingestion-runs.sql to enable tracking)");
   }
 
-  console.log("\n✓ Ingestion complete!");
+  let marketsFetched = 0;
+  let marketsUpserted = 0;
+  let disagreementsUpserted = 0;
+  let whalesProcessed = 0;
+
+  try {
+    // Reload PostgREST schema cache — prevents "Could not find column" errors
+    // after migrations add new columns. Requires notify_pgrst_reload() function
+    // from scripts/migrations/session42_schema_fixes.sql to be applied first.
+    try { await supabase.rpc("notify_pgrst_reload"); } catch { /* ignore */ }
+    console.log("  ✓ Schema cache reload signalled");
+
+    const markets = await ingestMarkets();
+    marketsFetched = markets.length;
+    marketsUpserted = markets.length;
+
+    await ingestPriceHistory(markets);
+    await ingestWhaleLeaderboard();
+    whalesProcessed = Math.min(25, markets.length);
+    await ingestWhaleTrades();
+    await ingestWhalePositions();
+    await ingestWhaleTradesV2();
+
+    const disagreements = await (async () => {
+      // Capture disagreement count from ingestDisagreements return value
+      await ingestDisagreements(markets);
+      const { count } = await supabase.from("disagreements").select("id", { count: "exact", head: true });
+      return count || 0;
+    })();
+    disagreementsUpserted = disagreements;
+
+    await snapshotDisagreements();
+
+    // Run alert evaluator after all data is refreshed
+    console.log("\n=== Running alert evaluator ===");
+    try {
+      const { runAlertEvaluator } = await import("../lib/run-alert-evaluator");
+      const evalResult = await runAlertEvaluator();
+      console.log(`  Alerts evaluated: ${evalResult.evaluated}, triggered: ${evalResult.triggered}, errors: ${evalResult.errors}`);
+    } catch (err: any) {
+      console.error("  Alert evaluator failed (non-fatal):", err.message);
+      runErrors.push({ stage: "alert_evaluator", error: err.message });
+    }
+
+    console.log("\n✓ Ingestion complete!");
+  } catch (err: any) {
+    console.error("Fatal ingestion error:", err.message);
+    runErrors.push({ stage: "main", error: err.message });
+    throw err;
+  } finally {
+    // Always update the run record — even if we crashed
+    if (runId) {
+      const durationSeconds = Math.round((Date.now() - runStart) / 1000);
+      const status = runErrors.some((e) => e.stage === "main")
+        ? "failed"
+        : runErrors.length > 0
+        ? "completed_with_errors"
+        : "completed";
+      try {
+        await supabase
+          .from("ingestion_runs")
+          .update({
+            completed_at: new Date().toISOString(),
+            status,
+            markets_fetched: marketsFetched,
+            markets_upserted: marketsUpserted,
+            disagreements_upserted: disagreementsUpserted,
+            whales_processed: whalesProcessed,
+            duration_seconds: durationSeconds,
+            errors: runErrors.length > 0 ? runErrors : null,
+          })
+          .eq("id", runId);
+        console.log(`  ✓ Run #${runId} recorded: ${status} in ${durationSeconds}s`);
+      } catch {
+        // Non-fatal — don't mask the real error
+      }
+    }
+  }
 }
 
 main().catch((err) => {

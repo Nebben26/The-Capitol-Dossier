@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { resend, isResendConfigured, FROM_EMAIL } from "@/lib/resend";
 import { supabase } from "@/lib/supabase";
 import { generateMorningBrief, renderMorningBriefHtml } from "@/lib/morning-brief-generator";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -95,6 +96,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("Morning brief send error:", err);
+    Sentry.captureException(err, { tags: { route: "morning-brief/send" } });
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

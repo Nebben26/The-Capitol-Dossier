@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: NextRequest) {
   if (!isStripeConfigured() || !stripe) {
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     console.error("Portal session error:", err);
+    Sentry.captureException(err, { tags: { route: "stripe/portal" } });
     return NextResponse.json(
       { error: "Unable to open billing portal. Please try again." },
       { status: 500 }

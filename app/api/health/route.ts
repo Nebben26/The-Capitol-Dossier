@@ -276,6 +276,112 @@ export async function GET() {
     });
   }
 
+  // ── Check 13: Last ingestion run ─────────────────────────────────
+  try {
+    const { data: lastRun, error } = await db
+      .from("ingestion_runs")
+      .select("id, started_at, status, duration_seconds, errors")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) throw error;
+
+    if (!lastRun) {
+      checks.push({
+        service: "ingestion_run_history",
+        status: "warning",
+        message: "No ingestion runs recorded yet",
+      });
+    } else {
+      const ageMinutes = Math.round(
+        (Date.now() - new Date(lastRun.started_at).getTime()) / 60000
+      );
+      if (lastRun.status === "running" && ageMinutes > 15) {
+        checks.push({
+          service: "ingestion_run_history",
+          status: "error",
+          message: `Last ingestion has been "running" for ${ageMinutes}m — likely stuck`,
+        });
+      } else if (lastRun.status === "failed") {
+        checks.push({
+          service: "ingestion_run_history",
+          status: "error",
+          message: `Last ingestion failed ${ageMinutes}m ago`,
+          details: lastRun.errors,
+        });
+      } else if (lastRun.status === "completed_with_errors") {
+        checks.push({
+          service: "ingestion_run_history",
+          status: "warning",
+          message: `Last ingestion had errors ${ageMinutes}m ago`,
+          details: lastRun.errors,
+        });
+      } else if (ageMinutes > 90) {
+        checks.push({
+          service: "ingestion_run_history",
+          status: "error",
+          message: `Last ingestion ${ageMinutes}m ago — cron may be down`,
+        });
+      } else {
+        checks.push({
+          service: "ingestion_run_history",
+          status: "ok",
+          message: `Last ingestion ${ageMinutes}m ago (${lastRun.duration_seconds ?? "?"}s)`,
+        });
+      }
+    }
+  } catch (err: unknown) {
+    checks.push({
+      service: "ingestion_run_history",
+      status: "warning",
+      message: `ingestion_runs table missing — run session15-ingestion-runs.sql: ${extractMessage(err)}`,
+    });
+  }
+
+  // ── Check 14: Sentry reachable ────────────────────────────────────
+  const sentryDsnForProbe = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  if (sentryDsnForProbe && !sentryDsnForProbe.includes("PLACEHOLDER")) {
+    try {
+      const dsnUrl = new URL(sentryDsnForProbe);
+      const projectId = dsnUrl.pathname.replace("/", "");
+      const probeUrl = `https://${dsnUrl.host}/api/${projectId}/store/`;
+      const probe = await fetch(probeUrl, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(5000),
+      });
+      if (probe.status === 401 || probe.status === 200 || probe.status === 405) {
+        checks.push({ service: "sentry_reachable", status: "ok", message: "Sentry endpoint reachable" });
+      } else {
+        checks.push({
+          service: "sentry_reachable",
+          status: "warning",
+          message: `Sentry returned unexpected ${probe.status}`,
+        });
+      }
+    } catch (err: unknown) {
+      checks.push({
+        service: "sentry_reachable",
+        status: "warning",
+        message: `Cannot reach Sentry: ${extractMessage(err)}`,
+      });
+    }
+  }
+
+  // ── Check 15: Function memory ─────────────────────────────────────
+  try {
+    const mem = process.memoryUsage();
+    const heapUsedMB = Math.round(mem.heapUsed / 1024 / 1024);
+    const heapTotalMB = Math.round(mem.heapTotal / 1024 / 1024);
+    checks.push({
+      service: "function_memory",
+      status: heapUsedMB > 400 ? "warning" : "ok",
+      message: `Heap ${heapUsedMB}MB / ${heapTotalMB}MB${heapUsedMB > 400 ? " — high" : ""}`,
+    });
+  } catch {
+    // Non-fatal — skip silently
+  }
+
   const overallStatus = checks.some((c) => c.status === "error")
     ? "error"
     : checks.some((c) => c.status === "warning")

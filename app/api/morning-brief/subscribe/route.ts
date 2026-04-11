@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Subscribed! You'll get the next Morning Brief at 7am ET." });
   } catch (err: any) {
     console.error("Subscribe error:", err);
+    Sentry.captureException(err, { tags: { route: "morning-brief/subscribe" } });
     return NextResponse.json({ error: err.message || "Failed to subscribe" }, { status: 500 });
   }
 }

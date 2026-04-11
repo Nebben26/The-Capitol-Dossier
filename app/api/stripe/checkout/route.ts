@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured, STRIPE_PRICE_IDS } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: NextRequest) {
   if (!isStripeConfigured() || !stripe) {
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err: any) {
     console.error("Stripe checkout error:", err);
+    Sentry.captureException(err, { tags: { route: "stripe/checkout" } });
     return NextResponse.json(
       { error: "Unable to start checkout. Please try again or contact support." },
       { status: 500 }

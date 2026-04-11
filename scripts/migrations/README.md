@@ -175,7 +175,35 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
-### 20. `backfill-resolved.sql`
+### 20. `whales-schema.sql`
+**What it does:** Creates `whales` table — stores whale leaderboard data ingested from the Polymarket Data API (address, rank, PnL, volume, win rate, accuracy, positions).
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`)
+**Dependencies:** None
+**Tables created:** `whales`
+**RLS:** Service role full access; public read
+**⚠️ Do NOT run if a `whales` table already exists** — check first with `\d whales` in psql or `SELECT * FROM whales LIMIT 1` in the SQL Editor.
+
+---
+
+### 21. `session15-ingestion-runs.sql`
+**What it does:** Creates `ingestion_runs` table — records every execution of the ingest script with status, counts, duration, and errors. Powers the `/pipelines` dashboard.
+**Idempotent:** Yes
+**Dependencies:** None
+**Tables created:** `ingestion_runs`
+**RLS:** Service role full access; public read (dashboard reads without auth)
+
+---
+
+### 22. `session15-stripe-events.sql`
+**What it does:** Creates `stripe_events` table — logs every inbound Stripe webhook event for idempotency (prevents double-processing on retries) and audit. Stripe event ID is the primary key.
+**Idempotent:** Yes
+**Dependencies:** None
+**Tables created:** `stripe_events`
+**RLS:** Service role full access; no public read (contains payment data)
+
+---
+
+### 23. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
 **Dependencies:** `markets` table must exist with `resolved`, `resolves_at`, `end_date`, `change_24h` columns
@@ -206,5 +234,8 @@ Mark each migration as ✅ once applied to production.
 | 17 | `session42_schema_fixes.sql` | ☐ |
 | 18 | `session44.sql` | ☐ |
 | 19 | `backfill-resolved.sql` *(run last)* | ☐ |
+| 20 | `whales-schema.sql` *(skip if whales table exists)* | ☐ |
+| 21 | `session15-ingestion-runs.sql` | ☐ |
+| 22 | `session15-stripe-events.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

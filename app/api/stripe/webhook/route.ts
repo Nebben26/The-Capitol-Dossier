@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
+import * as Sentry from "@sentry/nextjs";
 import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
@@ -26,6 +27,29 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Webhook signature verification failed:", err.message);
     return NextResponse.json({ error: `Webhook error: ${err.message}` }, { status: 400 });
+  }
+
+  // ── Idempotency: skip already-processed events ───────────────────
+  try {
+    const { data: existing } = await supabase
+      .from("stripe_events")
+      .select("id, status")
+      .eq("id", event.id)
+      .maybeSingle();
+
+    if (existing?.status === "processed") {
+      console.log(`Stripe event ${event.id} already processed — skipping`);
+      return NextResponse.json({ received: true });
+    }
+
+    // Log the event (upsert so retries don't fail)
+    await supabase.from("stripe_events").upsert(
+      { id: event.id, type: event.type, payload: event, status: "received" },
+      { onConflict: "id" }
+    );
+  } catch {
+    // stripe_events table may not exist yet — log but continue processing
+    console.warn("Could not log to stripe_events (run session15-stripe-events.sql to enable)");
   }
 
   try {
@@ -104,9 +128,23 @@ export async function POST(req: NextRequest) {
         break;
     }
 
+    // Mark event processed
+    await supabase
+      .from("stripe_events")
+      .update({ status: "processed", processed_at: new Date().toISOString() })
+      .eq("id", event.id)
+      .then(() => {}); // fire-and-forget, non-fatal
+
     return NextResponse.json({ received: true });
   } catch (err: any) {
     console.error("Webhook handler error:", err);
+    Sentry.captureException(err, { tags: { route: "stripe/webhook", event_type: event.type } });
+    // Mark event failed so we can query it later
+    await supabase
+      .from("stripe_events")
+      .update({ status: "failed", error: err.message })
+      .eq("id", event.id)
+      .then(() => {});
     return NextResponse.json({ error: "Internal webhook error" }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runAlertEvaluator } from "@/lib/run-alert-evaluator";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (err: any) {
     console.error("Alert evaluator error:", err);
+    Sentry.captureException(err, { tags: { route: "alerts/evaluate" } });
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

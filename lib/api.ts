@@ -655,9 +655,10 @@ export async function getWhaleActivity(): Promise<ApiResult<WhaleAlert[]>> {
   }
 
   try {
+    // select only columns used by dbTradeToWhaleAlert (wallet_address, market_id, side, outcome, size_usd, price, timestamp)
     const { data, error } = await supabase
       .from("whale_trades")
-      .select("*")
+      .select("id, wallet_address, market_id, side, outcome, size_usd, price, timestamp")
       .order("timestamp", { ascending: false })
       .limit(50);
 
@@ -1030,7 +1031,8 @@ export async function getWhaleAccuracy(
       .from("whale_positions")
       .select("market_id, outcome, pnl")
       .eq("whale_id", whaleId)
-      .neq("pnl", 0);
+      .neq("pnl", 0)
+      .limit(500); // cap at 500 resolved positions — enough for calibration stats
 
     if (error) throw error;
     if (!positions || positions.length === 0) {
@@ -1371,7 +1373,8 @@ export async function getCopyPortfolio(whaleIds: string[]): Promise<CopyPortfoli
     const { data: positions, error: posErr } = await supabase
       .from("whale_positions")
       .select("whale_id, market_id, outcome, current_value, pnl")
-      .in("whale_id", whaleIds);
+      .in("whale_id", whaleIds)
+      .limit(2000); // cap to prevent unbounded result sets on large whale lists
 
     if (posErr) throw posErr;
     if (!positions || positions.length === 0) return { ...empty, selected_count: whaleIds.length };
