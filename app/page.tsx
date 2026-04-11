@@ -43,6 +43,10 @@ import {
   ExternalLink,
   AlertTriangle,
   GitCompareArrows,
+  Clock,
+  Database,
+  Users,
+  Activity,
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
@@ -60,6 +64,8 @@ import { SearchBox } from "@/components/ui/search-box";
 import { SinceLastVisit } from "@/components/ui/since-last-visit";
 import { CountUp } from "@/components/ui/count-up";
 import { computeMarketPulse, pulseColor, pulseLabel, type MarketPulse } from "@/lib/market-pulse";
+import { useRecentMarkets } from "@/hooks/useRecentMarkets";
+import { supabase } from "@/lib/supabase";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -174,7 +180,8 @@ type SortDir = "asc" | "desc";
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [activeCategory, setActiveCategory] = useState("Trending");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [dataPointsDaily, setDataPointsDaily] = useState<number | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("change");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [loading, setLoading] = useState(true);
@@ -186,6 +193,7 @@ export default function HomePage() {
   const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number; whalesCount: number } | null>(null);
   const [pulse, setPulse] = useState<MarketPulse | null>(null);
 
+  const { recents } = useRecentMarkets();
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
   const { setSource } = useDataSource();
@@ -213,6 +221,12 @@ export default function HomePage() {
     getWaitlistCount().then(setWaitlistCount);
     getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount, whalesCount: s.whalesCount }));
     computeMarketPulse().then(setPulse).catch(() => {/* leave null */});
+    // Data points ingested in last 24h
+    supabase
+      .from("price_history")
+      .select("id", { count: "exact", head: true })
+      .gte("timestamp", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .then(({ count }) => { if (count && count > 0) setDataPointsDaily(count); });
   }, []);
 
   useEffect(() => {
@@ -231,9 +245,8 @@ export default function HomePage() {
   const filteredMovers = useMemo(() => {
     let filtered = allMarkets;
     let fallback: string | null = null;
-    if (activeCategory === "Trending") {
-      filtered = allMarkets.filter((m) => m.trending);
-      if (filtered.length < 3 && allMarkets.length > 0) { filtered = allMarkets; fallback = activeCategory; }
+    if (activeCategory === "All") {
+      // no category filter
     } else {
       const catFiltered = allMarkets.filter((m) => m.category === activeCategory);
       if (catFiltered.length >= 3) { filtered = catFiltered; }
@@ -279,7 +292,7 @@ export default function HomePage() {
 
   // Filter breaking markets by category
   const filteredBreaking = useMemo(() => {
-    if (activeCategory === "Trending") return breakingMarkets;
+    if (activeCategory === "All") return breakingMarkets;
     const catMarketIds = allMarkets.filter((m) => m.category === activeCategory).map((m) => m.id);
     const filtered = breakingMarkets.filter((b) => catMarketIds.includes(b.id));
     return filtered.length > 0 ? filtered : breakingMarkets;
@@ -287,7 +300,7 @@ export default function HomePage() {
 
   // Filter whale activity by category
   const filteredWhales = useMemo(() => {
-    if (activeCategory === "Trending") return whaleActivity;
+    if (activeCategory === "All") return whaleActivity;
     const catMarketIds = allMarkets.filter((m) => m.category === activeCategory).map((m) => m.id);
     const filtered = whaleActivity.filter((w) => catMarketIds.includes(w.marketId));
     return filtered.length > 0 ? filtered : whaleActivity;
@@ -365,6 +378,56 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─── SOCIAL PROOF STRIP ──────────────────────────────── */}
+      {(sysStats || dataPointsDaily) && (
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-4 px-6 rounded-2xl bg-[#161b27] border border-[#21262d]">
+          {sysStats && sysStats.marketsCount > 0 && (
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-[#57D7BA]/10 flex items-center justify-center">
+                <Activity className="size-4 text-[#57D7BA]" />
+              </div>
+              <div>
+                <div className="text-base font-bold tabular-nums font-mono text-[#f0f6fc]">{sysStats.marketsCount.toLocaleString()}</div>
+                <div className="text-[10px] text-[#8d96a0] uppercase tracking-wide">Markets</div>
+              </div>
+            </div>
+          )}
+          {sysStats && sysStats.whalesCount > 0 && (
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-[#8b5cf6]/10 flex items-center justify-center">
+                <Users className="size-4 text-[#8b5cf6]" />
+              </div>
+              <div>
+                <div className="text-base font-bold tabular-nums font-mono text-[#f0f6fc]">{sysStats.whalesCount.toLocaleString()}</div>
+                <div className="text-[10px] text-[#8d96a0] uppercase tracking-wide">Whales Tracked</div>
+              </div>
+            </div>
+          )}
+          {dataPointsDaily && dataPointsDaily > 0 && (
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-[#388bfd]/10 flex items-center justify-center">
+                <Database className="size-4 text-[#388bfd]" />
+              </div>
+              <div>
+                <div className="text-base font-bold tabular-nums font-mono text-[#f0f6fc]">{dataPointsDaily.toLocaleString()}</div>
+                <div className="text-[10px] text-[#8d96a0] uppercase tracking-wide">Data Points Today</div>
+              </div>
+            </div>
+          )}
+          {sysStats && sysStats.disagreementsCount > 0 && (
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-[#f59e0b]/10 flex items-center justify-center">
+                <GitCompareArrows className="size-4 text-[#f59e0b]" />
+              </div>
+              <div>
+                <div className="text-base font-bold tabular-nums font-mono text-[#f0f6fc]">{sysStats.disagreementsCount.toLocaleString()}</div>
+                <div className="text-[10px] text-[#8d96a0] uppercase tracking-wide">Spreads Found</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ─── FIRST-VISIT HERO ────────────────────────────────── */}
       <FirstVisitHero />
@@ -527,6 +590,37 @@ export default function HomePage() {
           </button>
         ))}
       </div>
+
+      {/* ─── RECENTLY VIEWED ─────────────────────────────────── */}
+      {recents.length > 0 && (
+        <Card className="bg-[#161b27] border-[#21262d]">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Clock className="size-4 text-[#8d96a0]" />
+              Recently Viewed
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-3">
+            <div className="flex flex-wrap gap-2">
+              {recents.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/markets/${r.id}`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0d1117] border border-[#21262d] hover:border-[#57D7BA]/30 hover:bg-[#57D7BA]/5 transition-all group"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors max-w-[200px] truncate">{r.question}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[9px] text-[#8d96a0]">{r.category}</span>
+                      <span className="font-mono text-[9px] text-[#8d96a0] tabular-nums">{r.price}¢</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ─── THREE COLUMN LAYOUT ─────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

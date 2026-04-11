@@ -87,6 +87,7 @@ import { WatchlistButton } from "@/components/ui/watchlist-button";
 import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
+import { useRecentMarkets } from "@/hooks/useRecentMarkets";
 
 
 
@@ -130,6 +131,13 @@ export default function MarketDetailPage() {
   const market = loadedMarket ?? placeholder;
   const { setSource } = useDataSource();
   useEffect(() => { setSource(source); }, [source, setSource]);
+  const { addRecent } = useRecentMarkets();
+  useEffect(() => {
+    if (loadedMarket && loadedMarket.question !== "Loading...") {
+      addRecent({ id: loadedMarket.id, question: loadedMarket.question, price: loadedMarket.price, category: loadedMarket.category });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedMarket?.id]);
   const [timeRange, setTimeRange] = useState<"1D" | "7D" | "30D" | "90D" | "ALL">("30D");
   const [chartMode, setChartMode] = useState<"area" | "candle">("area");
 

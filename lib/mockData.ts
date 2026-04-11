@@ -227,7 +227,7 @@ export interface CategoryPerf {
 export const CATEGORIES = ["All", "Trending", "Elections", "Economics", "Crypto", "Sports", "Tech", "Geopolitics", "Climate", "Science", "Policy"];
 export const PLATFORMS = ["All", "Polymarket", "Kalshi"];
 export const TIME_FILTERS = ["All Time", "30 Days", "7 Days", "24 Hours"] as const;
-export const HOMEPAGE_CATEGORIES = ["Trending", "Elections", "Economics", "Crypto", "Sports", "Tech", "Geopolitics", "Science", "Policy"];
+export const HOMEPAGE_CATEGORIES = ["All", "Elections", "Crypto", "Economics", "Geopolitics", "Tech", "Climate", "Culture"];
 export const STRAT_CATEGORIES = ["All", "Elections", "Economics", "Crypto", "Sports", "Geopolitics"];
 
 // ─── MARKETS ──────────────────────────────────────────────────────────

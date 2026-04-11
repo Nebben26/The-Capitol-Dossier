@@ -4,6 +4,7 @@ import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
+import { ShortcutsDrawer } from "@/components/ui/shortcuts-drawer";
 import "./globals.css";
 
 const inter = Inter({
@@ -73,6 +74,7 @@ export default function RootLayout({
         />
         <TooltipProvider>
           <AppShell>{children}</AppShell>
+          <ShortcutsDrawer />
         </TooltipProvider>
 
         {/* Schema.org Organization structured data */}

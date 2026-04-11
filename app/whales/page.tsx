@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { useWhales } from "@/hooks/useData";
 import type { Whale } from "@/lib/mockData";
+import { useFollowedWhales } from "@/hooks/useFollowedWhales";
 import { getAllWhaleAccuracies } from "@/lib/api";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { MarketsBrowseSkeleton } from "@/components/ui/skeleton-loaders";
@@ -73,7 +74,7 @@ function PnlSparkline({ data, positive }: { data: { d: number; v: number }[]; po
   );
 }
 
-function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: number; total: number } }) {
+function WhaleCard({ w, liveAccuracy, following, onFollow }: { w: Whale; liveAccuracy?: { accuracy: number; total: number }; following?: boolean; onFollow?: (e: React.MouseEvent) => void }) {
   const hasLiveData = liveAccuracy && liveAccuracy.total >= 1;
   const isNew = liveAccuracy && liveAccuracy.total === 0;
   const displayAccuracy = hasLiveData
@@ -96,6 +97,15 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
                 {w.streak >= 5 && <span className="px-1 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[7px] font-bold flex items-center gap-0.5"><Flame className="size-2" />{w.streak}W</span>}
               </div>
             </div>
+            {onFollow && (
+              <button
+                onClick={onFollow}
+                className={`shrink-0 size-7 rounded-full flex items-center justify-center transition-all border ${following ? "bg-[#57D7BA]/15 border-[#57D7BA]/40 text-[#57D7BA]" : "bg-[#21262d] border-[#30363d] text-[#484f58] hover:text-[#57D7BA] hover:border-[#57D7BA]/40"}`}
+                title={following ? "Unfollow" : "Follow"}
+              >
+                <UserPlus className="size-3.5" />
+              </button>
+            )}
           </div>
           <PnlSparkline data={w.spark} positive={w.totalPnlNum >= 0} />
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
@@ -122,6 +132,8 @@ export default function WhalesBrowsePage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [loading, setLoading] = useState(true);
   const [accuracyMap, setAccuracyMap] = useState<Record<string, { accuracy: number; total: number }>>({});
+  const [showFollowing, setShowFollowing] = useState(false);
+  const { followed, toggle, isFollowing } = useFollowedWhales();
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
 
@@ -138,6 +150,7 @@ export default function WhalesBrowsePage() {
 
   const filtered = useMemo(() => {
     let result = whales;
+    if (showFollowing) result = result.filter((w) => isFollowing(w.id));
     if (category !== "All") result = result.filter((w) => w.bestCategory === category);
     if (searchQuery) result = result.filter((w) => w.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return [...result].sort((a, b) => {
@@ -152,7 +165,7 @@ export default function WhalesBrowsePage() {
       const bv = valMap[sortBy](b);
       return sortDir === "asc" ? av - bv : bv - av;
     });
-  }, [whales, category, searchQuery, sortBy, sortDir]);
+  }, [whales, category, searchQuery, sortBy, sortDir, showFollowing, followed]);
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortBy !== col) return <ChevronDown className="size-3 opacity-30" />;
@@ -202,6 +215,13 @@ export default function WhalesBrowsePage() {
             className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setShowFollowing((v) => !v)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all flex items-center gap-1 ${showFollowing ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d]"}`}
+          >
+            <UserPlus className="size-3" />
+            Following {followed.length > 0 && `(${followed.length})`}
+          </button>
           {catFilters.map((cat) => (
             <button key={cat} onClick={() => setCategory(cat)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d]"}`}>
@@ -226,12 +246,12 @@ export default function WhalesBrowsePage() {
               <div className="w-16 h-16 rounded-2xl bg-[#161b27] border border-[#21262d] flex items-center justify-center mb-4">
                 <Inbox className="w-7 h-7 text-[#484f58]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">No whales match your filters</h3>
-              <p className="text-sm text-[#8d96a0] max-w-md mb-4">Try adjusting your search or category filter.</p>
+              <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">{showFollowing ? "No followed whales yet" : "No whales match your filters"}</h3>
+              <p className="text-sm text-[#8d96a0] max-w-md mb-4">{showFollowing ? "Follow whales by clicking the follow button on any card." : "Try adjusting your search or category filter."}</p>
               <div className="text-[11px] text-[#484f58]">Next update in {30 - (new Date().getMinutes() % 30)} minutes</div>
             </div>
           ) : (
-            filtered.map((w) => <WhaleCard key={w.id} w={w} liveAccuracy={accuracyMap[w.id]} />)
+            filtered.map((w) => <WhaleCard key={w.id} w={w} liveAccuracy={accuracyMap[w.id]} following={isFollowing(w.id)} onFollow={(e) => { e.preventDefault(); e.stopPropagation(); toggle(w.id); }} />)
           )}
         </div>
       )}
