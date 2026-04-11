@@ -7,6 +7,7 @@ import { TopCatalystsHero } from "@/components/calendar/TopCatalystsHero";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { UpcomingList } from "@/components/calendar/UpcomingList";
 import { DataFreshness } from "@/components/ui/data-freshness";
+import { Inbox } from "lucide-react";
 
 export default function CalendarPage() {
   const [catalysts, setCatalysts] = useState<CalendarMarket[]>([]);
@@ -43,7 +44,16 @@ export default function CalendarPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-[#8892b0] text-sm">Loading catalysts…</div>
+        <div className="text-center py-20 text-[#8d96a0] text-sm">Loading catalysts…</div>
+      ) : catalysts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#161b27] border border-[#21262d] flex items-center justify-center mb-4">
+            <Inbox className="w-7 h-7 text-[#484f58]" />
+          </div>
+          <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">No upcoming catalysts</h3>
+          <p className="text-sm text-[#8d96a0] max-w-md mb-4">Markets resolving in the next 30 days will appear here once ingested.</p>
+          <div className="text-[11px] text-[#484f58]">Next update in {30 - (new Date().getMinutes() % 30)} minutes</div>
+        </div>
       ) : (
         <>
           {/* Hero: top catalysts this week */}

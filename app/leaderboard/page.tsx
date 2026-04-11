@@ -58,7 +58,9 @@ import {
   UserPlus,
   BadgeCheck,
   Flame,
+  Inbox,
 } from "lucide-react";
+import { getWhaleGradientStyle } from "@/lib/whale-colors";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 import { DataFreshness } from "@/components/ui/data-freshness";
@@ -137,7 +139,7 @@ function MiniCalibration({ data }: { data: { predicted: number; actual: number }
 // ─── MOBILE CARD ──────────────────────────────────────────────────────
 function TraderCard({ t, followed, onFollow, liveAccuracy }: { t: Whale; followed: boolean; onFollow: () => void; liveAccuracy?: { accuracy: number; total: number } }) {
   return (
-    <Card className="bg-[#161b27] border-[#2a2f45]">
+    <Card className="bg-[#161b27] border-[#21262d] shadow-card hover:shadow-card-hover transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <RankBadge rank={t.rank} />
@@ -392,8 +394,11 @@ export default function LeaderboardPage() {
                           <Tooltip>
                             <TooltipTrigger>
                               <Link href={`/whales/${t.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors max-w-[140px]">
-                                <div className="size-7 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0">
-                                  <span className="text-[9px] font-bold text-[#0f1119]">{t.name[0]}</span>
+                                <div
+                                  className="size-7 rounded-full flex items-center justify-center shrink-0"
+                                  style={getWhaleGradientStyle(t.id)}
+                                >
+                                  <span className="text-[9px] font-bold text-[#0d1117]">{t.name[0]}</span>
                                 </div>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-1">
@@ -490,9 +495,19 @@ export default function LeaderboardPage() {
 
             {/* ─── MOBILE CARDS ─────────────────────────────────────── */}
             <div className="lg:hidden space-y-3">
-              {sorted.map((t) => (
-                <TraderCard key={t.id} t={t} followed={followedIds.has(t.id)} onFollow={() => toggleFollow(t.id)} liveAccuracy={accuracyMap[t.id]} />
-              ))}
+              {sorted.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[#161b27] border border-[#21262d] flex items-center justify-center mb-4">
+                    <Inbox className="w-7 h-7 text-[#484f58]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">No traders match your filters</h3>
+                  <p className="text-sm text-[#8d96a0] max-w-md">Try adjusting your search or category.</p>
+                </div>
+              ) : (
+                sorted.map((t) => (
+                  <TraderCard key={t.id} t={t} followed={followedIds.has(t.id)} onFollow={() => toggleFollow(t.id)} liveAccuracy={accuracyMap[t.id]} />
+                ))
+              )}
             </div>
 
             {/* ─── ACCURACY NOTE ───────────────────────────────────── */}

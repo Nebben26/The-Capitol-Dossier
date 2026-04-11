@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2 } from "lucide-react";
 import { PRICING } from "@/lib/pricing";
-import { WaitlistForm } from "@/components/ui/waitlist-form";
+import { WaitlistModal } from "@/components/pricing/waitlist-modal";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -122,26 +122,57 @@ const FAQS = [
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
 function CellValue({ val }: { val: TierVal }) {
-  if (val === true) return <Check className="size-4 text-[#22c55e] mx-auto" />;
-  if (val === false) return <span className="text-[#4a5168] text-sm">—</span>;
-  return <span className="text-xs font-medium text-[#e2e8f0]">{val}</span>;
+  if (val === true) return <Check className="size-4 text-[#3fb950] mx-auto" />;
+  if (val === false) return <span className="text-[#484f58] text-sm">—</span>;
+  return <span className="text-xs font-medium text-[#f0f6fc]">{val}</span>;
+}
+
+function PriceDisplay({ monthlyPrice, billingCycle }: { monthlyPrice: number; billingCycle: "monthly" | "annual" }) {
+  if (monthlyPrice === 0) {
+    return (
+      <div>
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold text-[#f0f6fc] font-mono">$0</span>
+          <span className="text-xs text-[#8d96a0]">forever</span>
+        </div>
+      </div>
+    );
+  }
+  const annualTotal = monthlyPrice * 10;
+  const annualMonthly = (annualTotal / 12).toFixed(2);
+  return (
+    <div>
+      <div className="flex items-baseline gap-1">
+        <span className="text-3xl font-bold text-[#f0f6fc] font-mono tabular-nums">
+          {billingCycle === "monthly" ? `$${monthlyPrice}` : `$${annualTotal}`}
+        </span>
+        <span className="text-xs text-[#8d96a0]">{billingCycle === "monthly" ? "/mo" : "/yr"}</span>
+      </div>
+      {billingCycle === "annual" && (
+        <p className="text-[10px] text-[#8d96a0] mt-0.5">${annualMonthly}/mo billed annually</p>
+      )}
+      {billingCycle === "monthly" && (
+        <p className="text-[10px] text-[#484f58] mt-0.5">or ${annualTotal}/yr (save 17%)</p>
+      )}
+    </div>
+  );
 }
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const [waitlistOpen, setWaitlistOpen] = useState<string | null>(null);
 
   const tiers = [
     {
       id: "free",
       badge: "Free Forever",
-      badgeColor: "#8892b0",
-      badgeBg: "#8892b018",
+      badgeColor: "#8d96a0",
+      badgeBg: "#8d96a018",
       icon: null,
-      price: PRICING.free.priceLabel,
-      period: "/month",
-      annual: null,
+      monthlyPrice: 0,
       description: "Scan the prediction market landscape",
       featured: false,
       features: [
@@ -157,7 +188,8 @@ export default function PricingPage() {
       ],
       cta: "Start free",
       ctaHref: "/",
-      ctaStyle: "border border-[#21262d] text-[#8892b0] hover:text-[#e2e8f0] hover:border-[#4a5168]",
+      ctaStyle: "border border-[#21262d] text-[#8d96a0] hover:text-[#f0f6fc] hover:border-[#484f58]",
+      ctaIsLink: true,
     },
     {
       id: "pro",
@@ -165,9 +197,7 @@ export default function PricingPage() {
       badgeColor: "#57D7BA",
       badgeBg: "#57D7BA18",
       icon: <Star className="size-3 fill-[#57D7BA]" />,
-      price: PRICING.pro.priceLabel,
-      period: "/month",
-      annual: `or ${PRICING.pro.annualLabel}`,
+      monthlyPrice: PRICING.pro.price,
       description: "Full intelligence layer for active traders",
       featured: true,
       features: [
@@ -182,8 +212,8 @@ export default function PricingPage() {
         { label: "Priority support + CSV export", included: true },
       ],
       cta: "Join the waitlist",
-      ctaHref: "#waitlist",
-      ctaStyle: "bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/90 font-bold",
+      ctaStyle: "bg-[#57D7BA] text-[#0d1117] hover:bg-[#57D7BA]/90 font-bold shadow-glow-brand",
+      ctaIsLink: false,
     },
     {
       id: "trader",
@@ -191,9 +221,7 @@ export default function PricingPage() {
       badgeColor: "#f59e0b",
       badgeBg: "#f59e0b18",
       icon: <BarChart2 className="size-3 text-[#f59e0b]" />,
-      price: PRICING.trader.priceLabel,
-      period: "/month",
-      annual: `or ${PRICING.trader.annualLabel}`,
+      monthlyPrice: PRICING.trader.price,
       description: "For professionals who execute regularly",
       featured: false,
       isNew: true,
@@ -206,8 +234,8 @@ export default function PricingPage() {
         { label: "REST API access (coming soon)", included: false },
       ],
       cta: "Join the waitlist",
-      ctaHref: "#waitlist",
       ctaStyle: "bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30 hover:bg-[#f59e0b]/20 font-semibold",
+      ctaIsLink: false,
     },
     {
       id: "quant",
@@ -215,9 +243,7 @@ export default function PricingPage() {
       badgeColor: "#8b5cf6",
       badgeBg: "#8b5cf618",
       icon: <Building2 className="size-3 text-[#8b5cf6]" />,
-      price: PRICING.quant.priceLabel,
-      period: "/month",
-      annual: `or ${PRICING.quant.annualLabel}`,
+      monthlyPrice: PRICING.quant.price,
       description: "For quants, hedge funds, and system builders",
       featured: false,
       features: [
@@ -231,6 +257,7 @@ export default function PricingPage() {
       cta: "Talk to Sales",
       ctaHref: "mailto:hello@quivermarkets.com?subject=Quant%20API%20Inquiry",
       ctaStyle: "bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/30 hover:bg-[#8b5cf6]/20",
+      ctaIsLink: true,
     },
   ];
 
@@ -248,97 +275,146 @@ export default function PricingPage() {
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
+      <WaitlistModal
+        open={waitlistOpen !== null}
+        onClose={() => setWaitlistOpen(null)}
+        tier={waitlistOpen ?? undefined}
+      />
+
       {/* ─── HEADER ─────────────────────────────────────────────────────── */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#57D7BA]/10 border border-[#57D7BA]/20 text-[11px] text-[#57D7BA] font-semibold">
           <Zap className="size-3" /> Transparent Pricing
         </div>
         <h1 className="text-4xl font-bold tracking-tight">Pricing</h1>
-        <p className="text-[#8892b0] max-w-xl mx-auto">
+        <p className="text-[#8d96a0] max-w-xl mx-auto">
           Four tiers, no hidden fees. Start free, upgrade when you see the alpha.
         </p>
-        <p className="text-[11px] text-[#4a5168]">
+        <p className="text-[11px] text-[#484f58]">
           All prices in USD · Cancel anytime · No overage charges
         </p>
+      </div>
+
+      {/* ─── BILLING TOGGLE ──────────────────────────────────────────────── */}
+      <div className="flex items-center justify-center -mt-8">
+        <div className="inline-flex items-center gap-1 bg-[#161b27] border border-[#21262d] rounded-full p-1">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-150 ${
+              billingCycle === "monthly"
+                ? "bg-[#57D7BA] text-[#0d1117]"
+                : "text-[#8d96a0] hover:text-[#f0f6fc]"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle("annual")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-150 flex items-center gap-2 ${
+              billingCycle === "annual"
+                ? "bg-[#57D7BA] text-[#0d1117]"
+                : "text-[#8d96a0] hover:text-[#f0f6fc]"
+            }`}
+          >
+            Annual
+            <span
+              className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                billingCycle === "annual"
+                  ? "bg-[#0d1117]/20 text-[#0d1117]"
+                  : "bg-[#57D7BA]/15 text-[#57D7BA]"
+              }`}
+            >
+              SAVE 17%
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* ─── PRICING CARDS ────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         {tiers.map((tier) => (
-          <div
-            key={tier.id}
-            className={`rounded-2xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border flex flex-col transition-all ${
-              tier.featured
-                ? "border-[#57D7BA] ring-1 ring-[#57D7BA]/20 shadow-lg shadow-[#57D7BA]/10 lg:-mt-2 lg:-mb-2"
-                : "border-[#21262d]"
-            }`}
-          >
-            <div className="p-5 flex flex-col gap-3 flex-1">
-              {/* Badge */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <div
-                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide"
-                  style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
-                >
-                  {tier.icon}
-                  {tier.badge}
+          <div key={tier.id} className="relative">
+            {/* Floating "Most Popular" badge for Pro */}
+            {tier.featured && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                <div className="inline-flex items-center gap-1.5 bg-[#57D7BA] text-[#0d1117] text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-glow-brand">
+                  <Star className="w-3 h-3 fill-[#0d1117]" />
+                  Most Popular
                 </div>
-                {"isNew" in tier && tier.isNew && (
-                  <span className="text-[8px] font-bold uppercase tracking-wide text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">
-                    NEW
-                  </span>
-                )}
               </div>
-
-              {/* Price */}
-              <div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-[#e2e8f0]">{tier.price}</span>
-                  <span className="text-xs text-[#8892b0]">{tier.period}</span>
-                </div>
-                {tier.annual && (
-                  <p className="text-[10px] text-[#4a5168] mt-0.5">{tier.annual}</p>
-                )}
-              </div>
-
-              {/* Description */}
-              <p className="text-[11px] text-[#8892b0] leading-relaxed">{tier.description}</p>
-
-              {/* Features */}
-              <ul className="space-y-1.5 flex-1">
-                {tier.features.map((f) => (
-                  <li key={f.label} className="flex items-start gap-1.5">
-                    {f.included ? (
-                      <Check className="size-3 text-[#22c55e] shrink-0 mt-0.5" />
-                    ) : (
-                      <X className="size-3 text-[#4a5168] shrink-0 mt-0.5" />
-                    )}
-                    <span className={`text-[10px] leading-relaxed ${f.included ? "text-[#8892b0]" : "text-[#4a5168]"}`}>
-                      {f.label}
+            )}
+            <div
+              className={`rounded-2xl shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border flex flex-col ${
+                tier.featured
+                  ? "bg-gradient-to-b from-[#57D7BA]/8 to-[#161b27] border-[#57D7BA]/40 shadow-glow-brand scale-[1.03] pt-3"
+                  : "bg-[#161b27] border-[#21262d]"
+              }`}
+            >
+              <div className="p-5 flex flex-col gap-3 flex-1">
+                {/* Badge */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <div
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide"
+                    style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
+                  >
+                    {tier.icon}
+                    {tier.badge}
+                  </div>
+                  {"isNew" in tier && tier.isNew && (
+                    <span className="text-[8px] font-bold uppercase tracking-wide text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">
+                      NEW
                     </span>
-                  </li>
-                ))}
-              </ul>
+                  )}
+                </div>
 
-              {/* CTA */}
-              <a
-                href={tier.ctaHref}
-                className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center ${tier.ctaStyle}`}
-              >
-                {tier.cta}
-              </a>
+                {/* Price */}
+                <PriceDisplay monthlyPrice={tier.monthlyPrice} billingCycle={billingCycle} />
 
-              {/* Pro / Trader waitlist form */}
-              {(tier.id === "pro" || tier.id === "trader") && (
-                <div id={tier.id === "pro" ? "waitlist" : undefined} className="pt-3 border-t border-[#21262d] space-y-2">
-                  <p className="text-[10px] text-[#8892b0] text-center">
+                {/* Description */}
+                <p className="text-[11px] text-[#8d96a0] leading-relaxed">{tier.description}</p>
+
+                {/* Features */}
+                <ul className="space-y-1.5 flex-1">
+                  {tier.features.map((f) => (
+                    <li key={f.label} className="flex items-start gap-1.5">
+                      {f.included ? (
+                        <Check className="size-3 text-[#3fb950] shrink-0 mt-0.5" />
+                      ) : (
+                        <X className="size-3 text-[#484f58] shrink-0 mt-0.5" />
+                      )}
+                      <span className={`text-[10px] leading-relaxed ${f.included ? "text-[#8d96a0]" : "text-[#484f58]"}`}>
+                        {f.label}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                {tier.ctaIsLink ? (
+                  <a
+                    href={tier.ctaHref}
+                    className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center active:scale-[0.97] ${tier.ctaStyle}`}
+                  >
+                    {tier.cta}
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setWaitlistOpen(tier.badge)}
+                    className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center active:scale-[0.97] ${tier.ctaStyle}`}
+                  >
+                    {tier.cta}
+                  </button>
+                )}
+
+                {/* Waitlist pricing note */}
+                {(tier.id === "pro" || tier.id === "trader") && (
+                  <p className="text-[10px] text-[#8d96a0] text-center pt-1">
                     {tier.id === "pro"
                       ? "Waitlist members get $39/mo founder pricing (20% off)."
                       : "Waitlist members get $119/mo founder pricing (20% off)."}
                   </p>
-                  <WaitlistForm compact source={`pricing-${tier.id}-tier`} />
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -346,38 +422,38 @@ export default function PricingPage() {
 
       {/* ─── COMPARISON TABLE ────────────────────────────────────────────── */}
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-center">Full Feature Comparison</h2>
-        <p className="text-[#8892b0] text-sm text-center mb-6">See exactly what&apos;s included in every tier</p>
+        <h2 className="text-2xl font-bold text-[#f0f6fc] text-center mb-2 tracking-tight">Compare plans</h2>
+        <p className="text-sm text-[#8d96a0] text-center mb-8">Every feature at a glance.</p>
 
-        <div className="overflow-x-auto rounded-2xl border border-[#21262d]">
+        <div className="overflow-x-auto rounded-xl border border-[#21262d] shadow-card">
           <table className="w-full text-sm min-w-[700px]">
             <thead>
-              <tr className="border-b border-[#21262d] bg-[#0d1117]">
-                <th className="text-left px-4 py-3 text-[#8892b0] text-xs font-semibold w-[36%]">Feature</th>
-                <th className="text-center px-3 py-3 text-[#8892b0] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Free</th>
-                <th className="text-center px-3 py-3 text-[#57D7BA] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Pro</th>
-                <th className="text-center px-3 py-3 text-[#f59e0b] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Trader</th>
-                <th className="text-center px-3 py-3 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Quant API</th>
+              <tr className="border-b border-[#21262d] bg-[#161b27]">
+                <th className="text-left px-6 py-4 text-[#8d96a0] font-medium w-[36%]">Feature</th>
+                <th className="text-center px-6 py-4 text-[#f0f6fc] font-semibold w-[16%] border-l border-[#21262d]">Free</th>
+                <th className="text-center px-6 py-4 text-[#57D7BA] font-semibold w-[16%] border-l border-[#21262d]">Pro</th>
+                <th className="text-center px-6 py-4 text-[#f59e0b] font-semibold w-[16%] border-l border-[#21262d]">Trader</th>
+                <th className="text-center px-6 py-4 text-[#8b5cf6] font-semibold w-[16%] border-l border-[#21262d]">Quant API</th>
               </tr>
             </thead>
             <tbody>
               {COMPARISON.map((section) => (
                 <React.Fragment key={section.heading}>
                   <tr className="bg-[#0d1117]/60">
-                    <td colSpan={5} className="px-4 py-2 text-[10px] font-bold tracking-widest text-[#4a5168] uppercase">
+                    <td colSpan={5} className="px-6 py-2 text-[10px] font-bold tracking-widest text-[#484f58] uppercase">
                       {section.heading}
                     </td>
                   </tr>
                   {section.rows.map((row, i) => (
                     <tr
                       key={row.label}
-                      className={`border-t border-[#21262d]/40 ${i % 2 === 0 ? "bg-[#161b27]" : "bg-[#1e2235]"}`}
+                      className={`border-t border-[#21262d]/40 ${i % 2 === 0 ? "bg-[#161b27]" : "bg-[#1c2333]"}`}
                     >
-                      <td className="px-4 py-2.5 text-[#8892b0] text-xs">{row.label}</td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.free} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.pro} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.trader} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.quant} /></td>
+                      <td className="px-6 py-2.5 text-[#8d96a0] text-xs">{row.label}</td>
+                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.free} /></td>
+                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.pro} /></td>
+                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.trader} /></td>
+                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.quant} /></td>
                     </tr>
                   ))}
                 </React.Fragment>
@@ -399,16 +475,16 @@ export default function PricingPage() {
               onClick={() => setOpenFaq(openFaq === i ? null : i)}
               className="w-full flex items-center justify-between px-5 py-4 text-left gap-3"
             >
-              <span className="text-sm font-semibold text-[#e2e8f0]">{faq.q}</span>
+              <span className="text-sm font-semibold text-[#f0f6fc]">{faq.q}</span>
               {openFaq === i ? (
-                <ChevronUp className="size-4 text-[#8892b0] shrink-0" />
+                <ChevronUp className="size-4 text-[#8d96a0] shrink-0" />
               ) : (
-                <ChevronDown className="size-4 text-[#8892b0] shrink-0" />
+                <ChevronDown className="size-4 text-[#8d96a0] shrink-0" />
               )}
             </button>
             {openFaq === i && (
               <div className="px-5 pb-4 border-t border-[#21262d]">
-                <p className="text-sm text-[#8892b0] leading-relaxed pt-3">{faq.a}</p>
+                <p className="text-sm text-[#8d96a0] leading-relaxed pt-3">{faq.a}</p>
               </div>
             )}
           </div>
@@ -418,17 +494,17 @@ export default function PricingPage() {
       {/* ─── BOTTOM CTA ──────────────────────────────────────────────────── */}
       <div className="text-center space-y-4 py-8 border-t border-[#21262d]">
         <h2 className="text-2xl font-bold">Still have questions?</h2>
-        <p className="text-[#8892b0] text-sm">We&apos;re happy to help you find the right tier.</p>
+        <p className="text-[#8d96a0] text-sm">We&apos;re happy to help you find the right tier.</p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <a
             href="mailto:hello@quivermarkets.com"
-            className="px-5 py-2.5 rounded-xl bg-[#57D7BA] text-[#0f1119] text-sm font-bold hover:bg-[#57D7BA]/90 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-[#57D7BA] text-[#0d1117] text-sm font-bold hover:bg-[#57D7BA]/90 transition-colors active:scale-[0.97]"
           >
             Email us
           </a>
           <Link
             href="/api-docs"
-            className="px-5 py-2.5 rounded-xl border border-[#21262d] text-[#8892b0] text-sm hover:text-[#e2e8f0] hover:border-[#4a5168] transition-colors"
+            className="px-5 py-2.5 rounded-xl border border-[#21262d] text-[#8d96a0] text-sm hover:text-[#f0f6fc] hover:border-[#484f58] transition-colors"
           >
             View API docs
           </Link>

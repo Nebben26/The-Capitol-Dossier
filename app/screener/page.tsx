@@ -435,11 +435,47 @@ export default function ScreenerPage() {
       </div>
 
       {/* Grid */}
-      {viewMode === "grid" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} insight={insightsMap.get(m.id)} causeType={causationLabelMap[m.id] ?? null} />)}
-        </div>
-      )}
+      {viewMode === "grid" && (() => {
+        const topSignal = markets
+          .filter((m) => m.volNum > 10000)
+          .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))[0] ?? null;
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {topSignal && (
+              <div className="col-span-full mb-2 relative">
+                <div className="absolute -top-3 left-6 z-10">
+                  <div className="inline-flex items-center gap-1.5 bg-[#0d1117] border border-[#d29922]/40 rounded-full px-3 py-1">
+                    <Flame className="w-3 h-3 text-[#d29922]" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#d29922]">Top Signal This Hour</span>
+                  </div>
+                </div>
+                <Link
+                  href={`/markets/${topSignal.id}`}
+                  className="block relative overflow-hidden rounded-xl bg-gradient-to-br from-[#d29922]/10 via-[#161b27] to-[#161b27] border border-[#d29922]/30 shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 p-6"
+                >
+                  <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#d29922]/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="relative flex items-center justify-between gap-6">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-medium text-[#8d96a0] uppercase tracking-wide mb-1">
+                        {topSignal.platform} · {topSignal.category}
+                      </div>
+                      <h3 className="text-xl font-bold text-[#f0f6fc] mb-2 truncate">{topSignal.question}</h3>
+                      <div className="text-sm text-[#8d96a0]">
+                        Volume: {topSignal.volume} ·{topSignal.change > 0 ? " ▲" : " ▼"} {Math.abs(topSignal.change).toFixed(1)}pt in 24h
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-3xl font-bold text-[#f0f6fc] tabular-nums font-mono">{Math.round(topSignal.price)}¢</div>
+                      <div className="text-xs text-[#8d96a0] mt-0.5">current</div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            )}
+            {filtered.slice(0, displayCount).map((m) => <ScreenerCard key={m.id} m={m} spread={spreadMap[m.id] ?? null} insight={insightsMap.get(m.id)} causeType={causationLabelMap[m.id] ?? null} />)}
+          </div>
+        );
+      })()}
 
       {/* Table */}
       {viewMode === "table" && (

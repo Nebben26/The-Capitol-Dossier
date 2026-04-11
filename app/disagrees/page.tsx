@@ -39,6 +39,8 @@ import {
   Target,
   Zap,
   TrendingUp,
+  Flame,
+  Inbox,
 } from "lucide-react";
 import { useDisagreements } from "@/hooks/useData";
 import { getSpreadHistory } from "@/lib/api";
@@ -121,10 +123,14 @@ function DisagreeCard({
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
   const annReturn = calcAnnReturn(d.polyPrice, d.kalshiPrice, d.spread, daysToRes);
   const isProfit = annReturn !== null && annReturn > 0;
+  const urgencyBorderColor = d.spread > 30 ? "#f85149" : d.spread > 15 ? "#d29922" : "#57D7BA";
 
   return (
     <div>
-      <Card className="bg-[#161b27] border-[#21262d] hover:border-[#f59e0b]/30 transition-all h-full">
+      <Card
+        className="bg-[#161b27] border-[#21262d] hover:border-[#f59e0b]/30 transition-all h-full overflow-hidden"
+        style={{ borderLeftColor: urgencyBorderColor, borderLeftWidth: "4px" }}
+      >
         <CardContent className="p-4">
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <span className="px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[8px] font-bold flex items-center gap-0.5">
@@ -380,8 +386,50 @@ function DisagreesContent() {
     return sortDir === "desc" ? <ChevronDown className="size-3 text-[#57D7BA]" /> : <ChevronUp className="size-3 text-[#57D7BA]" />;
   };
 
+  const topOpportunity = useMemo(() => {
+    return disagreements
+      .filter((d) => (d.matchConfidence ?? 1) >= 0.7 && d.spread >= 10)
+      .sort((a, b) => b.spread - a.spread)[0] ?? null;
+  }, [disagreements]);
+
+  const scrollToDisagreement = (id: string) => {
+    const el = document.getElementById(`disagreement-${id}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const minutesUntilNextUpdate = 30 - (new Date().getMinutes() % 30);
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+      {/* Sticky top opportunity banner */}
+      {topOpportunity && (
+        <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-gradient-to-r from-[#f85149]/10 via-[#161b27] to-[#161b27] border-b border-[#f85149]/20 backdrop-blur-sm mb-4">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#f85149]/15 flex items-center justify-center">
+                <Flame className="w-4 h-4 text-[#f85149]" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-[#f85149]">Top Opportunity Right Now</div>
+                <div className="text-sm font-semibold text-[#f0f6fc] truncate">{topOpportunity.question}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="text-right">
+                <div className="text-xl font-bold text-[#f0f6fc] tabular-nums font-mono">{topOpportunity.spread.toFixed(1)}pt</div>
+                <div className="text-[10px] text-[#8d96a0]">spread</div>
+              </div>
+              <button
+                onClick={() => scrollToDisagreement(topOpportunity.id)}
+                className="text-[11px] font-semibold text-[#57D7BA] hover:text-[#57D7BA]/80 transition-colors"
+              >
+                View →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
@@ -400,6 +448,23 @@ function DisagreesContent() {
             <AlertTriangle className="size-3" />
             {filtered.length} opportunities
           </span>
+        </div>
+      </div>
+
+      {/* Urgency legend */}
+      <div className="flex flex-wrap items-center gap-4 text-[11px] text-[#8d96a0]">
+        <span className="font-semibold text-[#484f58] uppercase tracking-wider">Urgency:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1 h-4 bg-[#f85149] rounded-sm inline-block" />
+          <span>High (30pt+ spread)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1 h-4 bg-[#d29922] rounded-sm inline-block" />
+          <span>Medium (15–30pt)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1 h-4 bg-[#57D7BA] rounded-sm inline-block" />
+          <span>Low (under 15pt)</span>
         </div>
       </div>
 
@@ -586,16 +651,28 @@ function DisagreesContent() {
       {/* Grid view */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((d) => (
-            <DisagreeCard
-              key={d.id}
-              d={d}
-              history={historyMap[d.marketId] || []}
-              expanded={expandedId === d.id}
-              onToggleExpand={() => toggleExpand(d.id)}
-              causationAnalysis={causationMap.get(d.id)!}
-            />
-          ))}
+          {filtered.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#161b27] border border-[#21262d] flex items-center justify-center mb-4">
+                <Inbox className="w-7 h-7 text-[#484f58]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">No significant disagreements right now</h3>
+              <p className="text-sm text-[#8d96a0] max-w-md mb-4">Markets are in agreement. Check back soon — spreads open and close throughout the day.</p>
+              <div className="text-[11px] text-[#484f58]">Next update in {minutesUntilNextUpdate} minutes</div>
+            </div>
+          ) : (
+            filtered.map((d) => (
+              <div key={d.id} id={`disagreement-${d.id}`}>
+                <DisagreeCard
+                  d={d}
+                  history={historyMap[d.marketId] || []}
+                  expanded={expandedId === d.id}
+                  onToggleExpand={() => toggleExpand(d.id)}
+                  causationAnalysis={causationMap.get(d.id)!}
+                />
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -685,11 +762,14 @@ function DisagreesContent() {
                   const isProfit = annReturn !== null && annReturn > 0;
                   const colSpan = 13;
 
+                  const tableUrgencyColor = d.spread > 30 ? "#f85149" : d.spread > 15 ? "#d29922" : "#57D7BA";
                   return (
                     <React.Fragment key={d.id}>
                       <TableRow
+                        id={`disagreement-${d.id}`}
                         ref={(el) => { rowRefs.current[d.id] = el; }}
                         className={`border-[#21262d]/50 hover:bg-[#f59e0b]/5 transition-colors ${isExpanded ? "bg-[#57D7BA]/5" : ""}`}
+                        style={{ borderLeftColor: tableUrgencyColor, borderLeftWidth: "3px" }}
                       >
                         <TableCell className="pl-4 py-2.5 max-w-[120px] sm:max-w-[220px]">
                           <div className="flex items-start gap-1.5">

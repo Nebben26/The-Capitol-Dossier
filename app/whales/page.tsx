@@ -37,6 +37,7 @@ import {
   Users,
   UserPlus,
   ChevronRight,
+  Inbox,
 } from "lucide-react";
 import { useWhales } from "@/hooks/useData";
 import type { Whale } from "@/lib/mockData";
@@ -220,7 +221,18 @@ export default function WhalesBrowsePage() {
       {/* Grid view */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.map((w) => <WhaleCard key={w.id} w={w} liveAccuracy={accuracyMap[w.id]} />)}
+          {filtered.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#161b27] border border-[#21262d] flex items-center justify-center mb-4">
+                <Inbox className="w-7 h-7 text-[#484f58]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#f0f6fc] mb-1">No whales match your filters</h3>
+              <p className="text-sm text-[#8d96a0] max-w-md mb-4">Try adjusting your search or category filter.</p>
+              <div className="text-[11px] text-[#484f58]">Next update in {30 - (new Date().getMinutes() % 30)} minutes</div>
+            </div>
+          ) : (
+            filtered.map((w) => <WhaleCard key={w.id} w={w} liveAccuracy={accuracyMap[w.id]} />)
+          )}
         </div>
       )}
 

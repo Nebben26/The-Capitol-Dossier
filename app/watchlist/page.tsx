@@ -36,6 +36,7 @@ import {
 import { useWatchlist } from "@/hooks/usePersistence";
 import { useMarkets, useWhales } from "@/hooks/useData";
 import { useAuth } from "@/components/layout/AuthContext";
+import { getWhaleGradientStyle } from "@/lib/whale-colors";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { supabase } from "@/lib/supabase";
 import type { Market, Whale } from "@/lib/mockData";
@@ -124,8 +125,11 @@ function WhaleWatchCard({ whale, onRemove }: { whale: Whale; onRemove: () => voi
     <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-start gap-3 mb-3">
-          <div className="size-10 rounded-xl bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0 relative">
-            <span className="text-xs font-bold text-[#0f1119]">#{whale.rank}</span>
+          <div
+            className="size-10 rounded-xl flex items-center justify-center shrink-0 relative"
+            style={getWhaleGradientStyle(whale.id)}
+          >
+            <span className="text-xs font-bold text-[#0d1117]">#{whale.rank}</span>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
