@@ -220,6 +220,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 26. `session20-portfolio.sql`
+**What it does:** Creates the My Quiver portfolio tracking tables — `user_portfolios` (one row per user, wallet address + summary P&L stats), `user_positions` (per-market positions synced from Polymarket data API, replaced wholesale on each sync), and `portfolio_snapshots` (time-series of total_value_usd for the sparkline chart).
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, `DO $$ BEGIN...EXCEPTION WHEN duplicate_object` for policies)
+**Dependencies:** Supabase `auth.users`
+**Tables created:** `user_portfolios`, `user_positions`, `portfolio_snapshots`
+**RLS:** Service role full access; authenticated users can read/write their own rows only
+
+---
+
 ### 23. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
@@ -257,5 +266,6 @@ Mark each migration as ✅ once applied to production.
 | 23 | `backfill-resolved.sql` *(run last)* | ☐ |
 | 24 | `session18-telegram.sql` | ☐ |
 | 25 | `session19-waitlist-tier.sql` | ☐ |
+| 26 | `session20-portfolio.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

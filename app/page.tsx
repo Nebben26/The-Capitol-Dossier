@@ -48,6 +48,7 @@ import {
   Users,
   Activity,
   Send,
+  Wallet,
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
@@ -477,6 +478,26 @@ export default function HomePage() {
           className="inline-flex items-center gap-1.5 text-[11px] text-[#d29922] font-semibold hover:text-[#d29922]/80 transition-colors"
         >
           Learn about Signal Desk →
+        </Link>
+      </div>
+
+      {/* ─── MY QUIVER CALLOUT ───────────────────────────────── */}
+      <div className="rounded-xl border border-[#57D7BA]/30 bg-gradient-to-r from-[#57D7BA]/8 to-[#161b27] p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#57D7BA]/15 flex items-center justify-center shrink-0">
+            <Wallet className="w-3.5 h-3.5 text-[#57D7BA]" />
+          </div>
+          <span className="text-xs font-bold text-[#57D7BA]">My Quiver</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">NEW · Free</span>
+        </div>
+        <p className="text-[11px] text-[#8d96a0] leading-relaxed">
+          Connect your Polymarket wallet to see your own positions, P&amp;L, and apply Quiver&apos;s intelligence to your real trades. Free for all users.
+        </p>
+        <Link
+          href="/my"
+          className="inline-flex items-center gap-1.5 text-[11px] text-[#57D7BA] font-semibold hover:text-[#57D7BA]/80 transition-colors"
+        >
+          Connect your wallet →
         </Link>
       </div>
 

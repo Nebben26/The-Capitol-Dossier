@@ -29,6 +29,7 @@ import {
   Info,
   Settings,
   CheckCircle,
+  Wallet,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -64,6 +65,7 @@ const navGroups = [
   {
     label: "My Account",
     items: [
+      { label: "My Quiver", icon: Wallet, href: "/my", badge: "NEW" },
       { label: "Watchlist", icon: Star, href: "/watchlist" },
       { label: "Calibration", icon: Crosshair, href: "/calibration" },
       { label: "Alerts", icon: Bell, href: "/alerts" },
@@ -149,6 +151,11 @@ export function Sidebar({
                     >
                       <item.icon className="size-4 shrink-0" />
                       {item.label}
+                      {"badge" in item && item.badge && (
+                        <span className="ml-auto text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-[#57D7BA]/15 text-[#57D7BA] border border-[#57D7BA]/20">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}

@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useUserTier } from "@/hooks/useUserTier";
 import { TIER_LABELS, TIER_COLORS } from "@/lib/tiers";
 import { TierBadge } from "@/components/layout/tier-badge";
-import { CreditCard, User, LogOut, ExternalLink, Settings, Send } from "lucide-react";
+import { CreditCard, User, LogOut, ExternalLink, Settings, Send, Wallet } from "lucide-react";
 import { trackEvent, resetAnalytics, AnalyticsEvents } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 import { TestModeBanner } from "@/components/ui/test-mode-banner";
@@ -169,6 +169,30 @@ export default function SettingsPage() {
             Upgrade to Pro for full AI theses, spread history, and CSV export. Cancel anytime.
           </p>
         )}
+      </div>
+
+      {/* My Quiver portfolio card */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#57D7BA]/10 flex items-center justify-center">
+            <Wallet className="w-4 h-4 text-[#57D7BA]" />
+          </div>
+          <h2 className="text-sm font-semibold text-[#f0f6fc]">My Quiver</h2>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+        </div>
+
+        <p className="text-xs text-[#8d96a0] leading-relaxed">
+          Connect your Polymarket wallet to track your positions, monitor P&amp;L, and
+          cross-reference your trades with whale activity and arbitrage data. Free for all users.
+        </p>
+
+        <Link
+          href="/my"
+          className="inline-flex items-center gap-2 bg-[#57D7BA]/10 border border-[#57D7BA]/30 text-[#57D7BA] hover:bg-[#57D7BA]/20 text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+        >
+          <Wallet className="w-3.5 h-3.5" />
+          Connect your Polymarket wallet
+        </Link>
       </div>
 
       {/* Telegram alerts card */}
