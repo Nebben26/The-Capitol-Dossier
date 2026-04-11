@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getLastIngestTimestamp } from "@/lib/api";
 import { DataFreshness } from "@/components/ui/data-freshness";
@@ -14,9 +15,11 @@ import {
   Zap,
   Users,
   ArrowRight,
+  Mail,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { formatUsd } from "@/lib/format";
 
 interface BriefMarket {
   id: string;
@@ -42,8 +45,126 @@ interface BriefSignal {
   type: string;
 }
 
+function UnsubscribeBanner() {
+  const params = useSearchParams();
+  const status = params.get("unsubscribed");
+
+  if (!status) return null;
+
+  if (status === "true") {
+    return (
+      <div className="flex items-center gap-2.5 rounded-xl border border-[#3fb950]/30 bg-[#3fb950]/10 px-4 py-3 text-sm text-[#3fb950]">
+        <CheckCircle className="size-4 shrink-0" />
+        You've been unsubscribed. You won't receive future Morning Briefs.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2.5 rounded-xl border border-[#f85149]/30 bg-[#f85149]/10 px-4 py-3 text-sm text-[#f85149]">
+      <XCircle className="size-4 shrink-0" />
+      That unsubscribe link is invalid or has already been used.
+    </div>
+  );
+}
+
+function SubscribeForm() {
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("morning_brief_subscribers")
+      .select("id", { count: "exact", head: true })
+      .eq("active", true)
+      .then(({ count: n }) => {
+        if (n != null) setCount(n);
+      });
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSubmitting(true);
+    setResult(null);
+    try {
+      const resp = await fetch("/api/morning-brief/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), source: "morning-brief-page" }),
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        setResult({ ok: true, message: data.message || "Subscribed!" });
+        setEmail("");
+        setCount((c) => (c != null ? c + 1 : c));
+      } else {
+        setResult({ ok: false, message: data.error || "Something went wrong." });
+      }
+    } catch {
+      setResult({ ok: false, message: "Network error — please try again." });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-[#57D7BA]/20 bg-gradient-to-br from-[#57D7BA]/10 via-[#388bfd]/5 to-transparent p-5 space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="size-9 rounded-xl bg-[#57D7BA]/15 flex items-center justify-center shrink-0 mt-0.5">
+          <Mail className="size-4 text-[#57D7BA]" />
+        </div>
+        <div>
+          <div className="text-sm font-bold text-[#f0f6fc]">Get the Morning Brief in your inbox</div>
+          <div className="text-[11px] text-[#8d96a0] mt-0.5">
+            Top arbs, biggest movers, and market stats — delivered at 7am ET.
+            {count != null && count > 0 && (
+              <span className="ml-1 text-[#57D7BA]">{count.toLocaleString()} subscribers.</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {result ? (
+        <div
+          className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium ${
+            result.ok
+              ? "bg-[#3fb950]/10 border border-[#3fb950]/30 text-[#3fb950]"
+              : "bg-[#f85149]/10 border border-[#f85149]/30 text-[#f85149]"
+          }`}
+        >
+          {result.ok ? <CheckCircle className="size-4 shrink-0" /> : <XCircle className="size-4 shrink-0" />}
+          {result.message}
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            required
+            className="flex-1 min-w-0 rounded-lg bg-[#0d1117] border border-[#21262d] text-[#f0f6fc] placeholder-[#484f58] px-3 py-2 text-sm focus:outline-none focus:border-[#57D7BA]/50 transition-colors"
+          />
+          <button
+            type="submit"
+            disabled={submitting}
+            className="px-4 py-2 rounded-lg bg-[#57D7BA] text-[#0d1117] text-sm font-bold hover:bg-[#57D7BA]/80 transition-colors disabled:opacity-60 shrink-0"
+          >
+            {submitting ? "Subscribing…" : "Subscribe"}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function MorningBriefPage() {
-  const [date] = useState(() => new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }));
+  const [date] = useState(() =>
+    new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+  );
   const [freshnessTs, setFreshnessTs] = useState<string | null>(null);
   const [movers, setMovers] = useState<BriefMarket[]>([]);
   const [arbs, setArbs] = useState<BriefArb[]>([]);
@@ -54,19 +175,18 @@ export default function MorningBriefPage() {
     getLastIngestTimestamp().then(setFreshnessTs);
 
     Promise.all([
-      // Top movers: markets with biggest absolute change
       supabase
         .from("markets")
-        .select("id, question, price, change, category, platform")
-        .order("change", { ascending: false })
+        .select("id, question, price, change_24h, category, platform")
+        .eq("resolved", false)
+        .not("change_24h", "is", null)
+        .order("change_24h", { ascending: false })
         .limit(10),
-      // Top arbs
       supabase
         .from("disagreements")
         .select("id, question, spread, poly_price, kalshi_price")
         .order("spread", { ascending: false })
         .limit(5),
-      // Recent signals
       supabase
         .from("signals")
         .select("signal_id, headline, confidence, type")
@@ -74,8 +194,15 @@ export default function MorningBriefPage() {
         .limit(6),
     ])
       .then(([mktsRes, arbsRes, sigsRes]) => {
-        const mkts = (mktsRes.data || []) as BriefMarket[];
-        // Separate big up vs big down movers
+        const raw = (mktsRes.data || []) as any[];
+        const mkts: BriefMarket[] = raw.map((r) => ({
+          id: r.id,
+          question: r.question,
+          price: Number(r.price) || 0,
+          change: Number(r.change_24h) || 0,
+          category: r.category,
+          platform: r.platform,
+        }));
         const sorted = [...mkts].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 6);
         setMovers(sorted);
         setArbs((arbsRes.data || []) as BriefArb[]);
@@ -103,6 +230,14 @@ export default function MorningBriefPage() {
         </div>
         <DataFreshness timestamp={freshnessTs} />
       </div>
+
+      {/* Unsubscribe banner (wrapped in Suspense for useSearchParams) */}
+      <Suspense fallback={null}>
+        <UnsubscribeBanner />
+      </Suspense>
+
+      {/* Email subscription */}
+      <SubscribeForm />
 
       {loading ? (
         <div className="space-y-4">
@@ -133,7 +268,7 @@ export default function MorningBriefPage() {
                           </div>
                           <div className="text-right shrink-0">
                             <div className="text-sm font-bold font-mono text-[#f0f6fc]">{m.price}¢</div>
-                            <div className="text-[10px] font-semibold text-[#3fb950]">+{m.change.toFixed(1)}pp</div>
+                            <div className="text-[10px] font-semibold text-[#3fb950]">+{m.change.toFixed(1)}pt</div>
                           </div>
                         </CardContent>
                       </Card>
@@ -156,7 +291,7 @@ export default function MorningBriefPage() {
                           </div>
                           <div className="text-right shrink-0">
                             <div className="text-sm font-bold font-mono text-[#f0f6fc]">{m.price}¢</div>
-                            <div className="text-[10px] font-semibold text-[#f85149]">{m.change.toFixed(1)}pp</div>
+                            <div className="text-[10px] font-semibold text-[#f85149]">{m.change.toFixed(1)}pt</div>
                           </div>
                         </CardContent>
                       </Card>
@@ -239,19 +374,6 @@ export default function MorningBriefPage() {
               </div>
             )}
           </section>
-
-          {/* ─── Footer CTA ─── */}
-          <div className="rounded-2xl bg-gradient-to-r from-[#57D7BA]/10 via-[#388bfd]/5 to-transparent border border-[#57D7BA]/20 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <div className="text-sm font-bold text-[#f0f6fc]">Stay ahead every morning</div>
-              <div className="text-[11px] text-[#8d96a0] mt-0.5">Upgrade to Pro for email delivery of your Morning Brief + AI-enhanced insights.</div>
-            </div>
-            <Link href="/pricing">
-              <button className="px-4 py-2 rounded-lg bg-[#57D7BA] text-[#0d1117] text-sm font-bold hover:bg-[#57D7BA]/80 transition-colors shrink-0">
-                Upgrade to Pro
-              </button>
-            </Link>
-          </div>
         </>
       )}
     </div>
