@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Footer } from "@/components/layout/Footer";
 import {
   Card,
   CardContent,
@@ -528,7 +527,6 @@ X-RateLimit-Tier: free`}
         </CardContent>
       </Card>
 
-      <Footer />
     </div>
   );
 }

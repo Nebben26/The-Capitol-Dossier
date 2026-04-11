@@ -449,15 +449,17 @@ export default function PricingPage() {
               }`}
             >
               <div className="p-5 flex flex-col gap-3 flex-1">
-                {/* Badge */}
+                {/* Badge — skip inline badge for featured tier (it has the floating pill instead) */}
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <div
-                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide"
-                    style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
-                  >
-                    {tier.icon}
-                    {tier.badge}
-                  </div>
+                  {!tier.featured && (
+                    <div
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide"
+                      style={{ backgroundColor: tier.badgeBg, color: tier.badgeColor }}
+                    >
+                      {tier.icon}
+                      {tier.badge}
+                    </div>
+                  )}
                   {"isNew" in tier && tier.isNew && (
                     <span className="text-[8px] font-bold uppercase tracking-wide text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">
                       NEW

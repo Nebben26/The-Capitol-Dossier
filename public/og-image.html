@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Screenshot this file at exactly 1200x630 to produce og-image.png -->
+<!-- Tools: Chrome DevTools device emulation, or puppeteer, or screely.com -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: linear-gradient(135deg, #0d1117 0%, #161b27 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #f0f6fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(87,215,186,0.15) 0%, transparent 70%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .glow-1 { top: -200px; left: -100px; }
+  .glow-2 { bottom: -200px; right: -100px; }
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(87,215,186,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(87,215,186,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .content {
+    text-align: center;
+    z-index: 10;
+    max-width: 900px;
+    padding: 0 48px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(87,215,186,0.1);
+    border: 1px solid rgba(87,215,186,0.3);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #57D7BA;
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-size: 70px;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    color: #f0f6fc;
+  }
+  .accent {
+    background: linear-gradient(135deg, #57D7BA 0%, #388bfd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  p {
+    font-size: 26px;
+    color: #8d96a0;
+    margin: 0 0 40px;
+    line-height: 1.4;
+  }
+  .stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    font-size: 17px;
+    color: #484f58;
+    font-weight: 600;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #57D7BA;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="grid-lines"></div>
+  <div class="content">
+    <div class="badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+      Quiver Markets
+    </div>
+    <h1>Prediction market<br>intelligence <span class="accent">you can act on</span></h1>
+    <p>Cross-platform arbitrage, whale tracking, and live signals<br>from Polymarket and Kalshi.</p>
+    <div class="stats">
+      <div class="stat"><span class="dot"></span>6,500+ markets</div>
+      <div class="stat"><span class="dot"></span>200+ tracked whales</div>
+      <div class="stat"><span class="dot"></span>Updated every 30 min</div>
+    </div>
+  </div>
+</body>
+</html>

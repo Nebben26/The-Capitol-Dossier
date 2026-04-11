@@ -18,35 +18,84 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+// Update SITE_URL when custom domain is purchased
+const SITE_URL = "https://quivermarkets.com";
+const SITE_NAME = "Quiver Markets";
+const SITE_DESCRIPTION =
+  "The intelligence layer for prediction markets. Cross-platform arbitrage, whale tracking, and live signals from Polymarket and Kalshi.";
+
 export const viewport: Viewport = {
   themeColor: "#57D7BA",
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Quiver Markets — Prediction Market Intelligence",
-    template: "%s · Quiver Markets",
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
   },
-  description: "Track whale positions, cross-platform arbitrage, and smart money moves on Polymarket and Kalshi.",
-  metadataBase: new URL("https://amazing-kitsune-139d51.netlify.app"),
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "prediction markets",
+    "polymarket",
+    "kalshi",
+    "arbitrage",
+    "whale tracking",
+    "prediction market analytics",
+    "polymarket alerts",
+    "kalshi alerts",
+    "cross-platform spreads",
+    "market intelligence",
+  ],
+  authors: [{ name: "Quiver Markets" }],
+  creator: "Quiver Markets",
+  publisher: "Quiver Markets",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
-    title: "Quiver Markets — Prediction Market Intelligence",
-    description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",
-    siteName: "Quiver Markets",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/og-image", width: 1200, height: 630, alt: "Quiver Markets — Prediction Market Intelligence" }],
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — Prediction market intelligence`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quiver Markets — Prediction Market Intelligence",
-    description: "Real-time prediction market analytics, whale tracking, and cross-platform arbitrage detection.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    // Update @quivermarkets when the account is created
     creator: "@quivermarkets",
-    images: ["/og-image"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-icon.png",
   },
   manifest: "/manifest.json",
 };
@@ -80,17 +129,60 @@ export default function RootLayout({
           </PostHogProvider>
         </TooltipProvider>
 
-        {/* Schema.org Organization structured data */}
+        {/* Schema.org structured data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Quiver Markets",
-              "url": "https://amazing-kitsune-139d51.netlify.app",
-              "description": "The intelligence layer for prediction markets",
-              "sameAs": ["https://twitter.com/quivermarkets"],
+              name: "Quiver Markets",
+              url: "https://quivermarkets.com",
+              logo: "https://quivermarkets.com/icon.svg",
+              description: "The intelligence layer for prediction markets.",
+              foundingDate: "2026",
+              founders: [{ "@type": "Person", name: "Ben Horch" }],
+              sameAs: [], // add social URLs when accounts exist
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Quiver Markets",
+              url: "https://quivermarkets.com",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate:
+                    "https://quivermarkets.com/screener?search={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Quiver Markets",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+                description:
+                  "Free tier with paid Pro and Trader plans available",
+              },
+              // TODO: replace with real aggregate rating once user reviews exist
             }),
           }}
         />

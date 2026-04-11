@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "News Catalysts",
-  description: "The latest news moving prediction markets — curated from Bloomberg, Reuters, AP, and more.",
+  title: "Market Insights",
+  description:
+    "News, catalyst analysis, and AI-generated intelligence for Polymarket and Kalshi prediction markets.",
+  openGraph: {
+    title: "Market Insights · Quiver Markets",
+    description:
+      "News, catalyst analysis, and AI-generated intelligence for Polymarket and Kalshi prediction markets.",
+  },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

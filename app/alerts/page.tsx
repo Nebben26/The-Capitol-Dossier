@@ -32,7 +32,6 @@ import type { Signal, SignalType } from "@/lib/signals";
 import { supabase } from "@/lib/supabase";
 import { useDataSource } from "@/components/layout/DataSourceContext";
 import { LastUpdated } from "@/components/layout/LastUpdated";
-import { Footer } from "@/components/layout/Footer";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 import { TrialBanner } from "@/components/ui/pro-gate";
 import { CustomAlertModal } from "@/components/alerts/custom-alert-modal";
@@ -502,7 +501,6 @@ export default function AlertsPage() {
         onClose={() => setAlertModalOpen(false)}
       />
 
-      <Footer />
     </div>
   );
 }

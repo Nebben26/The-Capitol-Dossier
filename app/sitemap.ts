@@ -1,31 +1,41 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 
-const BASE = "https://amazing-kitsune-139d51.netlify.app";
+// TODO: update to custom domain when purchased
+const SITE_URL = "https://quivermarkets.com";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+
   const staticPages = [
-    "", "/screener", "/disagrees", "/alerts", "/flow", "/leaderboard",
-    "/copy", "/watchlist", "/calibration", "/insights", "/api-docs",
-    "/pricing", "/about", "/roadmap", "/contact", "/status", "/changelog",
-    "/privacy", "/terms",
-  ].map((path) => ({
-    url: `${BASE}${path}`,
-    lastModified: new Date(),
-    changeFrequency: "daily" as const,
-    priority: path === "" ? 1.0 : 0.8,
-  }));
+    { url: "",             priority: 1.0, changeFrequency: "daily"   as const },
+    { url: "/disagrees",   priority: 0.9, changeFrequency: "hourly"  as const },
+    { url: "/whales",      priority: 0.9, changeFrequency: "daily"   as const },
+    { url: "/screener",    priority: 0.9, changeFrequency: "hourly"  as const },
+    { url: "/leaderboard", priority: 0.8, changeFrequency: "daily"   as const },
+    { url: "/calendar",    priority: 0.8, changeFrequency: "daily"   as const },
+    { url: "/compare",     priority: 0.7, changeFrequency: "weekly"  as const },
+    { url: "/insights",    priority: 0.7, changeFrequency: "daily"   as const },
+    { url: "/stories",     priority: 0.7, changeFrequency: "daily"   as const },
+    { url: "/morning-brief", priority: 0.7, changeFrequency: "daily" as const },
+    { url: "/pricing",     priority: 0.8, changeFrequency: "weekly"  as const },
+    { url: "/about",       priority: 0.6, changeFrequency: "monthly" as const },
+    { url: "/about-data",  priority: 0.6, changeFrequency: "monthly" as const },
+    { url: "/methodology", priority: 0.6, changeFrequency: "monthly" as const },
+    { url: "/blog",        priority: 0.6, changeFrequency: "weekly"  as const },
+    { url: "/api-docs",    priority: 0.5, changeFrequency: "monthly" as const },
+    { url: "/changelog",   priority: 0.4, changeFrequency: "weekly"  as const },
+    { url: "/resolved",    priority: 0.4, changeFrequency: "daily"   as const },
+    { url: "/terms",       priority: 0.3, changeFrequency: "yearly"  as const },
+    { url: "/privacy",     priority: 0.3, changeFrequency: "yearly"  as const },
+    { url: "/refunds",     priority: 0.3, changeFrequency: "yearly"  as const },
+    { url: "/cookies",     priority: 0.3, changeFrequency: "yearly"  as const },
+    { url: "/dmca",        priority: 0.3, changeFrequency: "yearly"  as const },
+  ];
 
-  try {
-    const { getAllMarkets } = await import("@/lib/api");
-    const { data: markets } = await getAllMarkets();
-    const marketPages = markets.slice(0, 5000).map((m) => ({
-      url: `${BASE}/markets/${m.id}`,
-      lastModified: new Date(),
-      changeFrequency: "hourly" as const,
-      priority: 0.6,
-    }));
-    return [...staticPages, ...marketPages];
-  } catch {
-    return staticPages;
-  }
+  return staticPages.map((page) => ({
+    url: `${SITE_URL}${page.url}`,
+    lastModified,
+    changeFrequency: page.changeFrequency,
+    priority: page.priority,
+  }));
 }
