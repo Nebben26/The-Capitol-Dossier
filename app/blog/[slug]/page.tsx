@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = getPost(slug);
   if (!post) return {};
   return {
-    title: `${post.title} — Quiver Markets`,
+    title: post.title,
     description: post.excerpt,
   };
 }

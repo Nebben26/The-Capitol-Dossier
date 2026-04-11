@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About — Quiver Markets",
+  title: "About",
   description: "Quiver Markets is the intelligence layer for prediction markets — independent, data-driven, built for traders.",
 };
 

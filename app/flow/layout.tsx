@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Smart Money Flow — Quiver Markets",
+  title: "Smart Money Flow",
   description: "Where the smart money is flowing today. Aggregated whale capital across prediction market categories.",
 };
 

@@ -111,9 +111,7 @@ export default function AboutPage() {
         </p>
         <p className="text-[13px] text-[#8d96a0] leading-relaxed">
           If you want to reach out, email{" "}
-          <a href="mailto:hello@quivermarkets.com" className="text-[#57D7BA] hover:underline">hello@quivermarkets.com</a>
-          {" "}or find him on{" "}
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#57D7BA] hover:underline">Twitter</a>.
+          <a href="mailto:hello@quivermarkets.com" className="text-[#57D7BA] hover:underline">hello@quivermarkets.com</a>.
         </p>
       </div>
 

@@ -44,24 +44,6 @@ export default function ContactPage() {
           </Card>
         </a>
 
-        <a
-          href="https://twitter.com/quivermarkets"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block group"
-        >
-          <Card className="bg-[#161b27] border-[#21262d] group-hover:border-[#1d9bf0]/40 transition-colors h-full">
-            <CardContent className="p-5 flex flex-col gap-3">
-              <div className="size-10 rounded-xl bg-[#1d9bf0]/10 flex items-center justify-center">
-                <ExternalLink className="size-5 text-[#1d9bf0]" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-[#e2e8f0]">Twitter</div>
-                <div className="text-[13px] text-[#1d9bf0] font-mono mt-0.5">@quivermarkets</div>
-              </div>
-            </CardContent>
-          </Card>
-        </a>
       </div>
 
       {/* What we respond to */}

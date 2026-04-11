@@ -110,7 +110,14 @@ export default function ResolvedPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-[#8892b0]">
           <CheckCircle className="size-10 mx-auto mb-3 opacity-20" />
-          <p className="text-sm">No resolved markets found.</p>
+          <p className="text-sm font-medium text-[#e2e8f0] mb-1">
+            {search ? "No markets match your search." : "No resolved markets yet."}
+          </p>
+          <p className="text-xs max-w-sm mx-auto leading-relaxed">
+            {search
+              ? "Try a different keyword, platform, or category."
+              : "Resolved markets appear here after Polymarket or Kalshi settles them. Check back after the next ingestion run, or browse active markets on the Screener."}
+          </p>
         </div>
       ) : (
         <div className="rounded-xl border border-[#2a2f45] overflow-hidden">

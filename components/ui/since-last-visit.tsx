@@ -26,6 +26,7 @@ export function SinceLastVisit() {
     const lastDate = new Date(last);
     const hoursAgo = (Date.now() - lastDate.getTime()) / 3_600_000;
     if (hoursAgo < 1) return; // too recent — don't show
+    if (hoursAgo > 24 * 30) return; // >30 days stale — last visit timestamp is no longer useful
 
     // Fetch new signals and disagreements since last visit
     Promise.all([
@@ -41,7 +42,8 @@ export function SinceLastVisit() {
         .from("markets")
         .select("id", { count: "exact", head: true })
         .eq("resolved", false)
-        .gte("change_24h", 5),
+        .gte("change_24h", 5)
+        .lte("change_24h", 100),
     ]).then(([signals, spreads, movers]) => {
       setDiff({
         newSignals: signals.count ?? 0,

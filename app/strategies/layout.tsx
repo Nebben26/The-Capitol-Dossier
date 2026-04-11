@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Strategies | Quiver Markets",
+  title: "Strategies",
   description: "Curated prediction market trading strategies with backtested returns. Whale shadow, dip hunter, election alpha, and more.",
 };
 

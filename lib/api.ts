@@ -1204,6 +1204,8 @@ export async function getMorningBrief(): Promise<{ data: MorningBrief; source: D
         .select("id, question, change_24h")
         .eq("resolved", false)
         .not("change_24h", "is", null)
+        .gte("change_24h", -100)
+        .lte("change_24h", 100)
         .order("change_24h", { ascending: true })
         .limit(1),
 
@@ -1212,6 +1214,8 @@ export async function getMorningBrief(): Promise<{ data: MorningBrief; source: D
         .select("id, question, change_24h")
         .eq("resolved", false)
         .not("change_24h", "is", null)
+        .gte("change_24h", -100)
+        .lte("change_24h", 100)
         .order("change_24h", { ascending: false })
         .limit(1),
 
@@ -1586,10 +1590,20 @@ export async function getLatestSignalTimestamp(): Promise<string | null> {
   }
 }
 
-/** Returns ISO timestamp of the most recently updated market row, or null if none */
+/** Returns ISO timestamp of the last completed ingestion run, or null if none */
 export async function getLastIngestTimestamp(): Promise<string | null> {
   if (!isSupabaseConfigured()) return null;
   try {
+    // Prefer ingestion_runs.completed_at as the authoritative source
+    const { data: runData } = await supabase
+      .from("ingestion_runs")
+      .select("completed_at")
+      .eq("status", "completed")
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (runData?.completed_at) return runData.completed_at;
+    // Fallback: most recently updated market row
     const { data } = await supabase
       .from("markets")
       .select("updated_at")

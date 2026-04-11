@@ -30,7 +30,7 @@ export default function BlogIndexPage() {
         <p className="text-[#8d96a0]">Insights and case studies from the Quiver Markets team.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={POSTS.length === 1 ? "max-w-2xl" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
         {POSTS.map((post) => {
           const category = deriveCategory(post.slug);
           const readTime = estimateReadTime(post);
@@ -83,6 +83,17 @@ export default function BlogIndexPage() {
           );
         })}
       </div>
+
+      {/* Morning Brief CTA — shown when there's only one post */}
+      {POSTS.length <= 2 && (
+        <div className="max-w-2xl mt-4 p-5 rounded-xl bg-[#161b27] border border-[#21262d]">
+          <p className="text-sm font-semibold text-[#e2e8f0] mb-1">Get the Morning Brief</p>
+          <p className="text-xs text-[#8d96a0] leading-relaxed">
+            New posts are rare — get daily market intelligence delivered straight to you instead.
+            The Morning Brief runs every morning on the homepage and covers spreads, movers, and whale signals.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

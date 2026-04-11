@@ -469,7 +469,6 @@ export default function HomePage() {
               : "Be one of the first to lock in founder pricing."}
           </p>
           <WaitlistForm source="homepage" />
-          <p className="text-[10px] text-[#4a5168] mt-3">Testimonials coming soon — be among the first to try Pro and share your feedback.</p>
         </CardContent>
       </Card>
 
@@ -853,7 +852,6 @@ export default function HomePage() {
             <Link href="/api-docs" className="hover:text-[#57D7BA] transition-colors">API</Link>
             <Link href="/pricing" className="hover:text-[#57D7BA] transition-colors">Pricing</Link>
             <a href="mailto:hello@quivermarkets.com" className="hover:text-[#57D7BA] transition-colors">Contact</a>
-            <a href="https://twitter.com/quivermarkets" target="_blank" rel="noopener noreferrer" className="hover:text-[#57D7BA] transition-colors">Twitter</a>
             <Link href="/blog" className="hover:text-[#57D7BA] transition-colors">Blog</Link>
             <Link href="/changelog" className="hover:text-[#57D7BA] transition-colors">Changelog</Link>
             <Link href="/status" className="hover:text-[#57D7BA] transition-colors">Status</Link>

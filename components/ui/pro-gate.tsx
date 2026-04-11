@@ -1,9 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Crown, Lock, Zap } from "lucide-react";
+import { Crown, Lock, Zap, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/layout/AuthContext";
+
+const DISMISS_KEY = "qm_cta_dismissed_until";
+const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /** Small inline "PRO" badge */
 export function ProBadge({ className = "" }: { className?: string }) {
@@ -77,6 +81,21 @@ export function ProGate({ children, feature }: { children: React.ReactNode; feat
 /** Upgrade CTA for sidebar */
 export function SidebarUpgradeCard() {
   const { isPro, trialDaysLeft } = useAuth();
+  const [dismissed, setDismissed] = useState(true); // start hidden to avoid flash
+
+  useEffect(() => {
+    const until = localStorage.getItem(DISMISS_KEY);
+    if (until && Date.now() < Number(until)) {
+      setDismissed(true);
+    } else {
+      setDismissed(false);
+    }
+  }, []);
+
+  function dismiss() {
+    localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_TTL_MS));
+    setDismissed(true);
+  }
 
   if (isPro && trialDaysLeft !== null && trialDaysLeft > 0) {
     return (
@@ -103,8 +122,17 @@ export function SidebarUpgradeCard() {
     );
   }
 
+  if (dismissed) return null;
+
   return (
-    <div className="p-3 rounded-xl bg-gradient-to-br from-[#57D7BA]/10 to-[#388bfd]/5 border border-[#57D7BA]/20 shadow-glow-brand">
+    <div className="relative p-3 rounded-xl bg-gradient-to-br from-[#57D7BA]/10 to-[#388bfd]/5 border border-[#57D7BA]/20 shadow-glow-brand">
+      <button
+        onClick={dismiss}
+        aria-label="Dismiss upgrade prompt"
+        className="absolute top-2 right-2 text-[#484f58] hover:text-[#8892b0] transition-colors"
+      >
+        <X className="size-3" />
+      </button>
       <div className="flex items-center gap-2 mb-2">
         <Zap className="size-3.5 text-[#57D7BA]" />
         <span className="text-sm font-semibold text-[#f0f6fc]">Unlock Pro</span>
