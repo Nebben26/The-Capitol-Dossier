@@ -203,6 +203,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 24. `session18-telegram.sql`
+**What it does:** Creates `telegram_subscribers` table (one row per linked Telegram chat, with preferences and rate-limit counters) and `telegram_alerts_sent` table (delivery log for every alert dispatched).
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`)
+**Dependencies:** Supabase `auth.users`
+**Tables created:** `telegram_subscribers`, `telegram_alerts_sent`
+**RLS:** Service role full access; authenticated users can read/update their own subscriber row
+
+---
+
 ### 23. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
@@ -237,5 +246,7 @@ Mark each migration as ✅ once applied to production.
 | 20 | `whales-schema.sql` *(skip if whales table exists)* | ☐ |
 | 21 | `session15-ingestion-runs.sql` | ☐ |
 | 22 | `session15-stripe-events.sql` | ☐ |
+| 23 | `backfill-resolved.sql` *(run last)* | ☐ |
+| 24 | `session18-telegram.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

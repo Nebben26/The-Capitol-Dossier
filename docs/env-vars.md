@@ -166,6 +166,35 @@ Variables must be set in both `.env.local` (local dev) **and** Netlify (producti
 
 ---
 
+## Telegram (Real-Time Alerts)
+
+See `docs/telegram-bot-setup.md` for the full bot creation walkthrough.
+
+### `TELEGRAM_BOT_TOKEN`
+- **Required:** No — Telegram features silently disabled when missing or when value contains "PLACEHOLDER"
+- **Service:** Telegram Bot API token from @BotFather
+- **Where to get it:** Open Telegram → search @BotFather → /newbot → copy the token it gives you
+- **Format:** `7234567890:AAF_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **If missing/placeholder:** Bot webhook returns 200 immediately (no-op); alert dispatch is skipped; link generation still works but `sendMessage` is a no-op
+- **Set in:** `.env.local` + Netlify
+
+### `TELEGRAM_WEBHOOK_SECRET`
+- **Required:** Yes (must match the `secret_token` you pass when registering the webhook with Telegram)
+- **Service:** Internal — random string you generate and register in both places
+- **How to generate:** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- **Pre-generated value for this project:** `459f0708163ee8d6b8bf99d48568c36ee713531aa91cf9e89d29c183a181cd91`
+- **If missing/placeholder:** Webhook endpoint rejects all Telegram requests with 401
+- **Set in:** `.env.local` + Netlify (must match the `secret_token` parameter in your `/setWebhook` curl command)
+
+### `TELEGRAM_BOT_USERNAME`
+- **Required:** No (defaults to `quivermarkets_bot`)
+- **Service:** Your bot's Telegram username (without the @)
+- **Where to get it:** BotFather tells you after creating the bot, e.g. `quivermarkets_bot`
+- **If missing:** Falls back to `quivermarkets_bot` — the generated `t.me/` link will be wrong if your bot has a different username
+- **Set in:** `.env.local` + Netlify
+
+---
+
 ## Internal Secrets
 
 ### `ALERT_EVALUATOR_SECRET`
@@ -213,3 +242,6 @@ Set at: GitHub repo → Settings → Secrets and variables → Actions → New r
 | `SENTRY_AUTH_TOKEN` | Low | Minified stack traces in Sentry |
 | `MORNING_BRIEF_FROM_EMAIL` | Low | Uses default address |
 | `NEXT_PUBLIC_POSTHOG_HOST` | Low | Uses default US host |
+| `TELEGRAM_BOT_TOKEN` | Low | Telegram alerts silently disabled |
+| `TELEGRAM_WEBHOOK_SECRET` | Medium | Webhook rejects all Telegram requests |
+| `TELEGRAM_BOT_USERNAME` | Low | Link URLs broken if username differs |

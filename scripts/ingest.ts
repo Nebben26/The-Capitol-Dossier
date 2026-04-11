@@ -687,6 +687,42 @@ async function ingestDisagreements(markets: any[]) {
     console.log("  No disagreements found — clearing table");
     await supabase.from("disagreements").delete().neq("id", "");
   }
+
+  // ── Telegram alerts for notable new spreads ───────────────────────────────
+  console.log("\n=== Checking for new arb alerts ===");
+  try {
+    const { dispatchAlert } = await import("../lib/telegram-dispatcher");
+
+    // Alert on the top spreads found this run (>= 10pt threshold)
+    const notableArbs = dedupedDisagreements
+      .filter((d) => d.spread >= 10)
+      .sort((a, b) => b.spread - a.spread)
+      .slice(0, 10);
+
+    if (notableArbs.length > 0) {
+      console.log(`  Found ${notableArbs.length} notable arbs (>= 10pt) to alert on`);
+      for (const arb of notableArbs) {
+        const result = await dispatchAlert({
+          type: "arb_spread",
+          marketId: arb.id,
+          question: arb.question,
+          spreadPt: Number(arb.spread),
+          polyPrice: Math.round(Number(arb.poly_price)),
+          kalshiPrice: Math.round(Number(arb.kalshi_price)),
+          category: arb.category || "Other",
+          url: `https://quivermarkets.com/disagrees?highlight=${arb.id}`,
+        });
+        if (result.sent > 0 || result.failed > 0) {
+          console.log(`  Arb ${arb.id} (${arb.spread}pt): sent=${result.sent} failed=${result.failed}`);
+        }
+      }
+    } else {
+      console.log("  No spreads >= 10pt — no Telegram alerts sent");
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("  Telegram alert dispatch failed (non-fatal):", msg);
+  }
 }
 
 // ─── 11. INGEST WHALE POSITIONS ──────────────────────────────────────
