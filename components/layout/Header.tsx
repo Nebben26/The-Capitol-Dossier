@@ -37,21 +37,23 @@ function MiniPulseGauge() {
   const color = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
 
   return (
-    <div className="hidden lg:flex items-center gap-1.5 shrink-0" title={`Market Pulse: ${value}`}>
-      <svg viewBox="0 0 100 55" className="w-10 h-auto">
+    <div className="hidden lg:flex items-center gap-2 bg-[#161b27] border border-[#21262d] rounded-lg px-2.5 py-1.5 shrink-0" title={`Market Pulse: ${value}`}>
+      <svg viewBox="0 0 100 55" className="w-9 h-auto">
         <defs>
           <linearGradient id="miniGaugeG" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22c55e" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#ef4444" />
+            <stop offset="0%" stopColor="#3fb950" />
+            <stop offset="50%" stopColor="#d29922" />
+            <stop offset="100%" stopColor="#f85149" />
           </linearGradient>
         </defs>
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="#21262d" strokeWidth="5" strokeLinecap="round" />
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="url(#miniGaugeG)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(value / 100) * 126} 126`} />
         <circle cx={dotX} cy={dotY} r={3} fill="#fff" stroke={color} strokeWidth={1.5} />
-        <text x="50" y="42" textAnchor="middle" fill="#e2e8f0" fontSize="11" fontWeight="700">{value}</text>
       </svg>
-      <span className="text-[9px] text-[#8892b0] leading-tight hidden xl:block">Pulse</span>
+      <div className="flex flex-col">
+        <div className="text-[9px] text-[#484f58] font-bold uppercase tracking-widest leading-none">Pulse</div>
+        <div className="text-sm font-bold tabular-nums text-[#f0f6fc] leading-tight mt-0.5">{value}</div>
+      </div>
     </div>
   );
 }
@@ -116,7 +118,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          className="w-full h-9 pl-9 pr-12 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all"
+          className="w-full h-9 pl-9 pr-12 rounded-lg bg-[#161b27] border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 hover:border-[#57D7BA]/50 hover:shadow-[0_0_0_3px_rgba(87,215,186,0.06)] transition-all duration-150"
         />
         <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-[#21262d] bg-[#0d1117] px-1.5 text-[10px] text-[#8892b0] font-mono">⌘K</kbd>
 
@@ -204,26 +206,26 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         )}
       </div>
 
-      {/* Right side: LIVE dot + Mini Gauge + Bell */}
-      <div className="flex items-center gap-2.5">
-        <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#22c55e]/10 text-[#22c55e] text-[10px] font-bold">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full rounded-full bg-[#22c55e] opacity-75 animate-ping" />
-            <span className="relative inline-flex size-2 rounded-full bg-[#22c55e] live-pulse" />
-          </span>
+      {/* Right side */}
+      <div className="flex items-center gap-2">
+        {/* LIVE badge */}
+        <div className="hidden md:inline-flex items-center gap-1.5 bg-[#3fb950]/15 border border-[#3fb950]/30 text-[#3fb950] text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#3fb950] animate-pulse shrink-0" />
           LIVE
         </div>
-        {source === "live" && (
-          <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-bold uppercase tracking-wider" title="Data refreshes every 30 minutes via GitHub Actions cron">
-            Live Data
-          </span>
-        )}
-        <Link href="/calibration" className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#6366f1]/10 text-[#6366f1] text-[9px] font-bold hover:bg-[#6366f1]/20 transition-colors">
+
+        {/* My Calibration */}
+        <Link href="/calibration" className="hidden xl:inline text-[11px] text-[#8d96a0] hover:text-[#f0f6fc] transition-colors">
           My Calibration
         </Link>
-        <Link href="/disagrees" className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-[9px] font-bold hover:bg-[#f59e0b]/20 transition-colors">
-          <span className="font-mono tabular-nums">{disagreements.length}</span> Disagrees
+
+        {/* Disagrees count */}
+        <Link href="/disagrees" className="hidden md:inline-flex items-center gap-1 bg-[#161b27] border border-[#21262d] text-[#f0f6fc] text-[11px] font-semibold px-2 py-1 rounded-md hover:border-[#57D7BA]/40 transition-colors">
+          <span className="font-mono tabular-nums">{disagreements.length}</span>
+          <span className="text-[#8d96a0]">Disagrees</span>
         </Link>
+
+        {/* Telegram share */}
         <button
           onClick={() => {
             const topDisagree = disagreements[0];
@@ -232,13 +234,14 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
               : "Check out Quiver Markets — prediction market intelligence";
             window.open(`https://t.me/share/url?text=${encodeURIComponent(text)}`, "_blank", "width=550,height=420");
           }}
-          className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#2AABEE]/10 text-[#2AABEE] text-[9px] font-bold hover:bg-[#2AABEE]/20 transition-colors border border-[#2AABEE]/20"
+          className="hidden lg:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#2AABEE]/10 text-[#2AABEE] text-[11px] font-bold hover:bg-[#2AABEE]/20 transition-colors border border-[#2AABEE]/20 active:scale-[0.97] transition-all duration-100"
           title="Share top disagree to Telegram"
           aria-label="Share top disagreement to Telegram"
         >
           <svg viewBox="0 0 24 24" className="size-3" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
-          Share
         </button>
+
+        {/* Pulse gauge */}
         <MiniPulseGauge />
       </div>
     </header>

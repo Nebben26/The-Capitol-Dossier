@@ -23,30 +23,54 @@ import {
   BookOpen,
   Sparkles,
   CalendarDays,
-  Network,
+  Zap,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
-const navItems = [
-  { label: "Home", icon: Home, href: "/" },
-  { label: "Screener", icon: Target, href: "/screener" },
-  { label: "Calendar", icon: CalendarDays, href: "/calendar" },
-  { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
-
-  { label: "Insights", icon: Newspaper, href: "/insights" },
-  { label: "Stories", icon: Sparkles, href: "/stories" },
-  { label: "Flow", icon: DollarSign, href: "/flow" },
-  { label: "Whales", icon: Users, href: "/whales" },
-  { label: "Smart Money", icon: Copy, href: "/copy" },
-  { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
-  { label: "Watchlist", icon: Star, href: "/watchlist" },
-  { label: "Calibration", icon: Crosshair, href: "/calibration" },
-  { label: "API", icon: Code, href: "/api-docs" },
-  { label: "Pricing", icon: CreditCard, href: "/pricing" },
-  { label: "Alerts", icon: Bell, href: "/alerts" },
-  { label: "Status", icon: Server, href: "/status" },
-  { label: "Changelog", icon: FileText, href: "/changelog" },
-  { label: "Blog", icon: BookOpen, href: "/blog" },
+const navGroups = [
+  {
+    label: "Discover",
+    items: [
+      { label: "Home", icon: Home, href: "/" },
+      { label: "Screener", icon: Target, href: "/screener" },
+      { label: "Calendar", icon: CalendarDays, href: "/calendar" },
+      { label: "Insights", icon: Newspaper, href: "/insights" },
+      { label: "Stories", icon: Sparkles, href: "/stories" },
+    ],
+  },
+  {
+    label: "Arbitrage",
+    items: [
+      { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
+      { label: "Flow", icon: DollarSign, href: "/flow" },
+    ],
+  },
+  {
+    label: "Whales",
+    items: [
+      { label: "Whales", icon: Users, href: "/whales" },
+      { label: "Smart Money", icon: Copy, href: "/copy" },
+      { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
+    ],
+  },
+  {
+    label: "My Account",
+    items: [
+      { label: "Watchlist", icon: Star, href: "/watchlist" },
+      { label: "Calibration", icon: Crosshair, href: "/calibration" },
+      { label: "Alerts", icon: Bell, href: "/alerts" },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      { label: "API", icon: Code, href: "/api-docs" },
+      { label: "Pricing", icon: CreditCard, href: "/pricing" },
+      { label: "Status", icon: Server, href: "/status" },
+      { label: "Changelog", icon: FileText, href: "/changelog" },
+      { label: "Blog", icon: BookOpen, href: "/blog" },
+    ],
+  },
 ];
 
 export function Sidebar({
@@ -66,51 +90,68 @@ export function Sidebar({
   return (
     <>
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#171b28] border-r border-[#2a2f45] flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-56 bg-[#0d1117] border-r border-[#21262d] flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center gap-2.5 px-5 h-14 border-b border-[#2a2f45]">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="size-7 rounded-lg bg-[#57D7BA] flex items-center justify-center">
-              <Activity className="size-4 text-[#0f1119]" />
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-[#21262d]">
+          <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-[#57D7BA] flex items-center justify-center shrink-0 shadow-glow-brand">
+              <Activity className="size-4 text-[#0d1117]" />
             </div>
-            <span className="font-semibold text-sm tracking-tight">
+            <span className="text-base font-bold tracking-tight text-[#f0f6fc] truncate">
               Quiver Markets
             </span>
           </Link>
           <button
             onClick={onClose}
             aria-label="Close navigation menu"
-            className="ml-auto lg:hidden text-[#8892b0] hover:text-[#e2e8f0]"
+            className="ml-auto lg:hidden text-[#8d96a0] hover:text-[#f0f6fc] transition-colors"
           >
             <X className="size-4" />
           </button>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
-          {navItems.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={onClose}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  active
-                    ? "bg-[#57D7BA]/10 text-[#57D7BA] font-medium"
-                    : "text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#161b27]"
-                }`}
-              >
-                <item.icon className="size-4" />
-                {item.label}
-              </Link>
-            );
-          })}
+
+        {/* Nav groups */}
+        <nav className="flex-1 py-2 overflow-y-auto">
+          {navGroups.map((group, gi) => (
+            <div key={group.label}>
+              <div className={`px-3 mb-1 ${gi === 0 ? "mt-2" : "mt-5"}`}>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#484f58]">
+                  {group.label}
+                </span>
+              </div>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={onClose}
+                      className={`flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150 ${
+                        active
+                          ? "bg-gradient-to-r from-[#57D7BA]/15 to-transparent border-l-2 border-[#57D7BA] text-[#57D7BA] font-semibold rounded-r-lg pl-[10px] pr-3"
+                          : "text-[#8d96a0] hover:bg-[#1c2333] hover:text-[#f0f6fc] rounded-lg mx-1 px-3"
+                      }`}
+                    >
+                      <item.icon className="size-4 shrink-0" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
+
+        {/* Upgrade card */}
         <div className="px-3 pb-4">
           <SidebarUpgradeCard />
         </div>
       </aside>
+
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity duration-300"

@@ -104,14 +104,14 @@ export function SidebarUpgradeCard() {
   }
 
   return (
-    <div className="p-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
+    <div className="p-3 rounded-xl bg-gradient-to-br from-[#57D7BA]/10 to-[#388bfd]/5 border border-[#57D7BA]/20 shadow-glow-brand">
       <div className="flex items-center gap-2 mb-2">
         <Zap className="size-3.5 text-[#57D7BA]" />
-        <span className="text-xs font-medium">Unlock Pro</span>
+        <span className="text-sm font-semibold text-[#f0f6fc]">Unlock Pro</span>
       </div>
-      <p className="text-[10px] text-[#8892b0] leading-relaxed mb-2">Real-time alerts, full API, advanced calibration & more.</p>
+      <p className="text-xs text-[#8d96a0] leading-relaxed mb-2">Real-time alerts, full API, advanced calibration & more.</p>
       <Link href="/pricing" className="block w-full">
-        <Button className="w-full h-7 text-xs bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">View Pricing</Button>
+        <Button className="w-full h-7 text-xs bg-[#57D7BA] text-[#0d1117] font-semibold hover:bg-[#57D7BA]/90 active:scale-[0.97] transition-all duration-100">View Pricing</Button>
       </Link>
     </div>
   );

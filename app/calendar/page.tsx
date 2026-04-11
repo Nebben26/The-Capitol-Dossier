@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { fetchUpcomingCatalysts, type CalendarMarket } from "@/lib/calendar";
+import { getLastIngestTimestamp } from "@/lib/api";
 import { TopCatalystsHero } from "@/components/calendar/TopCatalystsHero";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { UpcomingList } from "@/components/calendar/UpcomingList";
+import { DataFreshness } from "@/components/ui/data-freshness";
 
 export default function CalendarPage() {
   const [catalysts, setCatalysts] = useState<CalendarMarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [freshnessTs, setFreshnessTs] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUpcomingCatalysts(30)
@@ -20,6 +23,7 @@ export default function CalendarPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+    getLastIngestTimestamp().then(setFreshnessTs);
   }, []);
 
   // Top catalysts = markets resolving within 7 days, sorted by score
@@ -28,11 +32,14 @@ export default function CalendarPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
       {/* Page title */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Catalyst Calendar</h1>
-        <p className="text-sm text-[#8892b0] mt-1">
-          Upcoming market-resolving events ranked by volume, spread, and trader activity.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Catalyst Calendar</h1>
+          <p className="text-sm text-[#8892b0] mt-1">
+            Upcoming market-resolving events ranked by volume, spread, and trader activity.
+          </p>
+        </div>
+        <DataFreshness timestamp={freshnessTs} />
       </div>
 
       {loading ? (

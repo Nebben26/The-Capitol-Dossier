@@ -55,6 +55,7 @@ import { ProBadge } from "@/components/ui/pro-gate";
 import { formatPct, formatCents } from "@/lib/format";
 import { getMarketInsights, type MarketInsight } from "@/lib/api";
 import { analyzeCausation, getCausationLabel } from "@/lib/causation";
+import { DataFreshness } from "@/components/ui/data-freshness";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -302,6 +303,7 @@ export default function ScreenerPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <DataFreshness timestamp={lastFetched} />
           <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
           <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-bold tabular-nums">{filtered.length} results</span>
         </div>

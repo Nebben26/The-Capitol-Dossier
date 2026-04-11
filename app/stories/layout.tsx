@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Whale Leaderboard",
-  description: "The most accurate prediction market whales, ranked by P&L and win rate.",
+  title: "Stories",
+  description: "Deep-dive market intelligence stories — whale moves, arbitrage plays, and resolution analysis.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Whale Tracker | Quiver Markets",
+  title: "Whale Tracker",
   description: "Track the biggest prediction market whales. Real-time P&L, accuracy scores, and position tracking from Polymarket.",
 };
 

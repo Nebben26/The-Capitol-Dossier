@@ -43,6 +43,7 @@ import type { Whale } from "@/lib/mockData";
 import { getAllWhaleAccuracies } from "@/lib/api";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { MarketsBrowseSkeleton } from "@/components/ui/skeleton-loaders";
+import { DataFreshness } from "@/components/ui/data-freshness";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Sports", "Tech", "Geopolitics"];
 
@@ -112,7 +113,7 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
 }
 
 export default function WhalesBrowsePage() {
-  const { whales } = useWhales();
+  const { whales, lastFetched: whalesFetched } = useWhales();
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sortBy, setSortBy] = useState<SortKey>("rank");
@@ -170,7 +171,10 @@ export default function WhalesBrowsePage() {
           </h1>
           <p className="text-sm text-[#8892b0] mt-1">{whales.length} tracked wallets across all platforms</p>
         </div>
-        <LastUpdated />
+        <div className="flex items-center gap-2">
+          <DataFreshness timestamp={whalesFetched} />
+          <LastUpdated />
+        </div>
       </div>
 
       {/* Copy the Whales CTA */}

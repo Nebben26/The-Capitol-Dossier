@@ -55,6 +55,7 @@ import { analyzeCausation } from "@/lib/causation";
 import { analyzeResolutionDiff } from "@/lib/resolution-diff";
 import type { CausationType, CausationAnalysis } from "@/lib/causation";
 import type { Disagreement } from "@/lib/mockData";
+import { DataFreshness } from "@/components/ui/data-freshness";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
@@ -257,6 +258,14 @@ function DisagreesContent() {
   const [viewMode, setViewMode]       = useState<ViewMode>("grid");
   const [historyMap, setHistoryMap]   = useState<Record<string, Array<{ t: number; spread: number }>>>({});
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+
+  // Dynamic tab title
+  useEffect(() => {
+    if (disagreements.length > 0) {
+      document.title = `${disagreements.length} Disagreements · Quiver Markets`;
+    }
+    return () => { document.title = "Disagreements · Quiver Markets"; };
+  }, [disagreements.length]);
   const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({});
 
   useEffect(() => {
@@ -386,6 +395,7 @@ function DisagreesContent() {
         </div>
         <div className="flex items-center gap-2">
           <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
+          <DataFreshness timestamp={lastFetched} />
           <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-[10px] font-bold">
             <AlertTriangle className="size-3" />
             {filtered.length} opportunities

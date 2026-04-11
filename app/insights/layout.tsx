@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "News Catalysts — Quiver Markets",
+  title: "News Catalysts",
   description: "The latest news moving prediction markets — curated from Bloomberg, Reuters, AP, and more.",
 };
 

@@ -38,6 +38,7 @@ import {
   Flame,
   ArrowUpRight,
   ArrowDownRight,
+  ArrowRight,
   Trophy,
   ExternalLink,
   AlertTriangle,
@@ -57,6 +58,7 @@ import { formatSignedPct, formatPct, formatCents } from "@/lib/format";
 import { WaitlistForm } from "@/components/ui/waitlist-form";
 import { SearchBox } from "@/components/ui/search-box";
 import { SinceLastVisit } from "@/components/ui/since-last-visit";
+import { CountUp } from "@/components/ui/count-up";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -143,7 +145,7 @@ export default function HomePage() {
   const [isNarrow, setIsNarrow] = useState(false);
   const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
-  const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number } | null>(null);
+  const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number; whalesCount: number } | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -170,7 +172,7 @@ export default function HomePage() {
   useEffect(() => {
     getLastIngestTimestamp().then(setLastIngestAt);
     getWaitlistCount().then(setWaitlistCount);
-    getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount }));
+    getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount, whalesCount: s.whalesCount }));
   }, []);
 
   useEffect(() => {
@@ -258,8 +260,72 @@ export default function HomePage() {
 
   if (loading) return <HomepageSkeleton />;
 
+  const marketCount = sysStats?.marketsCount ?? 0;
+  const disagreeCount = sysStats?.disagreementsCount ?? 0;
+  const whaleCount = sysStats?.whalesCount ?? 0;
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
+      {/* ─── MARKETING HERO ──────────────────────────────────── */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#21262d] bg-gradient-to-br from-[#161b27] via-[#0d1117] to-[#0d1117] p-8 lg:p-12 mb-6">
+        {/* Ambient glows */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#57D7BA]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-[#388bfd]/8 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-3xl">
+          {/* Status pill */}
+          <div className="inline-flex items-center gap-2 bg-[#57D7BA]/10 border border-[#57D7BA]/20 rounded-full px-3 py-1 text-[11px] font-bold text-[#57D7BA] uppercase tracking-widest mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#57D7BA] animate-pulse" />
+            Live Intelligence
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#f0f6fc] leading-[1.1] tracking-tight mb-4">
+            Prediction market intelligence
+            <br />
+            <span className="bg-gradient-to-r from-[#57D7BA] to-[#388bfd] bg-clip-text text-transparent">you can&apos;t get anywhere else.</span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-base sm:text-lg text-[#8d96a0] leading-relaxed mb-6 max-w-2xl">
+            Track whale positions, detect cross-platform arbitrage, and see the smart money moves on Polymarket and Kalshi — updated every 30 minutes.
+          </p>
+
+          {/* Stat strip */}
+          <div className="flex flex-wrap items-center gap-6 sm:gap-10 mb-6">
+            <div>
+              {marketCount > 0
+                ? <CountUp end={marketCount} className="text-2xl font-bold text-[#f0f6fc] tabular-nums font-mono" />
+                : <span className="text-2xl font-bold text-[#f0f6fc] tabular-nums font-mono">—</span>}
+              <div className="text-xs text-[#8d96a0] uppercase tracking-wide mt-0.5">Markets Tracked</div>
+            </div>
+            <div>
+              {disagreeCount > 0
+                ? <CountUp end={disagreeCount} className="text-2xl font-bold text-[#57D7BA] tabular-nums font-mono" />
+                : <span className="text-2xl font-bold text-[#57D7BA] tabular-nums font-mono">—</span>}
+              <div className="text-xs text-[#8d96a0] uppercase tracking-wide mt-0.5">Active Disagreements</div>
+            </div>
+            <div>
+              {whaleCount > 0
+                ? <CountUp end={whaleCount} className="text-2xl font-bold text-[#f0f6fc] tabular-nums font-mono" />
+                : <span className="text-2xl font-bold text-[#f0f6fc] tabular-nums font-mono">—</span>}
+              <div className="text-xs text-[#8d96a0] uppercase tracking-wide mt-0.5">Whales Tracked</div>
+            </div>
+          </div>
+
+          {/* CTAs */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/disagrees" className="inline-flex items-center gap-2 bg-[#57D7BA] text-[#0d1117] font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#57D7BA]/90 transition-all duration-150 active:scale-[0.97] shadow-glow-brand">
+              See Live Opportunities
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link href="/pricing" className="inline-flex items-center gap-2 bg-[#161b27] text-[#f0f6fc] font-semibold text-sm px-5 py-2.5 rounded-lg border border-[#21262d] hover:border-[#57D7BA]/40 transition-all duration-150 active:scale-[0.97]">
+              View Pricing
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ─── FIRST-VISIT HERO ────────────────────────────────── */}
       <FirstVisitHero />
 

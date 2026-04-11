@@ -61,6 +61,7 @@ import {
 } from "lucide-react";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
+import { DataFreshness } from "@/components/ui/data-freshness";
 
 
 type SortKey = "rank" | "pnl" | "winRate" | "accuracy" | "volume" | "activeMarkets" | "brier";
@@ -182,7 +183,7 @@ function TraderCard({ t, followed, onFollow, liveAccuracy }: { t: Whale; followe
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────
 export default function LeaderboardPage() {
-  const { whales: traders } = useLeaderboard();
+  const { whales: traders, lastFetched: leaderboardFetched } = useLeaderboard();
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<typeof timeFilters[number]>("All Time");
   const [category, setCategory] = useState("All");
@@ -257,6 +258,7 @@ export default function LeaderboardPage() {
                 <p className="text-sm text-[#8892b0] mt-1">Top Prediction Market Traders — ranked by performance</p>
               </div>
               <div className="flex items-center gap-2">
+                <DataFreshness timestamp={leaderboardFetched} />
                 <LastUpdated />
                 <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-semibold">
                   <Users className="size-3" />
