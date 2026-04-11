@@ -111,9 +111,9 @@ Variables must be set in both `.env.local` (local dev) **and** Netlify (producti
 ### `MORNING_BRIEF_CRON_SECRET`
 - **Required:** Yes (for the Netlify scheduled function to authenticate with the API route)
 - **Service:** Internal — shared secret
-- **How to generate:** `openssl rand -hex 32`
+- **How to generate:** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 - **If missing/placeholder:** Netlify cron silently aborts; no morning briefs are ever sent
-- **Set in:** `.env.local` + Netlify (must match in both places)
+- **Set in:** `.env.local` + Netlify (must match in both places — the cron function and the API route must share the same value)
 
 ---
 
@@ -171,7 +171,7 @@ Variables must be set in both `.env.local` (local dev) **and** Netlify (producti
 ### `ALERT_EVALUATOR_SECRET`
 - **Required:** Yes (for the alert evaluator cron to authenticate)
 - **Service:** Internal — shared secret between cron caller and `/api/alerts/evaluate` route
-- **How to generate:** `openssl rand -hex 32`
+- **How to generate:** `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 - **If missing/placeholder:** Alert evaluation endpoint returns 401; no alerts ever fire
 - **Set in:** `.env.local` + Netlify + GitHub Actions secrets (if triggered from GH Actions)
 

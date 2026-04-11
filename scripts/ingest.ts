@@ -371,16 +371,24 @@ async function ingestMarkets() {
     });
   }
 
-  console.log(`\n=== Upserting ${rows.length} markets ===`);
-  // Batch upsert in chunks of 500
-  for (let i = 0; i < rows.length; i += 500) {
-    const chunk = rows.slice(i, i + 500);
+  // Deduplicate by ID before batching — Polymarket pagination windows overlap,
+  // so the same event can appear in multiple offset windows. Last occurrence wins
+  // (latest data from deeper in the pagination).
+  const dedupMap = new Map<string, (typeof rows)[0]>();
+  for (const market of rows) {
+    dedupMap.set(market.id, market);
+  }
+  const dedupedRows = Array.from(dedupMap.values());
+  console.log(`\n=== Upserting ${rows.length} markets (deduped to ${dedupedRows.length}, removed ${rows.length - dedupedRows.length} duplicates) ===`);
+
+  for (let i = 0; i < dedupedRows.length; i += 500) {
+    const chunk = dedupedRows.slice(i, i + 500);
     const { error } = await supabase.from("markets").upsert(chunk, { onConflict: "id" });
-    if (error) console.error(`  Upsert error (batch ${i}):`, error.message);
-    else console.log(`  Upserted batch ${i}-${i + chunk.length}`);
+    if (error) console.error(`  ✗ Batch ${i}-${i + chunk.length} failed:`, error.message);
+    else console.log(`  ✓ Batch ${i}-${i + chunk.length} upserted`);
   }
 
-  return rows;
+  return dedupedRows;
 }
 
 // ─── 7. INGEST PRICE HISTORY ─────────────────────────────────────────
@@ -615,16 +623,22 @@ async function ingestDisagreements(markets: any[]) {
     }
   }
 
-  console.log(`  Found ${rows.length} disagreements (spread >= 3pts)`);
+  // Deduplicate disagreements by id (derived from poly_market_id) before upserting
+  const disagreeDedup = new Map<string, (typeof rows)[0]>();
+  for (const row of rows) {
+    disagreeDedup.set(row.id, row);
+  }
+  const dedupedDisagreements = Array.from(disagreeDedup.values());
+  console.log(`  Found ${rows.length} disagreements (deduped to ${dedupedDisagreements.length}, spread >= 3pts)`);
 
-  if (rows.length > 0) {
+  if (dedupedDisagreements.length > 0) {
     // Clear old and insert fresh
     await supabase.from("disagreements").delete().neq("id", "");
-    for (let i = 0; i < rows.length; i += 100) {
-      const chunk = rows.slice(i, i + 100);
+    for (let i = 0; i < dedupedDisagreements.length; i += 100) {
+      const chunk = dedupedDisagreements.slice(i, i + 100);
       const { error } = await supabase.from("disagreements").upsert(chunk, { onConflict: "id" });
-      if (error) console.error(`  Disagreements upsert error (batch ${i}):`, error.message);
-      else console.log(`  Upserted batch ${i}-${i + chunk.length}`);
+      if (error) console.error(`  ✗ Disagreements batch ${i}-${i + chunk.length} failed:`, error.message);
+      else console.log(`  ✓ Disagreements batch ${i}-${i + chunk.length} upserted`);
     }
   } else {
     console.log("  No disagreements found — clearing table");

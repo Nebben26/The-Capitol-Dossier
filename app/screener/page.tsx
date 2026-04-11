@@ -306,6 +306,9 @@ export default function ScreenerPage() {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[#484f58] mb-1.5">
+            Markets · Screener
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3">
             <BarChart3 className="size-7 text-[#57D7BA]" />
             Markets

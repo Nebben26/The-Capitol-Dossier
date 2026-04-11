@@ -8,6 +8,19 @@ interface HealthCheck {
   details?: unknown;
 }
 
+// Supabase returns PostgrestError plain objects (not Error instances). Extract message robustly.
+function extractMessage(err: unknown): string {
+  if (err instanceof Error) return err.message || "Unknown error";
+  if (err && typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    if (e.message) return String(e.message);
+    if (e.details) return String(e.details);
+    if (e.code) return `DB error code ${e.code}`;
+    return JSON.stringify(err);
+  }
+  return String(err) || "Unknown error";
+}
+
 // Use service role key if available for more complete health checks;
 // fall back to anon key so the endpoint still works in dev
 function getSupabaseClient() {
@@ -35,7 +48,7 @@ export async function GET() {
     if (error) throw error;
     checks.push({ service: "supabase", status: "ok", message: "Database reachable" });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({ service: "supabase", status: "error", message: msg });
   }
 
@@ -77,7 +90,7 @@ export async function GET() {
       }
     }
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({ service: "markets_data", status: "error", message: msg });
   }
 
@@ -101,7 +114,7 @@ export async function GET() {
       });
     }
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({ service: "disagreements", status: "error", message: msg });
   }
 
@@ -110,8 +123,14 @@ export async function GET() {
     const { count, error } = await db
       .from("whales")
       .select("id", { count: "exact", head: true });
-    if (error) throw error;
-    if (!count || count === 0) {
+    if (error) {
+      // whales table not created yet — warning, not error (ingestion still works without it)
+      checks.push({
+        service: "whales",
+        status: "warning",
+        message: "whales table missing or inaccessible — whale tracking not yet set up",
+      });
+    } else if (!count || count === 0) {
       checks.push({
         service: "whales",
         status: "warning",
@@ -125,7 +144,7 @@ export async function GET() {
       });
     }
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({ service: "whales", status: "error", message: msg });
   }
 
@@ -189,7 +208,7 @@ export async function GET() {
       message: "user_tiers table exists",
     });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({
       service: "user_tiers_table",
       status: "error",
@@ -209,7 +228,7 @@ export async function GET() {
       message: "user_alerts table exists",
     });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({
       service: "user_alerts_table",
       status: "error",
@@ -229,7 +248,7 @@ export async function GET() {
       message: "alert_triggers table exists",
     });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({
       service: "alert_triggers_table",
       status: "error",
@@ -249,7 +268,7 @@ export async function GET() {
       message: "morning_brief_subscribers table exists",
     });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = extractMessage(err);
     checks.push({
       service: "morning_brief_subscribers_table",
       status: "error",
