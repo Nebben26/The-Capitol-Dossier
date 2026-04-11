@@ -49,6 +49,7 @@ import {
   Activity,
   Send,
   Wallet,
+  Code,
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
@@ -478,6 +479,26 @@ export default function HomePage() {
           className="inline-flex items-center gap-1.5 text-[11px] text-[#d29922] font-semibold hover:text-[#d29922]/80 transition-colors"
         >
           Learn about Signal Desk →
+        </Link>
+      </div>
+
+      {/* ─── EMBED CALLOUT ───────────────────────────────────── */}
+      <div className="rounded-xl border border-[#388bfd]/30 bg-gradient-to-r from-[#388bfd]/8 to-[#161b27] p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#388bfd]/15 flex items-center justify-center shrink-0">
+            <Code className="w-3.5 h-3.5 text-[#388bfd]" />
+          </div>
+          <span className="text-xs font-bold text-[#388bfd]">Embed Widgets</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#388bfd] bg-[#388bfd]/10 border border-[#388bfd]/20 px-1.5 py-0.5 rounded-full">FREE</span>
+        </div>
+        <p className="text-[11px] text-[#8d96a0] leading-relaxed">
+          Drop live prediction market data into any blog, newsletter, or news site. One script tag. Auto-refreshes every 60 seconds. No React required.
+        </p>
+        <Link
+          href="/embed/builder"
+          className="inline-flex items-center gap-1.5 text-[11px] text-[#388bfd] font-semibold hover:text-[#388bfd]/80 transition-colors"
+        >
+          Build your embed →
         </Link>
       </div>
 

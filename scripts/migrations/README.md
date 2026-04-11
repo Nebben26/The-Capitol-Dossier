@@ -238,6 +238,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 27. `session22-embed-analytics.sql`
+**What it does:** Creates `embed_views` table — logs every widget render with type, resource ID, HTTP referrer, and user-agent for affiliate outreach and usage analytics.
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
+**Dependencies:** None
+**Tables created:** `embed_views`
+**RLS:** Service role full access; no public read (analytics data)
+
+---
+
 ### 24. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
@@ -275,6 +284,7 @@ Mark each migration as ✅ once applied to production.
 | 23 | `session19-waitlist-tier.sql` | ☐ |
 | 24 | `session20-portfolio.sql` | ☐ |
 | 25 | `session21-profiles.sql` | ☐ |
-| 26 | `backfill-resolved.sql` *(run last)* | ☐ |
+| 26 | `session22-embed-analytics.sql` | ☐ |
+| 27 | `backfill-resolved.sql` *(run last)* | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).
