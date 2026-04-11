@@ -151,6 +151,15 @@ source: whale_positions table → joined with resolved market outcomes`}</Formul
               at render time without a &ldquo;data_source&rdquo; flag on the record.
             </p>
           </div>
+          <Body>
+            <strong className="text-[#f0f6fc]">Why we removed &ldquo;Win Rate&rdquo;:</strong> Whale cards and the leaderboard
+            previously showed both &ldquo;Accuracy&rdquo; and &ldquo;Win Rate&rdquo; as separate stats. In practice, the
+            <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">win_rate</code> column in the database is never populated
+            by the ingestion pipeline (it is always 0), so the UI was falling back to
+            <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">liveAccuracy.accuracy</code> for both fields — producing identical
+            numbers under two different labels. We removed the duplicate: whale cards now show P&amp;L, Accuracy, and Volume.
+            Win Rate would require computing mark-to-market P&amp;L on open positions, which is a future pipeline addition.
+          </Body>
         </Card>
       </Section>
 

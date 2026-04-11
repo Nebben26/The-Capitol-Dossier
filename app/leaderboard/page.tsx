@@ -164,8 +164,8 @@ function TraderCard({ t, followed, onFollow, liveAccuracy }: { t: Whale; followe
                 <span className={`font-mono font-bold ${t.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{t.totalPnl}</span>
               </div>
               <div>
-                <span className="text-[#8892b0] block">Win Rate</span>
-                <span className="font-mono font-bold">{liveAccuracy && liveAccuracy.total >= 1 ? `${liveAccuracy.accuracy}%` : t.winRate > 0 ? `${t.winRate}%` : "—"}</span>
+                <span className="text-[#8892b0] block">Accuracy</span>
+                <span className="font-mono font-bold">{liveAccuracy && liveAccuracy.total >= 1 ? `${liveAccuracy.accuracy}%` : t.accuracy > 0 ? `${t.accuracy}%` : "—"}</span>
               </div>
               <div>
                 <span className="text-[#8892b0] block">Volume</span>
@@ -398,8 +398,8 @@ export default function LeaderboardPage() {
                         <span className="flex items-center gap-0.5">P&L <SortIcon col="pnl" /></span>
                       </TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium hidden xl:table-cell">P&L TREND</TableHead>
-                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("winRate")}>
-                        <span className="flex items-center gap-0.5">WIN% <SortIcon col="winRate" /></span>
+                      <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("accuracy")}>
+                        <span className="flex items-center gap-0.5">ACCURACY <SortIcon col="accuracy" /></span>
                       </TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] hidden xl:table-cell" onClick={() => handleSort("brier")}>
                         <span className="flex items-center gap-0.5">BRIER <SortIcon col="brier" /></span>
@@ -487,7 +487,7 @@ export default function LeaderboardPage() {
                           <PnlSparkline data={t.spark} positive={t.totalPnlNum >= 0} />
                         </TableCell>
                         <TableCell className="py-3">
-                          <span className="font-mono text-xs font-semibold">{(() => { const la = accuracyMap[t.id]; return la && la.total >= 1 ? `${la.accuracy}%` : t.winRate > 0 ? `${t.winRate}%` : "—"; })()}</span>
+                          <span className="font-mono text-xs font-semibold">{(() => { const la = accuracyMap[t.id]; return la && la.total >= 1 ? `${la.accuracy}%` : t.accuracy > 0 ? `${t.accuracy}%` : "—"; })()}</span>
                         </TableCell>
                         <TableCell className="py-3 hidden xl:table-cell">
                           <span className={`font-mono text-xs font-semibold ${t.brier > 0 ? (t.brier <= 0.15 ? "text-[#22c55e]" : t.brier <= 0.20 ? "text-[#f59e0b]" : "text-[#8892b0]") : "text-[#8892b0]"}`}>

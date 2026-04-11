@@ -111,7 +111,7 @@ function WhaleCard({ w, liveAccuracy, following, onFollow }: { w: Whale; liveAcc
           <div className="grid grid-cols-3 gap-2 mt-3 text-center">
             <div><div className={`text-xs font-bold font-mono tabular-nums ${w.totalPnlNum >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{w.totalPnl}</div><div className="text-[8px] text-[#8892b0]">P&L</div></div>
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{displayAccuracy}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
-            <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{hasLiveData ? `${liveAccuracy.accuracy}%` : isNew ? "New" : w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
+            <div><div className="text-xs font-bold font-mono tabular-nums text-[#57D7BA]">{w.totalVolume}</div><div className="text-[8px] text-[#8892b0]">Volume</div></div>
           </div>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#21262d]">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}><Trophy className="size-2.5" />{w.bestCategory}</span>

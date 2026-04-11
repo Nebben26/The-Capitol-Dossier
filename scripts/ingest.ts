@@ -799,6 +799,16 @@ async function main() {
   await ingestDisagreements(markets);
   await snapshotDisagreements();
 
+  // Run alert evaluator after all data is refreshed
+  console.log("\n=== Running alert evaluator ===");
+  try {
+    const { runAlertEvaluator } = await import("../lib/run-alert-evaluator");
+    const evalResult = await runAlertEvaluator();
+    console.log(`  Alerts evaluated: ${evalResult.evaluated}, triggered: ${evalResult.triggered}, errors: ${evalResult.errors}`);
+  } catch (err: any) {
+    console.error("  Alert evaluator failed (non-fatal):", err.message);
+  }
+
   console.log("\n✓ Ingestion complete!");
 }
 

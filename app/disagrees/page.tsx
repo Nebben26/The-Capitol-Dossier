@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { useDisagreements } from "@/hooks/useData";
 import { getSpreadHistory } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { InlineSparkline } from "@/components/ui/inline-sparkline";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { DisagreeShareButton } from "@/components/ui/disagree-share";
@@ -295,6 +296,14 @@ function DisagreesContent() {
   const [eliteOnly, setEliteOnly]     = useState(false);
   const [arbModalId, setArbModalId]   = useState<string | null>(null);
   const [activeTab, setActiveTab]     = useState<"active" | "resolved">("active");
+  const [resolvedDisagreements, setResolvedDisagreements] = useState<Array<{
+    id: string;
+    question: string;
+    spread: number;
+    resolved_at: string | null;
+    converged: boolean;
+  }>>([]);
+  const [resolvedLoading, setResolvedLoading] = useState(false);
   const { tier } = useUserTier();
   const { searches, saveSearch, deleteSearch } = useSavedSearches("disagrees");
   const [showSaved, setShowSaved] = useState(false);
@@ -313,6 +322,54 @@ function DisagreesContent() {
     const ids = disagreements.map((d) => d.marketId).filter(Boolean);
     getSpreadHistory(ids).then(setHistoryMap).catch(() => {/* non-blocking */});
   }, [disagreements]);
+
+  // Fetch resolved disagreements when that tab is opened
+  useEffect(() => {
+    if (activeTab !== "resolved") return;
+    if (resolvedDisagreements.length > 0) return; // already loaded
+    setResolvedLoading(true);
+    (async () => {
+      try {
+        // Step 1: get IDs of resolved markets
+        const { data: resolvedMarkets } = await supabase
+          .from("markets")
+          .select("id")
+          .eq("resolved", true)
+          .limit(200);
+
+        if (!resolvedMarkets || resolvedMarkets.length === 0) {
+          setResolvedLoading(false);
+          return;
+        }
+
+        const resolvedIds = resolvedMarkets.map((m) => m.id);
+
+        // Step 2: get disagreements that matched any of those market IDs
+        const { data: rows } = await supabase
+          .from("disagreements")
+          .select("id, question, spread, updated_at, poly_market_id, kalshi_market_id")
+          .or(`poly_market_id.in.(${resolvedIds.join(",")}),kalshi_market_id.in.(${resolvedIds.join(",")})`)
+          .order("updated_at", { ascending: false })
+          .limit(50);
+
+        if (rows) {
+          setResolvedDisagreements(
+            rows.map((r) => ({
+              id: r.id,
+              question: r.question,
+              spread: Number(r.spread) || 0,
+              resolved_at: r.updated_at,
+              converged: (Number(r.spread) || 0) < 2,
+            }))
+          );
+        }
+      } catch {
+        // non-fatal — show empty state
+      } finally {
+        setResolvedLoading(false);
+      }
+    })();
+  }, [activeTab]);
 
   // Auto-expand highlighted row from URL param
   useEffect(() => {
@@ -800,19 +857,66 @@ function DisagreesContent() {
       {/* Resolved tab content */}
       {activeTab === "resolved" && (
         <div className="space-y-4">
-          <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-6 text-center space-y-3">
-            <GitCompareArrows className="size-10 text-[#21262d] mx-auto" />
-            <h3 className="text-base font-semibold text-[#f0f6fc]">Resolved Arbitrage Archive</h3>
-            <p className="text-sm text-[#8d96a0] max-w-md mx-auto">
-              Track which spreads converged before resolution vs. which ones blew out.
-              Historical resolution data is collected every ingestion cycle and will appear here once enough spreads have resolved.
-            </p>
-            <div className="flex items-center justify-center gap-4 pt-2 text-[11px] text-[#484f58]">
-              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#3fb950]" />Converged — arb profitable</span>
-              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#f85149]" />Blew out — arb lost</span>
-              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#8d96a0]" />Unresolved</span>
+          {resolvedLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-16 rounded-xl bg-[#161b27] animate-pulse" />
+              ))}
             </div>
-          </div>
+          ) : resolvedDisagreements.length === 0 ? (
+            <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-8 text-center space-y-3">
+              <GitCompareArrows className="size-10 text-[#21262d] mx-auto" />
+              <h3 className="text-base font-semibold text-[#f0f6fc]">No resolved arbs yet</h3>
+              <p className="text-sm text-[#8d96a0] max-w-md mx-auto">
+                This archive fills as markets resolve. When a market we tracked a spread on closes, it appears here with its final convergence outcome — did the arb pay off or blow out?
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Summary stat */}
+              {(() => {
+                const convergedCount = resolvedDisagreements.filter((d) => d.converged).length;
+                const pct = Math.round((convergedCount / resolvedDisagreements.length) * 100);
+                return (
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#161b27] border border-[#21262d]">
+                    <GitCompareArrows className="size-4 text-[#57D7BA] shrink-0" />
+                    <span className="text-sm text-[#8d96a0]">
+                      <span className="text-[#f0f6fc] font-semibold">{convergedCount} of {resolvedDisagreements.length}</span> tracked arbs converged at resolution <span className="text-[#57D7BA] font-semibold">({pct}%)</span>
+                    </span>
+                    <div className="flex items-center gap-3 ml-auto text-[11px] text-[#484f58] shrink-0">
+                      <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-[#3fb950]" />Converged</span>
+                      <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-[#f85149]" />Did not converge</span>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Cards grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {resolvedDisagreements.map((d) => (
+                  <div key={d.id} className="rounded-xl bg-[#161b27] border border-[#21262d] p-4 space-y-2.5">
+                    <p className="text-xs font-medium text-[#e2e8f0] line-clamp-2 leading-snug">{d.question}</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Final spread</div>
+                        <div className={`text-sm font-bold font-mono tabular-nums ${d.converged ? "text-[#3fb950]" : "text-[#f85149]"}`}>
+                          {d.spread.toFixed(1)}pt
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold ${d.converged ? "bg-[#3fb950]/10 text-[#3fb950]" : "bg-[#f85149]/10 text-[#f85149]"}`}>
+                        {d.converged ? "Converged" : "Did not converge"}
+                      </span>
+                    </div>
+                    {d.resolved_at && (
+                      <div className="text-[10px] text-[#484f58]">
+                        Resolved {new Date(d.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 
