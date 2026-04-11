@@ -69,6 +69,8 @@ import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { canAccess } from "@/lib/tiers";
 import { Download, Bookmark, BookmarkCheck } from "lucide-react";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
+import { ExecutionSimulator } from "@/components/arb/execution-simulator";
+import { Calculator } from "lucide-react";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
@@ -118,7 +120,7 @@ function sidesFor(d: Disagreement): { polymarketSide: "YES" | "NO"; kalshiSide: 
 
 // ─── Grid card ────────────────────────────────────────────────────────────
 function DisagreeCard({
-  d, history, expanded, onToggleExpand, causationAnalysis, onOpenCalc,
+  d, history, expanded, onToggleExpand, causationAnalysis, onOpenCalc, simulating, onToggleSimulate,
 }: {
   d: Disagreement;
   history: Array<{ t: number; spread: number }>;
@@ -126,6 +128,8 @@ function DisagreeCard({
   onToggleExpand: () => void;
   causationAnalysis: CausationAnalysis;
   onOpenCalc?: () => void;
+  simulating?: boolean;
+  onToggleSimulate?: () => void;
 }) {
   const { polymarketSide, kalshiSide } = sidesFor(d);
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
@@ -248,6 +252,20 @@ function DisagreeCard({
                 Execute
                 {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
               </button>
+              {onToggleSimulate && (
+                <button
+                  onClick={onToggleSimulate}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-all border ${
+                    simulating
+                      ? "bg-[#388bfd]/20 text-[#388bfd] border-[#388bfd]/30"
+                      : "bg-[#388bfd]/10 text-[#388bfd] border-[#388bfd]/20 hover:bg-[#388bfd]/20"
+                  }`}
+                >
+                  <Calculator className="size-3" />
+                  Simulate
+                  {simulating ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                </button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -276,6 +294,28 @@ function DisagreeCard({
           />
         </div>
       </div>
+
+      {/* Expandable simulator */}
+      <div
+        className="overflow-hidden transition-all duration-300"
+        style={{ maxHeight: simulating ? "3000px" : "0px", opacity: simulating ? 1 : 0 }}
+      >
+        <ExecutionSimulator
+          disagreement={{
+            id: d.id,
+            question: d.question,
+            category: d.category,
+            polyPrice: d.polyPrice,
+            kalshiPrice: d.kalshiPrice,
+            spread: d.spread,
+            polyVol: d.polyVol,
+            kalshiVol: d.kalshiVol,
+            daysLeft: d.daysLeft,
+            direction: d.direction,
+            resolution: d.resolution,
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -294,6 +334,7 @@ function DisagreesContent() {
   const [viewMode, setViewMode]       = useState<ViewMode>("grid");
   const [historyMap, setHistoryMap]   = useState<Record<string, Array<{ t: number; spread: number }>>>({});
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+  const [simulateId, setSimulateId]   = useState<string | null>(null);
   const [eliteOnly, setEliteOnly]     = useState(false);
   const [arbModalId, setArbModalId]   = useState<string | null>(null);
   const [activeTab, setActiveTab]     = useState<"active" | "resolved">("active");
@@ -388,7 +429,8 @@ function DisagreesContent() {
     }
   }, [highlightId, disagreements]);
 
-  const toggleExpand = (id: string) => setExpandedId((prev) => (prev === id ? null : id));
+  const toggleExpand   = (id: string) => setExpandedId((prev) => (prev === id ? null : id));
+  const toggleSimulate = (id: string) => setSimulateId((prev) => (prev === id ? null : id));
 
   const handleSort = (key: SortKey) => {
     if (sortBy === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -973,6 +1015,8 @@ function DisagreesContent() {
                     trackEvent(AnalyticsEvents.OPEN_ARB_CALCULATOR, { disagreementId: d.id });
                     setArbModalId(d.id);
                   }}
+                  simulating={simulateId === d.id}
+                  onToggleSimulate={() => toggleSimulate(d.id)}
                 />
               </div>
             ))

@@ -238,6 +238,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 28. `session23-signal-history.sql`
+**What it does:** Creates `signal_history` table — snapshots every arb signal at detection time with spread, prices, volumes, and resolution tracking. Powers the simulator's historical context section and the future backtester.
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
+**Dependencies:** None
+**Tables created:** `signal_history`
+**RLS:** Public read; service role full access
+
+---
+
 ### 27. `session22-embed-analytics.sql`
 **What it does:** Creates `embed_views` table — logs every widget render with type, resource ID, HTTP referrer, and user-agent for affiliate outreach and usage analytics.
 **Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
@@ -285,6 +294,7 @@ Mark each migration as ✅ once applied to production.
 | 24 | `session20-portfolio.sql` | ☐ |
 | 25 | `session21-profiles.sql` | ☐ |
 | 26 | `session22-embed-analytics.sql` | ☐ |
-| 27 | `backfill-resolved.sql` *(run last)* | ☐ |
+| 27 | `session23-signal-history.sql` | ☐ |
+| 28 | `backfill-resolved.sql` *(run last)* | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

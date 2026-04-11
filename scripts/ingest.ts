@@ -723,6 +723,42 @@ async function ingestDisagreements(markets: any[]) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("  Telegram alert dispatch failed (non-fatal):", msg);
   }
+
+  // ── Signal history snapshots ──────────────────────────────────────────────
+  console.log("\n=== Writing signal history snapshots ===");
+  try {
+    const snapshots = dedupedDisagreements
+      .filter((d) => d.spread >= 5)
+      .map((d) => ({
+        disagreement_id: d.id,
+        question: d.question,
+        category: d.category || null,
+        poly_price: Number(d.poly_price),
+        kalshi_price: Number(d.kalshi_price),
+        spread: Number(d.spread),
+        score: d.score ? Number(d.score) : null,
+        poly_volume: d.poly_volume ? Number(d.poly_volume) : null,
+        kalshi_volume: d.kalshi_volume ? Number(d.kalshi_volume) : null,
+        poly_url: d.poly_url || null,
+        kalshi_url: d.kalshi_url || null,
+      }));
+
+    if (snapshots.length > 0) {
+      for (let i = 0; i < snapshots.length; i += 100) {
+        const batch = snapshots.slice(i, i + 100);
+        const { error } = await supabase
+          .from("signal_history")
+          .upsert(batch, { onConflict: "disagreement_id,detected_at", ignoreDuplicates: true });
+        if (error) console.warn("  signal_history batch error:", error.message);
+      }
+      console.log(`  Wrote ${snapshots.length} signal history snapshots`);
+    } else {
+      console.log("  No spreads >= 5pt to snapshot");
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("  Signal history write failed (non-fatal):", msg);
+  }
 }
 
 // ─── 11. INGEST WHALE POSITIONS ──────────────────────────────────────
