@@ -118,7 +118,7 @@ export function Sidebar({
         </div>
 
         {/* Nav groups */}
-        <nav className="flex-1 py-2 overflow-y-auto">
+        <nav className="flex-1 py-2 overflow-y-auto scrollbar-thin">
           {navGroups.map((group, gi) => (
             <div key={group.label}>
               <div className={`px-3 mb-1 ${gi === 0 ? "mt-2" : "mt-5"}`}>

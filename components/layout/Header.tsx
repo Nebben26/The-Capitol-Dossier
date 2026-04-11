@@ -19,25 +19,29 @@ import { useTopMarkets, useWhales, useDisagreements } from "@/hooks/useData";
 import { useDataSource } from "./DataSourceContext";
 import { useAuth } from "./AuthContext";
 import { LogOut, User } from "lucide-react";
+import { computeMarketPulse, pulseColor, pulseLabel, type MarketPulse } from "@/lib/market-pulse";
 
 // ─── MINI PULSE GAUGE ─────────────────────────────────────────────────
 function MiniPulseGauge() {
-  const { markets: pulseMarkets } = useTopMarkets();
-  const value = useMemo(() => {
-    const top = pulseMarkets.filter(m => m.volNum > 100000 && m.change !== 0);
-    if (top.length === 0) return 50;
-    const avgChange = top.reduce((s, m) => s + m.change, 0) / top.length;
-    return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
-  }, [pulseMarkets]);
+  const [pulse, setPulse] = useState<MarketPulse | null>(null);
+
+  useEffect(() => {
+    computeMarketPulse().then(setPulse).catch(() => {/* leave null */});
+  }, []);
+
+  const value = pulse?.score ?? -1;
+  const displayValue = value < 0 ? "—" : String(value);
+  const color = pulseColor(value);
+  const label = pulse ? pulseLabel(pulse.label) : "Loading…";
 
   // Arc dot position: center=(50,46), radius=40
-  const angle = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const arcValue = value < 0 ? 50 : value;
+  const angle = ((arcValue / 100) * Math.PI) - (Math.PI / 2);
   const dotX = 50 + 40 * Math.sin(angle);
   const dotY = 46 - 40 * Math.cos(angle);
-  const color = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
 
   return (
-    <div className="hidden lg:flex items-center gap-2 bg-[#161b27] border border-[#21262d] rounded-lg px-2.5 py-1.5 shrink-0" title={`Market Pulse: ${value}`}>
+    <div className="relative group hidden lg:flex items-center gap-2 bg-[#161b27] border border-[#21262d] rounded-lg px-2.5 py-1.5 shrink-0 cursor-default">
       <svg viewBox="0 0 100 55" className="w-9 h-auto">
         <defs>
           <linearGradient id="miniGaugeG" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -47,12 +51,48 @@ function MiniPulseGauge() {
           </linearGradient>
         </defs>
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="#21262d" strokeWidth="5" strokeLinecap="round" />
-        <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="url(#miniGaugeG)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(value / 100) * 126} 126`} />
-        <circle cx={dotX} cy={dotY} r={3} fill="#fff" stroke={color} strokeWidth={1.5} />
+        {value >= 0 && (
+          <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="url(#miniGaugeG)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(arcValue / 100) * 126} 126`} />
+        )}
+        <circle cx={dotX} cy={dotY} r={3} fill="#fff" stroke={value < 0 ? "#484f58" : color} strokeWidth={1.5} />
       </svg>
       <div className="flex flex-col">
         <div className="text-[9px] text-[#484f58] font-bold uppercase tracking-widest leading-none">Pulse</div>
-        <div className="text-sm font-bold tabular-nums text-[#f0f6fc] leading-tight mt-0.5">{value}</div>
+        <div className="text-sm font-bold tabular-nums leading-tight mt-0.5" style={{ color: value < 0 ? "#484f58" : "#f0f6fc" }}>
+          {displayValue}
+        </div>
+      </div>
+
+      {/* Tooltip — shown on hover */}
+      <div className="absolute top-full right-0 mt-2 w-56 bg-[#0d1117] border border-[#21262d] rounded-lg p-3 shadow-card opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-30">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-[#8d96a0] mb-1.5">
+          Market Pulse · {label}
+        </div>
+        {pulse ? (
+          <div className="space-y-1.5 text-xs">
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Spread health</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.spreadScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Volume</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.volumeScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Whale activity</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.whaleScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Price movement</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.movementScore}</span>
+            </div>
+            <div className="pt-1.5 mt-1.5 border-t border-[#21262d] text-[9px] text-[#484f58]">
+              Computed from live Supabase data
+            </div>
+          </div>
+        ) : (
+          <div className="text-xs text-[#484f58]">Computing…</div>
+        )}
       </div>
     </div>
   );
@@ -124,7 +164,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Results dropdown — full-screen sheet on mobile, inline dropdown on sm+ */}
         {open && (
-          <div className="fixed top-14 inset-x-0 bottom-0 sm:absolute sm:top-full sm:bottom-auto sm:mt-1.5 sm:max-h-[420px] rounded-none sm:rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border-t sm:border border-[#21262d] shadow-xl shadow-black/40 overflow-y-auto z-50">
+          <div className="fixed top-14 inset-x-0 bottom-0 sm:absolute sm:top-full sm:bottom-auto sm:mt-1.5 sm:max-h-[420px] rounded-none sm:rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border-t sm:border border-[#21262d] shadow-xl shadow-black/40 overflow-y-auto scrollbar-thin z-50">
             {/* Empty state — no query entered yet */}
             {!query.trim() && (
               <div className="px-4 py-8 text-center">

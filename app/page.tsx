@@ -59,6 +59,7 @@ import { WaitlistForm } from "@/components/ui/waitlist-form";
 import { SearchBox } from "@/components/ui/search-box";
 import { SinceLastVisit } from "@/components/ui/since-last-visit";
 import { CountUp } from "@/components/ui/count-up";
+import { computeMarketPulse, pulseColor, pulseLabel, type MarketPulse } from "@/lib/market-pulse";
 
 // ─── MINI SPARKLINE ───────────────────────────────────────────────────
 function Sparkline({ data, positive }: { data: { d: number; v: number }[]; positive: boolean }) {
@@ -104,28 +105,65 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
 }
 
 // ─── GAUGE COMPONENT ──────────────────────────────────────────────────
-function PulseGauge({ value, label }: { value: number; label: string }) {
+function PulseGauge({ pulse }: { pulse: MarketPulse | null }) {
+  const value = pulse?.score ?? -1;
+  const displayValue = value < 0 ? "—" : String(value);
+  const color = pulseColor(value);
+  const arcValue = value < 0 ? 50 : value;
+
   // Arc dot position: center=(100,95), radius=80
-  const angle = ((value / 100) * Math.PI) - (Math.PI / 2);
+  const angle = ((arcValue / 100) * Math.PI) - (Math.PI / 2);
   const dotX = 100 + 80 * Math.sin(angle);
   const dotY = 95 - 80 * Math.cos(angle);
-  const dotColor = value >= 65 ? "#ef4444" : value >= 45 ? "#f59e0b" : "#22c55e";
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative group flex flex-col items-center cursor-default">
       <svg viewBox="0 0 200 115" className="w-48 h-auto">
         <defs>
           <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22c55e" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#ef4444" />
+            <stop offset="0%" stopColor="#3fb950" />
+            <stop offset="50%" stopColor="#d29922" />
+            <stop offset="100%" stopColor="#f85149" />
           </linearGradient>
         </defs>
         <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="#2a2f45" strokeWidth="12" strokeLinecap="round" />
-        <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" strokeDasharray={`${(value / 100) * 251} 251`} />
-        <circle cx={dotX} cy={dotY} r={6} fill="#fff" stroke={dotColor} strokeWidth={2} />
-        <text x="100" y="85" textAnchor="middle" fill="#e2e8f0" fontSize="22" fontWeight="700">{value}</text>
+        {value >= 0 && (
+          <path d="M 20 95 A 80 80 0 0 1 180 95" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" strokeDasharray={`${(arcValue / 100) * 251} 251`} />
+        )}
+        <circle cx={dotX} cy={dotY} r={6} fill="#fff" stroke={value < 0 ? "#484f58" : color} strokeWidth={2} />
+        <text x="100" y="85" textAnchor="middle" fill={value < 0 ? "#484f58" : "#f0f6fc"} fontSize="22" fontWeight="700">{displayValue}</text>
       </svg>
-      <span className="text-xs text-[#8892b0] mt-1 tracking-wide uppercase">{label}</span>
+      <span className="text-xs text-[#8892b0] mt-1 tracking-wide uppercase">
+        {pulse ? pulseLabel(pulse.label) : "Loading…"}
+      </span>
+
+      {/* Breakdown tooltip */}
+      {pulse && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-[#0d1117] border border-[#21262d] rounded-lg p-3 shadow-card opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-30">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[#8d96a0] mb-2">Market Pulse Components</div>
+          <div className="space-y-1.5 text-xs">
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Spread health</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.spreadScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Volume</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.volumeScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Whale activity</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.whaleScore}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[#8d96a0]">Price movement</span>
+              <span className="text-[#f0f6fc] tabular-nums font-mono">{pulse.components.movementScore}</span>
+            </div>
+          </div>
+          <div className="pt-1.5 mt-1.5 border-t border-[#21262d] text-[9px] text-[#484f58]">
+            Computed from live Supabase data
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -146,6 +184,7 @@ export default function HomePage() {
   const [lastIngestAt, setLastIngestAt] = useState<string | null>(null);
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
   const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number; whalesCount: number } | null>(null);
+  const [pulse, setPulse] = useState<MarketPulse | null>(null);
 
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
   const { disagreements: rawDisagreements } = useDisagreements();
@@ -173,6 +212,7 @@ export default function HomePage() {
     getLastIngestTimestamp().then(setLastIngestAt);
     getWaitlistCount().then(setWaitlistCount);
     getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount, whalesCount: s.whalesCount }));
+    computeMarketPulse().then(setPulse).catch(() => {/* leave null */});
   }, []);
 
   useEffect(() => {
@@ -375,12 +415,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#57D7BA]/5 via-transparent to-[#ef4444]/5 pointer-events-none" />
         <CardContent className="p-5 relative">
           <div className="flex flex-col lg:flex-row items-center gap-6">
-            <PulseGauge value={(() => {
-              const top = allMarkets.filter(m => m.volNum > 100000 && m.change !== 0);
-              if (top.length === 0) return 50;
-              const avgChange = top.reduce((s, m) => s + m.change, 0) / top.length;
-              return Math.min(100, Math.max(0, Math.round(50 + avgChange * 5)));
-            })()} label="Fear & Greed" />
+            <PulseGauge pulse={pulse} />
             <div className="flex-1 text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-xs font-semibold">
