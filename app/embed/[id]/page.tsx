@@ -63,7 +63,7 @@ export default function MarketEmbedPage({ params }: { params: { id: string } }) 
         </span>
         <span className={`flex items-center gap-0.5 font-mono text-sm font-bold tabular-nums ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
           {positive ? <ArrowUpRight className="size-4" /> : <ArrowDownRight className="size-4" />}
-          {Math.abs(market.change ?? 0).toFixed(1)}%
+          {Math.abs(market.change ?? 0).toFixed(1)}pt
         </span>
       </div>
 

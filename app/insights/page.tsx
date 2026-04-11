@@ -271,9 +271,9 @@ export default function InsightsPage() {
 function PriceChange({ change }: { change: number | null }) {
   if (change === null || change === undefined) return null;
   const abs = Math.abs(change).toFixed(1);
-  if (change > 0) return <span className="text-green-400 font-mono whitespace-nowrap">↑{abs}%</span>;
-  if (change < 0) return <span className="text-red-400 font-mono whitespace-nowrap">↓{abs}%</span>;
-  return <span className="text-[#8892b0] font-mono whitespace-nowrap">0%</span>;
+  if (change > 0) return <span className="text-green-400 font-mono whitespace-nowrap">↑{abs}pt</span>;
+  if (change < 0) return <span className="text-red-400 font-mono whitespace-nowrap">↓{abs}pt</span>;
+  return <span className="text-[#8892b0] font-mono whitespace-nowrap">0pt</span>;
 }
 
 function ArticleCard({ article }: { article: NewsArticle }) {

@@ -23,7 +23,7 @@ function MarketEmbed() {
         <div className="flex items-center gap-2">
           <span className="text-2xl font-bold font-mono tabular-nums">{m.price}<span className="text-sm text-[#8892b0]">¢</span></span>
           <span className={`flex items-center gap-0.5 font-mono text-xs font-bold tabular-nums ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-            {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{Math.abs(m.change)}%
+            {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{Math.abs(m.change)}pt
           </span>
         </div>
         <span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{m.category}</span>

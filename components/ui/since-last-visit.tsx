@@ -40,6 +40,7 @@ export function SinceLastVisit() {
       supabase
         .from("markets")
         .select("id", { count: "exact", head: true })
+        .eq("resolved", false)
         .gte("change_24h", 5),
     ]).then(([signals, spreads, movers]) => {
       setDiff({
@@ -67,7 +68,7 @@ export function SinceLastVisit() {
             {diff.newSpreads > 0 && (diff.newSignals > 0 || diff.movedMarkets > 0) && <span>, </span>}
             {diff.newSignals > 0 && <span className="text-[#57D7BA]">{diff.newSignals} new signal{diff.newSignals > 1 ? "s" : ""}</span>}
             {diff.newSignals > 0 && diff.movedMarkets > 0 && <span>, </span>}
-            {diff.movedMarkets > 0 && <span className="text-[#22c55e]">{diff.movedMarkets} market{diff.movedMarkets > 1 ? "s" : ""} moved &gt;5%</span>}
+            {diff.movedMarkets > 0 && <span className="text-[#22c55e]">{diff.movedMarkets} market{diff.movedMarkets > 1 ? "s" : ""} moved &gt;5pt</span>}
           </>
         ) : (
           <span>Welcome back. Nothing major has moved since you left {diff.hoursAgo}h ago.</span>

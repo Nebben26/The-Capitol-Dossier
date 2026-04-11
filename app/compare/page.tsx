@@ -358,7 +358,7 @@ export default function ComparePage() {
                     <TrendingDown className="size-3" />
                   )}
                   {marketA.change >= 0 ? "+" : ""}
-                  {marketA.change}%
+                  {marketA.change}pt
                 </span>
               }
               b={
@@ -371,7 +371,7 @@ export default function ComparePage() {
                     <TrendingDown className="size-3" />
                   )}
                   {marketB.change >= 0 ? "+" : ""}
-                  {marketB.change}%
+                  {marketB.change}pt
                 </span>
               }
             />

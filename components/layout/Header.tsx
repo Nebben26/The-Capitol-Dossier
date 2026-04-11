@@ -203,7 +203,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
                       <span className="font-mono text-xs font-semibold text-[#e2e8f0]">{m.price}¢</span>
                       <span className={`flex items-center gap-0.5 font-mono text-[10px] font-semibold justify-end ${m.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
                         {m.change >= 0 ? <ArrowUpRight className="size-2.5" /> : <ArrowDownRight className="size-2.5" />}
-                        {Math.abs(m.change)}%
+                        {Math.abs(m.change)}pt
                       </span>
                     </div>
                   </button>

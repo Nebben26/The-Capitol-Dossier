@@ -59,6 +59,8 @@ export interface Market {
   platformUrl?: string;
   priceHistory?: { time: string; price: number; vol: number; open: number; high: number; low: number; close: number }[];
   volAnomaly?: boolean;
+  resolved?: boolean;
+  resolvesAt?: string | null;
 }
 
 export interface Whale {

@@ -174,7 +174,7 @@ export function NotificationBell() {
                         }`}
                       >
                         {n.change >= 0 ? "+" : ""}
-                        {n.change}%
+                        {n.change}pt
                       </span>
                       <span className="text-[10px] text-[#8d96a0]">{n.price}¢</span>
                       <span className="text-[9px] text-[#484f58] ml-auto">{formatAge(n.ts)}</span>

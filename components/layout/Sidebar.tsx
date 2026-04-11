@@ -28,6 +28,7 @@ import {
   Mail,
   Info,
   Settings,
+  CheckCircle,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -37,6 +38,7 @@ const navGroups = [
     items: [
       { label: "Home", icon: Home, href: "/" },
       { label: "Screener", icon: Target, href: "/screener" },
+      { label: "Resolved", icon: CheckCircle, href: "/resolved" },
       { label: "Calendar", icon: CalendarDays, href: "/calendar" },
       { label: "Compare", icon: ArrowLeftRight, href: "/compare" },
       { label: "Insights", icon: Newspaper, href: "/insights" },

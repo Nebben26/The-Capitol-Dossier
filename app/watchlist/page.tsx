@@ -103,7 +103,7 @@ function MarketWatchCard({ market, onRemove, signal }: { market: Market; onRemov
           <div className="flex items-center gap-2">
             <span className={`flex items-center gap-0.5 font-mono text-xs font-semibold tabular-nums ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
               {positive ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
-              {Math.abs(market.change)}%
+              {Math.abs(market.change)}pt
             </span>
             <span className="font-mono text-[10px] text-[#8892b0] tabular-nums">{market.volume}</span>
           </div>
@@ -288,7 +288,7 @@ export default function WatchlistPage() {
                     : <TrendingDown className="size-3 text-[#ef4444]" />}
                   <span className="truncate max-w-[140px]">{biggestMover.question.slice(0, 30)}…</span>
                   <span className={`font-mono font-semibold tabular-nums ${biggestMover.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                    {biggestMover.change >= 0 ? "+" : ""}{biggestMover.change}%
+                    {biggestMover.change >= 0 ? "+" : ""}{biggestMover.change}pt
                   </span>
                 </Link>
               )}

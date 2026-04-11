@@ -216,7 +216,7 @@ async function ingestMarkets() {
 
   // Fetch existing prices to compute real change_24h
   console.log("  Loading existing prices for change computation...");
-  const { data: existingRows } = await supabase.from("markets").select("id, price");
+  const { data: existingRows } = await supabase.from("markets").select("id, price").eq("resolved", false);
   const oldPrices = new Map<string, number>();
   if (existingRows) {
     for (const r of existingRows) oldPrices.set(r.id, r.price);
@@ -267,7 +267,7 @@ async function ingestMarkets() {
 
     const eventId = ev.slug || ev.id;
     const oldPrice = oldPrices.get(eventId);
-    const change24h = oldPrice && oldPrice > 0 ? Math.round(((price - oldPrice) / oldPrice) * 1000) / 10 : 0;
+    const change24h = oldPrice != null ? Math.round((price - oldPrice) * 10) / 10 : 0;
     const daysLeft = Math.max(0, Math.round((new Date(ev.endDate).getTime() - Date.now()) / 86400000));
     const traders = ev.numTraders || Math.floor((ev.volume || 0) / 500);
 
@@ -292,7 +292,7 @@ async function ingestMarkets() {
       ticker: null,
       url: `https://polymarket.com/event/${ev.slug}`,
       description: ev.description || ev.title,
-      resolved: false,
+      resolved: !!(ev.resolved || ev.markets.every((m: any) => m.closed || m.resolved)),
       resolution: null,
     });
   }
@@ -340,8 +340,8 @@ async function ingestMarkets() {
 
     const kalshiId = `kalshi-${kev.event_ticker.toLowerCase()}`;
     const oldKalshiPrice = oldPrices.get(kalshiId);
-    const prevPrice = oldKalshiPrice ?? price;
-    const change = prevPrice > 0 && prevPrice !== price ? Math.round(((price - prevPrice) / prevPrice) * 1000) / 10 : 0;
+    const prevPrice = oldKalshiPrice ?? null;
+    const change = prevPrice != null ? Math.round((price - prevPrice) * 10) / 10 : 0;
     const title = kev.title || kev.event_ticker;
     const daysLeft = closeTime ? Math.max(0, Math.round((new Date(closeTime).getTime() - Date.now()) / 86400000)) : 0;
 

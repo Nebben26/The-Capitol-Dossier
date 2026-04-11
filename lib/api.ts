@@ -96,6 +96,8 @@ function dbMarketToFrontend(row: any): Market {
     ticker: row.ticker || undefined,
     platformUrl: row.url || undefined,
     volAnomaly: false,
+    resolved: row.resolved ?? false,
+    resolvesAt: row.resolves_at || null,
   };
 }
 
@@ -230,6 +232,7 @@ export async function getAllMarkets(): Promise<ApiResult<Market[]>> {
       const { data, error } = await supabase
         .from("markets")
         .select("*")
+        .eq("resolved", false)
         .order("id", { ascending: true })
         .range(from, to);
 
@@ -1195,6 +1198,7 @@ export async function getMorningBrief(): Promise<{ data: MorningBrief; source: D
       // Biggest negative mover
       supabase.from("markets")
         .select("id, question, change_24h")
+        .eq("resolved", false)
         .not("change_24h", "is", null)
         .order("change_24h", { ascending: true })
         .limit(1),
@@ -1202,6 +1206,7 @@ export async function getMorningBrief(): Promise<{ data: MorningBrief; source: D
       // Biggest positive mover
       supabase.from("markets")
         .select("id, question, change_24h")
+        .eq("resolved", false)
         .not("change_24h", "is", null)
         .order("change_24h", { ascending: false })
         .limit(1),

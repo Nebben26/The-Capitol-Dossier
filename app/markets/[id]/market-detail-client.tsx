@@ -80,7 +80,7 @@ import { getSpreadHistory, getMarketThesis, getMarketCandles, getWalletLabels, t
 import { formatWallet } from "@/lib/format-wallet";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
 import { WhaleTimeline } from "@/components/markets/whale-timeline";
-import { formatSignedPct, formatCents } from "@/lib/format";
+import { formatCents } from "@/lib/format";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
 import { useDataSource } from "@/components/layout/DataSourceContext";
@@ -329,16 +329,29 @@ export default function MarketDetailPage() {
           {/* ─── PRICE BLOCK ───────────────────────────────────────── */}
           <Card className="bg-[#161b27] border-[#2a2f45] lg:min-w-[280px] shrink-0">
             <CardContent className="p-5">
-              <div className="text-center lg:text-right">
-                <div className="text-xs text-[#8892b0] mb-1 uppercase tracking-wider">Current Price</div>
-                <div className="text-5xl font-bold font-mono tracking-tighter text-[#e2e8f0]">
-                  {formatCents(market.price)}
+              {market.resolved ? (
+                <div className="text-center lg:text-right">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#8892b0]/10 border border-[#8892b0]/20 mb-3">
+                    <CheckCircle className="size-3.5 text-[#8892b0]" />
+                    <span className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider">Resolved</span>
+                  </div>
+                  <div className="text-5xl font-bold font-mono tracking-tighter text-[#8892b0]">
+                    {formatCents(market.price)}
+                  </div>
+                  <div className="text-xs text-[#8892b0] mt-1">Final settlement price</div>
                 </div>
-                <div className={`flex items-center justify-center lg:justify-end gap-1 mt-2 text-sm font-semibold ${market.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                  {market.change >= 0 ? <ArrowUpRight className="size-4" /> : <ArrowDownRight className="size-4" />}
-                  {formatSignedPct(market.change)} (24h)
+              ) : (
+                <div className="text-center lg:text-right">
+                  <div className="text-xs text-[#8892b0] mb-1 uppercase tracking-wider">Current Price</div>
+                  <div className="text-5xl font-bold font-mono tracking-tighter text-[#e2e8f0]">
+                    {formatCents(market.price)}
+                  </div>
+                  <div className={`flex items-center justify-center lg:justify-end gap-1 mt-2 text-sm font-semibold ${market.change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
+                    {market.change >= 0 ? <ArrowUpRight className="size-4" /> : <ArrowDownRight className="size-4" />}
+                    {market.change >= 0 ? "+" : ""}{Math.abs(market.change).toFixed(1)}pt (24h)
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-[#2a2f45]">
                 <div>
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Volume</div>
@@ -357,10 +370,12 @@ export default function MarketDetailPage() {
                   <div className="text-sm font-semibold font-mono">{market.created}</div>
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <TradeButton side="YES" price={market.price} url={market.platformUrl} />
-                <TradeButton side="NO" price={market.price} url={market.platformUrl} />
-              </div>
+              {!market.resolved && (
+                <div className="flex gap-2 mt-4">
+                  <TradeButton side="YES" price={market.price} url={market.platformUrl} />
+                  <TradeButton side="NO" price={market.price} url={market.platformUrl} />
+                </div>
+              )}
               <div className="mt-3 flex justify-center gap-2">
                 <ShareCardButton title={market.question} price={market.price} change={market.change} />
                 <WatchlistButton type="market" itemId={market.id} name={market.question} />

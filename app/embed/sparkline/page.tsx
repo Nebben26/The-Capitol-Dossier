@@ -21,7 +21,7 @@ function SparklineEmbed() {
           <div className="size-3 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2 text-[#0f1119]" /></div>
           <span className="text-[7px] text-[#8892b0]">Quiver</span>
         </div>
-        <span className="font-mono text-xs font-bold tabular-nums">{m.price}¢ <span className={`text-[10px] ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{positive ? "+" : ""}{m.change}%</span></span>
+        <span className="font-mono text-xs font-bold tabular-nums">{m.price}¢ <span className={`text-[10px] ${positive ? "text-[#22c55e]" : "text-[#ef4444]"}`}>{positive ? "+" : ""}{m.change}pt</span></span>
       </div>
       <p className="text-[9px] text-[#8892b0] truncate mb-1">{m.question}</p>
       <div className="h-14 w-full">

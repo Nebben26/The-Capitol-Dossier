@@ -37,7 +37,7 @@ export function RelatedMarkets({ markets }: RelatedMarketsProps) {
                   }`}
                 >
                   {up ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
-                  {up ? "+" : ""}{m.change}%
+                  {up ? "+" : ""}{m.change}pt
                 </div>
               </div>
 

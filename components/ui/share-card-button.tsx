@@ -16,7 +16,7 @@ export function ShareCardButton({
   const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
-    const changeStr = change ? `${change >= 0 ? "+" : ""}${change}%` : "";
+    const changeStr = change ? `${change >= 0 ? "+" : ""}${change}pt` : "";
     const priceStr = price ? `${price}¢` : "";
     const pageUrl = typeof window !== "undefined" ? window.location.href : "";
     const text = `${title}${priceStr ? ` — ${priceStr}` : ""}${changeStr ? ` (${changeStr} 24h)` : ""}\n\n${pageUrl}\nvia Quiver Markets`;
@@ -47,7 +47,7 @@ export function ShareCardButton({
                 {price && <span className="font-mono text-lg font-bold text-[#e2e8f0] tabular-nums">{price}¢</span>}
                 {change && (
                   <span className={`font-mono text-xs font-semibold tabular-nums ${change >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
-                    {change >= 0 ? "+" : ""}{change}% 24h
+                    {change >= 0 ? "+" : ""}{change}pt 24h
                   </span>
                 )}
               </div>
