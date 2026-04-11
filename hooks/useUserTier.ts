@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Tier } from "@/lib/tiers";
+import { identifyUser } from "@/lib/analytics";
 
 interface UserTierState {
   tier: Tier;
@@ -51,6 +52,11 @@ export function useUserTier(): UserTierState {
         }
 
         setState({ tier, loading: false, userId });
+        // Identify user in analytics with their tier
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && !cancelled) {
+          identifyUser(user.id, { email: user.email, tier });
+        }
       } catch {
         if (!cancelled) setState({ tier: "free", loading: false, userId });
       }

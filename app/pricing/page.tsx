@@ -9,6 +9,7 @@ import { CheckoutSuccess } from "@/components/pricing/checkout-success";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { TestModeBanner } from "@/components/ui/test-mode-banner";
 import { supabase } from "@/lib/supabase";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -167,6 +168,11 @@ function PriceDisplay({ monthlyPrice, billingCycle }: { monthlyPrice: number; bi
 export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+
+  useEffect(() => {
+    trackEvent(AnalyticsEvents.VIEW_PRICING);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [waitlistOpen, setWaitlistOpen] = useState<string | null>(null);
 
   // Stripe checkout state
@@ -201,6 +207,7 @@ export default function PricingPage() {
   }, [pendingCheckout]);
 
   const handleCheckout = async (tier: "pro" | "trader", cycle: "monthly" | "annual") => {
+    trackEvent(AnalyticsEvents.CLICK_SUBSCRIBE, { tier, cycle });
     const key = `${tier}_${cycle}`;
     setCheckoutLoading(key);
     try {

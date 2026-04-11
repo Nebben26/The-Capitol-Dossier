@@ -68,6 +68,7 @@ import { useUserTier } from "@/hooks/useUserTier";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { canAccess } from "@/lib/tiers";
 import { Download, Bookmark, BookmarkCheck } from "lucide-react";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
@@ -796,6 +797,7 @@ function DisagreesContent() {
                 window.location.href = "/pricing";
                 return;
               }
+              trackEvent(AnalyticsEvents.EXPORT_CSV, { page: "disagrees" });
               const rows = [
                 ["Question", "Spread", "Polymarket", "Kalshi", "Category", "Days Left", "Volume Poly", "Volume Kalshi"],
                 ...filtered.map((d) => [
@@ -967,7 +969,10 @@ function DisagreesContent() {
                   expanded={expandedId === d.id}
                   onToggleExpand={() => toggleExpand(d.id)}
                   causationAnalysis={causationMap.get(d.id)!}
-                  onOpenCalc={() => setArbModalId(d.id)}
+                  onOpenCalc={() => {
+                    trackEvent(AnalyticsEvents.OPEN_ARB_CALCULATOR, { disagreementId: d.id });
+                    setArbModalId(d.id);
+                  }}
                 />
               </div>
             ))

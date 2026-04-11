@@ -5,6 +5,7 @@ import { useUserTier } from "@/hooks/useUserTier";
 import { TIER_LABELS, TIER_COLORS } from "@/lib/tiers";
 import { TierBadge } from "@/components/layout/tier-badge";
 import { CreditCard, User, LogOut, ExternalLink, Settings } from "lucide-react";
+import { trackEvent, resetAnalytics, AnalyticsEvents } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 import { TestModeBanner } from "@/components/ui/test-mode-banner";
 import Link from "next/link";
@@ -42,6 +43,8 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
+    trackEvent(AnalyticsEvents.SIGN_OUT);
+    resetAnalytics();
     await supabase.auth.signOut();
     router.push("/");
   };

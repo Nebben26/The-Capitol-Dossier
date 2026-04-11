@@ -65,6 +65,7 @@ import {
   LineChart as LineChartIcon,
 } from "lucide-react";
 import { useMarketDetail, useMarkets } from "@/hooks/useData";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { getRelatedMarkets } from "@/lib/related-markets";
 import { RelatedMarkets } from "@/components/markets/related-markets";
 import { supabase } from "@/lib/supabase";
@@ -138,6 +139,7 @@ export default function MarketDetailPage() {
   useEffect(() => {
     if (loadedMarket && loadedMarket.question !== "Loading...") {
       addRecent({ id: loadedMarket.id, question: loadedMarket.question, price: loadedMarket.price, category: loadedMarket.category });
+      trackEvent(AnalyticsEvents.VIEW_MARKET, { id: loadedMarket.id, category: loadedMarket.category });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadedMarket?.id]);

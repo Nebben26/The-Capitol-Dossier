@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { X, Mail, Lock, Loader2, CheckCircle2 } from "lucide-react";
+import { trackEvent, identifyUser, AnalyticsEvents } from "@/lib/analytics";
 
 interface AuthModalProps {
   open: boolean;
@@ -47,10 +48,15 @@ export function AuthModal({
           options: { emailRedirectTo: window.location.origin },
         });
         if (signUpError) throw signUpError;
+        trackEvent(AnalyticsEvents.SIGN_UP, { source: "auth_modal" });
         setSuccess(true);
       } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
+        trackEvent(AnalyticsEvents.SIGN_IN);
+        if (signInData.user) {
+          identifyUser(signInData.user.id, { email: signInData.user.email });
+        }
         onSuccess?.();
         onClose();
       }

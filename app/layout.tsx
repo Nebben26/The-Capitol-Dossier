@@ -5,6 +5,7 @@ import NextTopLoader from "nextjs-toploader";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShortcutsDrawer } from "@/components/ui/shortcuts-drawer";
+import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -73,8 +74,10 @@ export default function RootLayout({
           shadow="0 0 10px #57D7BA,0 0 5px #57D7BA"
         />
         <TooltipProvider>
-          <AppShell>{children}</AppShell>
-          <ShortcutsDrawer />
+          <PostHogProvider>
+            <AppShell>{children}</AppShell>
+            <ShortcutsDrawer />
+          </PostHogProvider>
         </TooltipProvider>
 
         {/* Schema.org Organization structured data */}

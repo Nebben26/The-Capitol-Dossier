@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getLastIngestTimestamp } from "@/lib/api";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { DataFreshness } from "@/components/ui/data-freshness";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -100,6 +101,7 @@ function SubscribeForm() {
         setResult({ ok: true, message: data.message || "Subscribed!" });
         setEmail("");
         setCount((c) => (c != null ? c + 1 : c));
+        trackEvent(AnalyticsEvents.SUBSCRIBE_MORNING_BRIEF, { source: "morning_brief_page" });
       } else {
         setResult({ ok: false, message: data.error || "Something went wrong." });
       }
