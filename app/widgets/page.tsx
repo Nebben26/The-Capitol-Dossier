@@ -29,8 +29,8 @@ function CopyCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="relative">
-      <div className="rounded-lg bg-[#0f1119] border border-[#2f374f] overflow-hidden">
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#2f374f]">
+      <div className="rounded-lg bg-[#0f1119] border border-[#21262d] overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#21262d]">
           <span className="text-[9px] text-[#8892b0] font-mono">HTML</span>
           <button onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex items-center gap-1 text-[9px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">
             {copied ? <Check className="size-3 text-[#22c55e]" /> : <Copy className="size-3" />}{copied ? "Copied!" : "Copy"}
@@ -77,7 +77,7 @@ export default function WidgetsPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <div className="bg-[#1a1e2e] text-[#e2e8f0] p-4 rounded-xl border border-[#2f374f] max-w-sm w-full">
+          <div className="bg-[#0d1117] text-[#e2e8f0] p-4 rounded-xl border border-[#21262d] max-w-sm w-full">
             <div className="flex items-center gap-1.5 mb-2">
               <div className="size-4 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2.5 text-[#0f1119]" /></div>
               <span className="text-[8px] text-[#8892b0] uppercase tracking-wider font-semibold">Quiver Markets</span>
@@ -104,7 +104,7 @@ export default function WidgetsPage() {
         </div>
       </div>
 
-      <hr className="border-[#2f374f]" />
+      <hr className="border-[#21262d]" />
 
       {/* Widget 2: Mini Disagrees Card */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -120,7 +120,7 @@ export default function WidgetsPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <div className="bg-[#1a1e2e] text-[#e2e8f0] p-4 rounded-xl border border-[#2f374f] max-w-sm w-full">
+          <div className="bg-[#0d1117] text-[#e2e8f0] p-4 rounded-xl border border-[#21262d] max-w-sm w-full">
             <div className="flex items-center gap-1.5 mb-2">
               <div className="size-4 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2.5 text-[#0f1119]" /></div>
               <span className="text-[8px] text-[#8892b0] uppercase tracking-wider font-semibold">Quiver Markets</span>
@@ -128,12 +128,12 @@ export default function WidgetsPage() {
             </div>
             <p className="text-xs font-semibold leading-snug mb-3">{sampleDisagree.question}</p>
             <div className="flex items-center gap-2 mb-2">
-              <div className="flex-1 text-center p-2 rounded-lg bg-[#0f1119] border border-[#2f374f]">
+              <div className="flex-1 text-center p-2 rounded-lg bg-[#0f1119] border border-[#21262d]">
                 <div className="text-[8px] text-[#8892b0] mb-0.5">Polymarket</div>
                 <div className="font-mono text-lg font-bold tabular-nums">{sampleDisagree.polyPrice}¢</div>
               </div>
               <div className="px-2 py-1 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-sm font-bold font-mono tabular-nums border border-[#f59e0b]/20">{sampleDisagree.spread}pt</div>
-              <div className="flex-1 text-center p-2 rounded-lg bg-[#0f1119] border border-[#2f374f]">
+              <div className="flex-1 text-center p-2 rounded-lg bg-[#0f1119] border border-[#21262d]">
                 <div className="text-[8px] text-[#8892b0] mb-0.5">Kalshi</div>
                 <div className="font-mono text-lg font-bold tabular-nums">{sampleDisagree.kalshiPrice}¢</div>
               </div>
@@ -146,7 +146,7 @@ export default function WidgetsPage() {
         </div>
       </div>
 
-      <hr className="border-[#2f374f]" />
+      <hr className="border-[#21262d]" />
 
       {/* Widget 3: Live Sparkline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -162,7 +162,7 @@ export default function WidgetsPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <div className="bg-[#1a1e2e] text-[#e2e8f0] p-3 rounded-xl border border-[#2f374f]" style={{ width: 280 }}>
+          <div className="bg-[#0d1117] text-[#e2e8f0] p-3 rounded-xl border border-[#21262d]" style={{ width: 280 }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-1">
                 <div className="size-3 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2 text-[#0f1119]" /></div>
@@ -180,12 +180,12 @@ export default function WidgetsPage() {
         </div>
       </div>
 
-      <hr className="border-[#2f374f]" />
+      <hr className="border-[#21262d]" />
 
       {/* All Markets List */}
       <div>
         <h2 className="text-lg font-bold mb-3">Available Market IDs</h2>
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="p-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
               {markets.slice(0, 16).map((m) => (
@@ -200,7 +200,7 @@ export default function WidgetsPage() {
       </div>
 
       {/* CTA */}
-      <Card className="bg-[#222638] border-[#6366f1]/20 ring-1 ring-[#6366f1]/10 overflow-hidden relative">
+      <Card className="bg-[#161b27] border-[#6366f1]/20 ring-1 ring-[#6366f1]/10 overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[#6366f1]/5 via-transparent to-[#57D7BA]/5 pointer-events-none" />
         <CardContent className="p-8 text-center relative space-y-4">
           <Code className="size-10 text-[#6366f1] mx-auto" />
@@ -212,7 +212,7 @@ export default function WidgetsPage() {
         </CardContent>
       </Card>
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

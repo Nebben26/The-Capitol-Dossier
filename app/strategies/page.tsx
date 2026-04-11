@@ -137,7 +137,7 @@ export default function StrategiesPage() {
 
               {/* ═══ CURATED STRATEGIES TAB ═══════════════════════════ */}
               <TabsContent value="curated" className="pt-5">
-                <Card className="bg-[#222638] border-[#2a2f45]">
+                <Card className="bg-[#161b27] border-[#2a2f45]">
                   <CardContent className="py-16 text-center">
                     <div className="size-16 rounded-2xl bg-[#f59e0b]/10 flex items-center justify-center mx-auto mb-4">
                       <Sparkles className="size-8 text-[#f59e0b]" />
@@ -153,7 +153,7 @@ export default function StrategiesPage() {
               {/* ═══ BACKTESTER TAB ═══════════════════════════════════ */}
               <TabsContent value="backtest" className="pt-5 space-y-5">
                 {/* Builder form */}
-                <Card className="bg-[#222638] border-[#2a2f45]">
+                <Card className="bg-[#161b27] border-[#2a2f45]">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <FlaskConical className="size-4 text-[#57D7BA]" />
@@ -170,7 +170,7 @@ export default function StrategiesPage() {
                         <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1.5">Strategy Type</label>
                         <div className="relative">
                           <select value={btRule} onChange={(e) => setBtRule(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all">
+                            className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all">
                             <option value="whale-follow">Follow Whale Positions</option>
                             <option value="dip-buy">Buy the Dip</option>
                             <option value="momentum">Momentum / Trend</option>
@@ -186,7 +186,7 @@ export default function StrategiesPage() {
                         <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1.5">Min Whale Accuracy</label>
                         <div className="relative">
                           <input type="number" value={btAccuracy} onChange={(e) => setBtAccuracy(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
+                            className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#8892b0]">%</span>
                         </div>
                       </div>
@@ -197,7 +197,7 @@ export default function StrategiesPage() {
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#8892b0]">$</span>
                           <input type="text" value={btMinVol} onChange={(e) => setBtMinVol(e.target.value)}
-                            className="w-full h-9 pl-6 pr-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
+                            className="w-full h-9 pl-6 pr-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
                         </div>
                       </div>
 
@@ -206,7 +206,7 @@ export default function StrategiesPage() {
                         <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1.5">Backtest Period</label>
                         <div className="relative">
                           <select value={btTimeframe} onChange={(e) => setBtTimeframe(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all">
+                            className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all">
                             <option value="7d">Last 7 Days</option>
                             <option value="30d">Last 30 Days</option>
                             <option value="90d">Last 90 Days</option>
@@ -222,7 +222,7 @@ export default function StrategiesPage() {
                         <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1.5">Take Profit</label>
                         <div className="relative">
                           <input type="number" value={btTakeProfit} onChange={(e) => setBtTakeProfit(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
+                            className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#8892b0]">%</span>
                         </div>
                       </div>
@@ -232,7 +232,7 @@ export default function StrategiesPage() {
                         <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1.5">Stop Loss</label>
                         <div className="relative">
                           <input type="number" value={btStopLoss} onChange={(e) => setBtStopLoss(e.target.value)}
-                            className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
+                            className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#2a2f45] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all" />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#8892b0]">%</span>
                         </div>
                       </div>
@@ -259,7 +259,7 @@ export default function StrategiesPage() {
 
                 {/* ─── BACKTEST RESULTS (coming soon) ──────────────────── */}
                 {backtestRun && (
-                  <Card className="bg-[#222638] border-[#2a2f45]">
+                  <Card className="bg-[#161b27] border-[#2a2f45]">
                     <CardContent className="py-16 text-center">
                       <TrendingUp className="size-12 text-[#2a2f45] mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">Backtest not yet available</h3>
@@ -272,7 +272,7 @@ export default function StrategiesPage() {
 
                 {/* Empty state before running */}
                 {!backtestRun && !backtestLoading && (
-                  <Card className="bg-[#222638] border-[#2a2f45]">
+                  <Card className="bg-[#161b27] border-[#2a2f45]">
                     <CardContent className="py-16 text-center">
                       <FlaskConical className="size-12 text-[#2a2f45] mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">Configure & Run Your Backtest</h3>

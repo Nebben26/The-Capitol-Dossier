@@ -243,7 +243,7 @@ export default function MarketDetailPage() {
   if (notFound) {
     return (
       <div className="max-w-[1440px] mx-auto px-4 py-20 text-center">
-        <div className="text-6xl font-bold font-mono text-[#2f374f] mb-4">404</div>
+        <div className="text-6xl font-bold font-mono text-[#21262d] mb-4">404</div>
         <h1 className="text-xl font-bold mb-2">Market Not Found</h1>
         <p className="text-sm text-[#8892b0] mb-6">The market &quot;{id}&quot; doesn&apos;t exist or hasn&apos;t been indexed yet.</p>
         <Link href="/markets" className="text-sm text-[#57D7BA] hover:underline">Browse all markets →</Link>
@@ -254,15 +254,15 @@ export default function MarketDetailPage() {
   if (loading) {
     return (
       <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
-        <div className="h-12 rounded-lg bg-[#222638] animate-pulse" />
+        <div className="h-12 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 animate-pulse" />
         <div className="flex flex-col lg:flex-row gap-5">
           <div className="flex-1 space-y-3">
-            <div className="h-4 w-24 rounded bg-[#222638] animate-pulse" />
-            <div className="h-8 w-3/4 rounded bg-[#222638] animate-pulse" />
-            <div className="h-4 w-full rounded bg-[#222638] animate-pulse" />
-            <div className="h-4 w-5/6 rounded bg-[#222638] animate-pulse" />
+            <div className="h-4 w-24 rounded bg-[#161b27] animate-pulse" />
+            <div className="h-8 w-3/4 rounded bg-[#161b27] animate-pulse" />
+            <div className="h-4 w-full rounded bg-[#161b27] animate-pulse" />
+            <div className="h-4 w-5/6 rounded bg-[#161b27] animate-pulse" />
           </div>
-          <div className="lg:min-w-[280px] h-48 rounded-xl bg-[#222638] animate-pulse" />
+          <div className="lg:min-w-[280px] h-48 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 animate-pulse" />
         </div>
         <ChartSkeleton height="h-96" />
       </div>
@@ -272,7 +272,7 @@ export default function MarketDetailPage() {
   return (
     <>
       {/* ─── TOP NAV BAR ──────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 h-12 bg-[#1a1e2e]/95 backdrop-blur-md border-b border-[#2a2f45] flex items-center gap-3 px-4">
+      <div className="sticky top-0 z-20 h-12 bg-[#0d1117]/95 backdrop-blur-md border-b border-[#2a2f45] flex items-center gap-3 px-4">
         <Link href="/" className="flex items-center gap-1.5 text-[#8892b0] hover:text-[#57D7BA] transition-colors text-sm">
           <ArrowLeft className="size-4" />
           <span className="hidden sm:inline">Home</span>
@@ -302,7 +302,7 @@ export default function MarketDetailPage() {
                 <Clock className="size-2.5" />
                 Resolves {market.resolution}
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-[#222638] text-[#8892b0] text-[10px] font-medium border border-[#2a2f45]">
+              <span className="px-2 py-0.5 rounded-full bg-[#161b27] text-[#8892b0] text-[10px] font-medium border border-[#2a2f45]">
                 {market.creator}
               </span>
             </div>
@@ -315,7 +315,7 @@ export default function MarketDetailPage() {
           </div>
 
           {/* ─── PRICE BLOCK ───────────────────────────────────────── */}
-          <Card className="bg-[#222638] border-[#2a2f45] lg:min-w-[280px] shrink-0">
+          <Card className="bg-[#161b27] border-[#2a2f45] lg:min-w-[280px] shrink-0">
             <CardContent className="p-5">
               <div className="text-center lg:text-right">
                 <div className="text-xs text-[#8892b0] mb-1 uppercase tracking-wider">Current Price</div>
@@ -392,9 +392,9 @@ export default function MarketDetailPage() {
                 Loading analysis…
               </div>
             ) : !thesis ? (
-              <Card className="bg-[#222638] border-[#2a2f45]">
+              <Card className="bg-[#161b27] border-[#2a2f45]">
                 <CardContent className="py-12 text-center">
-                  <Brain className="size-10 text-[#2f374f] mx-auto mb-4" />
+                  <Brain className="size-10 text-[#21262d] mx-auto mb-4" />
                   <p className="text-sm text-[#8892b0]">Analysis not yet generated for this market.</p>
                   <p className="text-xs text-[#8892b0]/60 mt-1">Theses are generated weekly for the top 25 highest-volume markets.</p>
                 </CardContent>
@@ -446,7 +446,7 @@ export default function MarketDetailPage() {
                   {/* Confidence meter */}
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] text-[#8892b0] whitespace-nowrap">Confidence: {thesis.confidence}/10</span>
-                    <div className="w-32 h-2 bg-[#1a1e2e] rounded-full overflow-hidden">
+                    <div className="w-32 h-2 bg-[#0d1117] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
@@ -459,7 +459,7 @@ export default function MarketDetailPage() {
                 </div>
 
                 {/* Bull case — always visible */}
-                <Card className="bg-[#222638] border-[#2a2f45]">
+                <Card className="bg-[#161b27] border-[#2a2f45]">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <TrendingUp className="size-4 text-[#22c55e]" />
@@ -480,7 +480,7 @@ export default function MarketDetailPage() {
                   const firstSentence = text?.split(/(?<=[.!?])\s/)[0] ?? "";
                   const hasMore = text && text.length > firstSentence.length + 1;
                   return (
-                    <div key={label} className="relative overflow-hidden rounded-xl border border-[#2a2f45] bg-[#222638]">
+                    <div key={label} className="relative overflow-hidden rounded-xl border border-[#2a2f45] bg-[#161b27]">
                       <div className="p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <Icon className="size-4" style={{ color }} />
@@ -496,7 +496,7 @@ export default function MarketDetailPage() {
                       {/* Gradient fade cut */}
                       {hasMore && (
                         <div className="absolute bottom-0 left-0 right-0 h-10 pointer-events-none"
-                          style={{ background: "linear-gradient(to bottom, transparent, #222638)" }} />
+                          style={{ background: "linear-gradient(to bottom, transparent, #161b27)" }} />
                       )}
                     </div>
                   );
@@ -531,7 +531,7 @@ export default function MarketDetailPage() {
                     { label: "YES Whale Capital", val: dataLoading ? "—" : fmtUsd(yesVal), color: "#22c55e" },
                     { label: "NO Whale Capital", val: dataLoading ? "—" : fmtUsd(noVal), color: "#ef4444" },
                   ].map((s) => (
-                    <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
+                    <Card key={s.label} className="bg-[#161b27] border-[#2a2f45]">
                       <CardContent className="p-4 text-center">
                         <div className="text-lg font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
                         <div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">{s.label}</div>
@@ -543,7 +543,7 @@ export default function MarketDetailPage() {
             })()}
             {/* Top 3 whales on this market */}
             {!dataLoading && marketWhales.length > 0 && (
-              <Card className="bg-[#222638] border-[#2a2f45]">
+              <Card className="bg-[#161b27] border-[#2a2f45]">
                 <CardContent className="p-4">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mb-3">Top Whales on This Market</div>
                   <div className="space-y-2">
@@ -555,7 +555,7 @@ export default function MarketDetailPage() {
                       const addr = w.whale_id || "";
                       const label = formatWallet(addr, walletLabels);
                       return (
-                        <div key={i} className="flex items-center gap-3 py-2 border-b border-[#2f374f]/40 last:border-0">
+                        <div key={i} className="flex items-center gap-3 py-2 border-b border-[#21262d]/40 last:border-0">
                           <span className="text-[10px] font-mono font-bold text-[#4a5168] w-4 shrink-0">{i + 1}</span>
                           <Link href={`/whales/${addr}`} className="flex-1 text-xs text-[#e2e8f0] hover:text-[#57D7BA] transition-colors font-mono truncate">
                             {label}
@@ -583,7 +583,7 @@ export default function MarketDetailPage() {
 
             {/* Tagged news */}
             {marketNews.length > 0 && (
-              <Card className="bg-[#222638] border-[#2a2f45]">
+              <Card className="bg-[#161b27] border-[#2a2f45]">
                 <CardContent className="p-4 space-y-2">
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mb-3">Related News</div>
                   {marketNews.map((tag: any) => {
@@ -591,7 +591,7 @@ export default function MarketDetailPage() {
                     if (!art) return null;
                     return (
                       <a key={art.id} href={art.url} target="_blank" rel="noopener noreferrer"
-                        className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#1a1e2e] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors group">
+                        className="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#0d1117] border border-[#21262d] hover:border-[#57D7BA]/30 transition-colors group">
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors leading-snug line-clamp-2">{art.title}</div>
                           <div className="text-[10px] text-[#8892b0] mt-0.5">{art.source}</div>
@@ -612,7 +612,7 @@ export default function MarketDetailPage() {
 
           {/* ─── PRICE CHART TAB ───────────────────────────────────── */}
           <TabsContent value="price" className="pt-5 space-y-4">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -621,7 +621,7 @@ export default function MarketDetailPage() {
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     {/* Time range buttons */}
-                    <div className="flex items-center gap-0.5 bg-[#1a1e2e] rounded-lg p-0.5 border border-[#2a2f45]">
+                    <div className="flex items-center gap-0.5 bg-[#0d1117] rounded-lg p-0.5 border border-[#2a2f45]">
                       {(["1D", "7D", "30D", "90D", "ALL"] as const).map((r) => (
                         <button
                           key={r}
@@ -637,7 +637,7 @@ export default function MarketDetailPage() {
                       ))}
                     </div>
                     {/* Chart mode toggle */}
-                    <div className="flex items-center gap-0.5 bg-[#1a1e2e] rounded-lg p-0.5 border border-[#2a2f45]">
+                    <div className="flex items-center gap-0.5 bg-[#0d1117] rounded-lg p-0.5 border border-[#2a2f45]">
                       <button
                         onClick={() => setChartMode("area")}
                         className={`p-1.5 rounded-md transition-all ${chartMode === "area" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0] hover:text-[#e2e8f0]"}`}
@@ -736,7 +736,7 @@ export default function MarketDetailPage() {
 
           {/* ─── WHALE FLOWS TAB ───────────────────────────────────── */}
           <TabsContent value="whales" className="pt-5">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -801,7 +801,7 @@ export default function MarketDetailPage() {
 
           {/* ─── CROSS-PLATFORM TAB ────────────────────────────────── */}
           <TabsContent value="cross" className="pt-5">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Layers className="size-4 text-[#57D7BA]" />
@@ -840,7 +840,7 @@ export default function MarketDetailPage() {
                         { label: "Polymarket", price: Math.round(marketDisagreement.poly_price), color: "#6366f1" },
                         { label: "Kalshi", price: Math.round(marketDisagreement.kalshi_price), color: "#22c55e" },
                       ].map((p) => (
-                        <div key={p.label} className="p-4 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-center">
+                        <div key={p.label} className="p-4 rounded-lg bg-[#0d1117] border border-[#21262d] text-center">
                           <div className="text-[10px] text-[#8892b0] mb-1">{p.label}</div>
                           <div className="text-2xl font-mono font-bold tabular-nums" style={{ color: p.color }}>{p.price}¢</div>
                         </div>
@@ -860,7 +860,7 @@ export default function MarketDetailPage() {
                     </div>
                     {/* Sparkline */}
                     {spreadHistory.length >= 2 && (
-                      <div className="pt-2 border-t border-[#2f374f]">
+                      <div className="pt-2 border-t border-[#21262d]">
                         <div className="text-[10px] text-[#8892b0] mb-2 uppercase tracking-wide">48h Spread History</div>
                         <Sparkline data={spreadHistory} width={300} height={48} strokeColor="#f59e0b" />
                       </div>
@@ -876,7 +876,7 @@ export default function MarketDetailPage() {
                 <div className="flex items-start gap-2 flex-wrap">
                   <CausationTag analysis={crossPlatformCausation} compact={false} showExplanation={true} />
                 </div>
-                <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+                <div className="rounded-xl bg-[#0d1117] border border-[#21262d] p-3">
                   <SpreadHistoryChart marketId={id} question={market.question} heightPx={240} />
                 </div>
                 <ResolutionCriteriaDiff result={analyzeResolutionDiff(null, null)} polymarketUrl={null} kalshiUrl={null} />
@@ -895,7 +895,7 @@ export default function MarketDetailPage() {
           {/* ─── ORDERBOOK TAB ─────────────────────────────────────── */}
           <TabsContent value="orderbook" className="pt-5 space-y-4">
             {/* Depth Chart */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <BookOpen className="size-4 text-[#57D7BA]" />
@@ -912,7 +912,7 @@ export default function MarketDetailPage() {
             {/* Order Tables */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Bids */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
+              <Card className="bg-[#161b27] border-[#2a2f45]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm text-[#22c55e] flex items-center gap-2">
                     <ArrowUpRight className="size-4" />
@@ -954,7 +954,7 @@ export default function MarketDetailPage() {
               </Card>
 
               {/* Asks */}
-              <Card className="bg-[#222638] border-[#2a2f45]">
+              <Card className="bg-[#161b27] border-[#2a2f45]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm text-[#ef4444] flex items-center gap-2">
                     <ArrowDownRight className="size-4" />
@@ -999,7 +999,7 @@ export default function MarketDetailPage() {
 
           {/* ─── RESOLUTION HISTORY TAB ─────────────────────────────── */}
           <TabsContent value="resolution" className="pt-5 space-y-4">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -1055,7 +1055,7 @@ export default function MarketDetailPage() {
             </Card>
 
             {/* Calibration Breakdown */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Target className="size-4 text-[#f59e0b]" />
@@ -1070,7 +1070,7 @@ export default function MarketDetailPage() {
                     { label: "Avg Brier Score", val: "0.18", color: "#f59e0b" },
                     { label: "Calibration Error", val: "8.2%", color: "#ef4444" },
                   ].map((stat) => (
-                    <div key={stat.label} className="text-center p-3 rounded-lg bg-[#1a1e2e] border border-[#2a2f45]">
+                    <div key={stat.label} className="text-center p-3 rounded-lg bg-[#0d1117] border border-[#2a2f45]">
                       <div className="text-xl font-bold font-mono" style={{ color: stat.color }}>
                         {stat.val}
                       </div>
@@ -1084,7 +1084,7 @@ export default function MarketDetailPage() {
 
           {/* ─── SIGNALS TAB ───────────────────────────────────────── */}
           <TabsContent value="signals" className="pt-5">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Brain className="size-4 text-[#8b5cf6]" />
@@ -1155,7 +1155,7 @@ export default function MarketDetailPage() {
                       <p className="text-[11px] text-[#8892b0] leading-relaxed">{s.desc}</p>
                     </div>
                     <div className="shrink-0 w-16">
-                      <div className="h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden">
+                      <div className="h-1.5 rounded-full bg-[#0d1117] overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{ width: `${s.strength}%`, backgroundColor: s.color }}

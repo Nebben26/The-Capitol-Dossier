@@ -123,7 +123,7 @@ function DisagreeCard({
 
   return (
     <div>
-      <Card className="bg-[#222638] border-[#2f374f] hover:border-[#f59e0b]/30 transition-all h-full">
+      <Card className="bg-[#161b27] border-[#21262d] hover:border-[#f59e0b]/30 transition-all h-full">
         <CardContent className="p-4">
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <span className="px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[8px] font-bold flex items-center gap-0.5">
@@ -145,7 +145,7 @@ function DisagreeCard({
             </p>
           </Link>
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 text-center p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+            <div className="flex-1 text-center p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
               <div className="text-[9px] text-[#8892b0] mb-0.5">Polymarket</div>
               <div className="font-mono text-lg font-bold tabular-nums text-[#e2e8f0]">{d.polyPrice}¢</div>
               <div className="text-[8px] text-[#8892b0] mt-0.5">{d.polyVol}</div>
@@ -159,7 +159,7 @@ function DisagreeCard({
                 <Sparkline data={history} width={80} height={24} strokeColor="#f59e0b" />
               </div>
             </div>
-            <div className="flex-1 text-center p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+            <div className="flex-1 text-center p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
               <div className="text-[9px] text-[#8892b0] mb-0.5">Kalshi</div>
               <div className="font-mono text-lg font-bold tabular-nums text-[#e2e8f0]">{d.kalshiPrice}¢</div>
               <div className="text-[8px] text-[#8892b0] mt-0.5">{d.kalshiVol}</div>
@@ -204,7 +204,7 @@ function DisagreeCard({
                     ? "bg-[#57D7BA]/20 text-[#57D7BA] border border-[#57D7BA]/30"
                     : isProfit
                       ? "bg-[#57D7BA]/10 text-[#57D7BA] border border-[#57D7BA]/20 animate-pulse-glow"
-                      : "bg-[#2f374f] text-[#8892b0] border border-[#2f374f] hover:text-[#57D7BA]"
+                      : "bg-[#21262d] text-[#8892b0] border border-[#21262d] hover:text-[#57D7BA]"
                 }`}
               >
                 <Zap className="size-3" />
@@ -221,7 +221,7 @@ function DisagreeCard({
         style={{ maxHeight: expanded ? "1200px" : "0px", opacity: expanded ? 1 : 0 }}
       >
         <div className="pt-2 space-y-2">
-          <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+          <div className="rounded-xl bg-[#0d1117] border border-[#21262d] p-3">
             <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
           </div>
           <ResolutionCriteriaDiff
@@ -407,7 +407,7 @@ function DisagreesContent() {
             {topOpportunities.map(({ d, annReturn }) => {
               const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
               return (
-                <Card key={d.id} className="bg-[#222638] border-[#fbbf24]/20 hover:border-[#fbbf24]/40 transition-all">
+                <Card key={d.id} className="bg-[#161b27] border-[#fbbf24]/20 hover:border-[#fbbf24]/40 transition-all">
                   <CardContent className="p-4">
                     <p className="text-xs text-[#e2e8f0] font-medium leading-snug line-clamp-2 mb-3">
                       {d.question.length > 60 ? d.question.slice(0, 60) + "…" : d.question}
@@ -458,7 +458,7 @@ function DisagreesContent() {
 
       {/* Explainer */}
       {disagreements.length >= 10 && (
-        <Card className="bg-[#222638] border-[#f59e0b]/20">
+        <Card className="bg-[#161b27] border-[#f59e0b]/20">
           <CardContent className="p-4 flex items-start gap-3">
             <AlertTriangle className="size-5 text-[#f59e0b] shrink-0 mt-0.5" />
             <div>
@@ -482,7 +482,7 @@ function DisagreesContent() {
             placeholder="Search disagreements..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
+            className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -492,7 +492,7 @@ function DisagreesContent() {
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d]"}`}
               >
                 {cat}
               </button>
@@ -515,7 +515,7 @@ function DisagreesContent() {
                 className={`shrink-0 px-2.5 py-1 rounded-full text-[9px] font-medium transition-all border ${
                   causeFilter === key
                     ? "text-[#0f1119] border-transparent"
-                    : "bg-[#1a1e2e] text-[#8892b0] hover:text-[#e2e8f0] border-[#2f374f]"
+                    : "bg-[#0d1117] text-[#8892b0] hover:text-[#e2e8f0] border-[#21262d]"
                 }`}
                 style={causeFilter === key ? { backgroundColor: color ?? "#f59e0b", borderColor: "transparent" } : undefined}
               >
@@ -529,20 +529,20 @@ function DisagreesContent() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => handleSort("opportunity")}
-              className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "opportunity" ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] border border-[#2f374f] hover:text-[#e2e8f0]"}`}
+              className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "opportunity" ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"}`}
             >
               Score ↓
             </button>
             <button
               onClick={() => handleSort("annReturn")}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "annReturn" ? "bg-[#fbbf24] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] border border-[#2f374f] hover:text-[#e2e8f0]"}`}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "annReturn" ? "bg-[#fbbf24] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"}`}
             >
               Ann. Return ↓
               {sortBy !== "annReturn" && <span className="px-1 py-0.5 rounded text-[7px] font-bold bg-[#fbbf24]/20 text-[#fbbf24]">NEW</span>}
             </button>
           </div>
           <span className="text-[10px] text-[#8892b0] font-mono">{filtered.length} results</span>
-          <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2f374f]">
+          <div className="flex items-center gap-0.5 bg-[#161b27] rounded-lg p-0.5 border border-[#21262d]">
             <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-[#f59e0b] text-[#0f1119]" : "text-[#8892b0]"}`}><LayoutGrid className="size-3.5" /></button>
             <button onClick={() => setViewMode("table")} className={`p-1.5 rounded-md transition-all ${viewMode === "table" ? "bg-[#f59e0b] text-[#0f1119]" : "text-[#8892b0]"}`}><List className="size-3.5" /></button>
           </div>
@@ -559,7 +559,7 @@ function DisagreesContent() {
             { label: "Combined Volume", val: "$" + (disagreements.reduce((s, d) => s + parseVol(d.polyVol) + parseVol(d.kalshiVol), 0) / 1000000).toFixed(0) + "M", color: "#57D7BA" },
             { label: "Actionable", val: `${actionableCount}`, color: "#22c55e" },
           ].map((s) => (
-            <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
+            <Card key={s.label} className="bg-[#161b27] border-[#21262d]">
               <CardContent className="p-3 text-center">
                 <div className="flex items-center justify-center">
                   <div className="text-lg font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
@@ -591,11 +591,11 @@ function DisagreesContent() {
 
       {/* Table view */}
       {viewMode === "table" && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="px-0 py-0 overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-[#2f374f] hover:bg-transparent">
+                <TableRow className="border-[#21262d] hover:bg-transparent">
                   <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">MARKET</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium">POLY</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium">KALSHI</TableHead>
@@ -679,7 +679,7 @@ function DisagreesContent() {
                     <React.Fragment key={d.id}>
                       <TableRow
                         ref={(el) => { rowRefs.current[d.id] = el; }}
-                        className={`border-[#2f374f]/50 hover:bg-[#f59e0b]/5 transition-colors ${isExpanded ? "bg-[#57D7BA]/5" : ""}`}
+                        className={`border-[#21262d]/50 hover:bg-[#f59e0b]/5 transition-colors ${isExpanded ? "bg-[#57D7BA]/5" : ""}`}
                       >
                         <TableCell className="pl-4 py-2.5 max-w-[120px] sm:max-w-[220px]">
                           <div className="flex items-start gap-1.5">
@@ -751,7 +751,7 @@ function DisagreesContent() {
                                 ? "bg-[#57D7BA]/20 text-[#57D7BA] border border-[#57D7BA]/30"
                                 : isProfit
                                   ? "bg-[#57D7BA]/10 text-[#57D7BA] border border-[#57D7BA]/20 animate-pulse-glow"
-                                  : "bg-[#2f374f] text-[#8892b0] border border-[#2f374f] hover:text-[#57D7BA] hover:border-[#57D7BA]/20"
+                                  : "bg-[#21262d] text-[#8892b0] border border-[#21262d] hover:text-[#57D7BA] hover:border-[#57D7BA]/20"
                             }`}
                           >
                             <Zap className="size-3" />
@@ -765,7 +765,7 @@ function DisagreesContent() {
                         <TableRow className="border-[#57D7BA]/20 bg-[#57D7BA]/5">
                           <TableCell colSpan={colSpan} className="p-4">
                             <div className="space-y-3">
-                              <div className="rounded-xl bg-[#1a1e2e] border border-[#2f374f] p-3">
+                              <div className="rounded-xl bg-[#0d1117] border border-[#21262d] p-3">
                                 <SpreadHistoryChart marketId={d.marketId} question={d.question} heightPx={180} />
                               </div>
                               <ResolutionCriteriaDiff
@@ -795,9 +795,9 @@ function DisagreesContent() {
       )}
 
       {disagreements.length === 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-16 text-center">
-            <GitCompareArrows className="size-12 text-[#2f374f] mx-auto mb-4" />
+            <GitCompareArrows className="size-12 text-[#21262d] mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No active arbitrage opportunities right now</h3>
             <p className="text-sm text-[#8892b0]">Check back in 30 minutes — disagreements are recalculated each ingestion cycle.</p>
           </CardContent>
@@ -805,16 +805,16 @@ function DisagreesContent() {
       )}
 
       {disagreements.length > 0 && filtered.length === 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-16 text-center">
-            <GitCompareArrows className="size-12 text-[#2f374f] mx-auto mb-4" />
+            <GitCompareArrows className="size-12 text-[#21262d] mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No disagreements found</h3>
             <p className="text-sm text-[#8892b0]">Try adjusting your search or filters</p>
           </CardContent>
         </Card>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

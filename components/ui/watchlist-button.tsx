@@ -34,7 +34,7 @@ export function WatchlistButton({
       className={`gap-1.5 ${
         watched
           ? "border-[#f59e0b]/30 text-[#f59e0b] bg-[#f59e0b]/5 hover:bg-[#f59e0b]/10"
-          : "border-[#2f374f] text-[#8892b0] hover:text-[#f59e0b] hover:border-[#f59e0b]/30"
+          : "border-[#21262d] text-[#8892b0] hover:text-[#f59e0b] hover:border-[#f59e0b]/30"
       }`}
     >
       <Star className={`size-3.5 ${watched ? "fill-[#f59e0b]" : ""}`} />

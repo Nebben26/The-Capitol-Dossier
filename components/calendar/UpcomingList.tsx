@@ -60,7 +60,7 @@ export function UpcomingList({ catalysts, selectedDate, onClearFilter }: Upcomin
           </span>
           <button
             onClick={onClearFilter}
-            className="text-xs text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f] hover:border-[#4a5168] px-2.5 py-1 rounded-lg transition-colors"
+            className="text-xs text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d] hover:border-[#4a5168] px-2.5 py-1 rounded-lg transition-colors"
           >
             Clear filter
           </button>
@@ -82,7 +82,7 @@ export function UpcomingList({ catalysts, selectedDate, onClearFilter }: Upcomin
             <span className="text-xs font-semibold text-[#8892b0] uppercase tracking-wider">
               {dayLabel(dateKey)}
             </span>
-            <div className="flex-1 h-px bg-[#2f374f]" />
+            <div className="flex-1 h-px bg-[#21262d]" />
             <span className="text-[10px] text-[#4a5168] font-mono">{events.length}</span>
           </div>
 
@@ -92,7 +92,7 @@ export function UpcomingList({ catalysts, selectedDate, onClearFilter }: Upcomin
               <Link
                 key={m.id}
                 href={`/markets/${m.id}`}
-                className="flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg bg-[#222638] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors group"
+                className="flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] hover:border-[#57D7BA]/30 transition-colors group"
               >
                 {/* Days left */}
                 <span className={`font-mono text-xs font-bold tabular-nums w-8 shrink-0 ${daysColor(m.days_left)}`}>

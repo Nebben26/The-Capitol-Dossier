@@ -51,19 +51,19 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
 
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: "#1a1e2e" },
+        background: { type: ColorType.Solid, color: "#0d1117" },
         textColor: "#8892b0",
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "#2f374f" },
-        horzLines: { color: "#2f374f" },
+        vertLines: { color: "#21262d" },
+        horzLines: { color: "#21262d" },
       },
-      rightPriceScale: { borderColor: "#2f374f" },
-      timeScale: { borderColor: "#2f374f", timeVisible: true, secondsVisible: false },
+      rightPriceScale: { borderColor: "#21262d" },
+      timeScale: { borderColor: "#21262d", timeVisible: true, secondsVisible: false },
       crosshair: {
-        vertLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#222638" },
-        horzLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#222638" },
+        vertLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#161b27" },
+        horzLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#161b27" },
       },
       width: el.clientWidth,
       height: heightPx,
@@ -123,7 +123,7 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
               className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all ${
                 window === w
                   ? "bg-[#fbbf24] text-[#0f1119]"
-                  : "bg-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0]"
+                  : "bg-[#21262d] text-[#8892b0] hover:text-[#e2e8f0]"
               }`}
             >
               {w}
@@ -134,15 +134,15 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
 
       {/* Chart area */}
       {loading ? (
-        <div className="rounded-lg bg-[#1a1e2e] border border-[#2f374f] animate-pulse flex items-center justify-center" style={{ height: heightPx }}>
+        <div className="rounded-lg bg-[#0d1117] border border-[#21262d] animate-pulse flex items-center justify-center" style={{ height: heightPx }}>
           <div className="space-y-2 w-3/4">
             {[0.6, 0.9, 0.7, 0.8, 0.5].map((w, i) => (
-              <div key={i} className="h-1.5 rounded bg-[#2f374f]" style={{ width: `${w * 100}%` }} />
+              <div key={i} className="h-1.5 rounded bg-[#21262d]" style={{ width: `${w * 100}%` }} />
             ))}
           </div>
         </div>
       ) : snapshots.length === 0 ? (
-        <div className="rounded-lg bg-[#1a1e2e] border border-[#2f374f] flex items-center justify-center p-6" style={{ height: heightPx }}>
+        <div className="rounded-lg bg-[#0d1117] border border-[#21262d] flex items-center justify-center p-6" style={{ height: heightPx }}>
           <div className="text-center max-w-xs">
             <div className="text-[11px] text-[#8892b0] leading-relaxed">
               Historical spread data accumulating. Chart will populate as the ingest pipeline captures snapshots over the next few hours.
@@ -151,9 +151,9 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
         </div>
       ) : (
         <div className="relative">
-          <div ref={containerRef} className="rounded-lg overflow-hidden border border-[#2f374f]" style={{ height: heightPx }} />
+          <div ref={containerRef} className="rounded-lg overflow-hidden border border-[#21262d]" style={{ height: heightPx }} />
           {snapshots.length < 3 && (
-            <div className="absolute top-1 left-2 bg-[#222638]/90 px-1.5 py-0.5 rounded text-[9px] text-[#8892b0]">
+            <div className="absolute top-1 left-2 bg-[#161b27]/90 px-1.5 py-0.5 rounded text-[9px] text-[#8892b0]">
               Limited history — chart will fill out as more data accumulates.
             </div>
           )}
@@ -163,11 +163,11 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
       {/* Summary stats */}
       {!loading && snapshots.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
             <div className="text-[9px] text-[#8892b0] mb-0.5">Current Spread</div>
             <div className="font-mono font-bold text-[#fbbf24] tabular-nums">{current}pt</div>
           </div>
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
             <div className="text-[9px] text-[#8892b0] mb-0.5">24h Change</div>
             {change24h === null ? (
               <div className="font-mono text-[#8892b0] text-xs">—</div>
@@ -178,11 +178,11 @@ export function SpreadHistoryChart({ marketId, question, heightPx = 200 }: Sprea
               </div>
             )}
           </div>
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
             <div className="text-[9px] text-[#8892b0] mb-0.5">Max in Window</div>
             <div className="font-mono font-bold text-[#ef4444] tabular-nums">{maxSpread}pt</div>
           </div>
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d]">
             <div className="text-[9px] text-[#8892b0] mb-0.5">Data Points</div>
             <div className="font-mono font-bold text-[#e2e8f0] tabular-nums">{snapshots.length}</div>
           </div>

@@ -37,7 +37,7 @@ export default function MarketEmbedPage({ params }: { params: { id: string } }) 
 
   return (
     <div
-      className="bg-[#1a1e2e] text-[#e2e8f0] p-5 font-sans"
+      className="bg-[#0d1117] text-[#e2e8f0] p-5 font-sans"
       style={{ fontFamily: "Inter, system-ui, sans-serif", width: "600px", height: "300px", overflow: "hidden", boxSizing: "border-box" }}
     >
       {/* Header */}

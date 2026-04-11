@@ -79,7 +79,7 @@ export function RelatedMarkets({ marketId }: { marketId: string }) {
           <button
             key={item.otherId}
             onClick={() => router.push(`/markets/${item.otherId}`)}
-            className="w-full flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg bg-[#222638] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors text-left group"
+            className="w-full flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] hover:border-[#57D7BA]/30 transition-colors text-left group"
           >
             {/* Correlation badge */}
             <span

@@ -239,9 +239,9 @@ export default function CalibrationPage() {
 
       {/* ─── CONNECT OR ADD ──────────────────────────────── */}
       {loaded && predictions.length === 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-12 text-center space-y-5">
-            <Crosshair className="size-14 text-[#2f374f] mx-auto" />
+            <Crosshair className="size-14 text-[#21262d] mx-auto" />
             <h2 className="text-xl font-bold">How good are your predictions?</h2>
             <p className="text-sm text-[#8892b0] max-w-md mx-auto">
               Connect your Polymarket wallet to auto-import your trading history, or manually add your past predictions to get a full calibration analysis.
@@ -250,7 +250,7 @@ export default function CalibrationPage() {
               <Button onClick={connectWallet} className="bg-[#6366f1] text-white hover:bg-[#6366f1]/80 h-11 px-6 font-semibold gap-2">
                 <Wallet className="size-4" /> Connect Polymarket Wallet
               </Button>
-              <Button onClick={() => { setShowForm(true); }} variant="outline" className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 h-11 px-6 gap-2">
+              <Button onClick={() => { setShowForm(true); }} variant="outline" className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 h-11 px-6 gap-2">
                 <Plus className="size-4" /> Add Predictions Manually
               </Button>
             </div>
@@ -260,7 +260,7 @@ export default function CalibrationPage() {
 
       {/* ─── ADD PREDICTION FORM ──────────────────────────── */}
       {(showForm || predictions.length > 0) && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Plus className="size-4 text-[#57D7BA]" /> Add a Prediction
@@ -271,28 +271,28 @@ export default function CalibrationPage() {
               <div className="lg:col-span-2">
                 <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1">Question</label>
                 <input type="text" value={formQ} onChange={(e) => setFormQ(e.target.value)} placeholder="Will X happen by Y?"
-                  className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-sm text-[#e2e8f0] focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+                  className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-sm text-[#e2e8f0] focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
               </div>
               <div>
                 <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1">Your Probability</label>
                 <div className="relative">
                   <input type="number" min="1" max="99" value={formProb} onChange={(e) => setFormProb(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+                    className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-sm text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#8892b0]">%</span>
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1">Outcome</label>
                 <div className="flex gap-1.5">
-                  <button onClick={() => setFormOutcome("YES")} className={`flex-1 h-9 rounded-lg text-xs font-bold transition-all ${formOutcome === "YES" ? "bg-[#22c55e] text-white" : "bg-[#1a1e2e] border border-[#2f374f] text-[#8892b0]"}`}>YES</button>
-                  <button onClick={() => setFormOutcome("NO")} className={`flex-1 h-9 rounded-lg text-xs font-bold transition-all ${formOutcome === "NO" ? "bg-[#ef4444] text-white" : "bg-[#1a1e2e] border border-[#2f374f] text-[#8892b0]"}`}>NO</button>
+                  <button onClick={() => setFormOutcome("YES")} className={`flex-1 h-9 rounded-lg text-xs font-bold transition-all ${formOutcome === "YES" ? "bg-[#22c55e] text-white" : "bg-[#0d1117] border border-[#21262d] text-[#8892b0]"}`}>YES</button>
+                  <button onClick={() => setFormOutcome("NO")} className={`flex-1 h-9 rounded-lg text-xs font-bold transition-all ${formOutcome === "NO" ? "bg-[#ef4444] text-white" : "bg-[#0d1117] border border-[#21262d] text-[#8892b0]"}`}>NO</button>
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] text-[#8892b0] uppercase tracking-wider mb-1">Category</label>
                 <div className="relative">
                   <select value={formCat} onChange={(e) => setFormCat(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all">
+                    className="w-full h-9 px-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-sm text-[#e2e8f0] appearance-none focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all">
                     {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-[#8892b0] pointer-events-none" />
@@ -304,7 +304,7 @@ export default function CalibrationPage() {
                 <Plus className="size-4" /> Add
               </Button>
               {predictions.length === 0 && (
-                <Button onClick={connectWallet} variant="outline" className="border-[#2f374f] text-[#8892b0] hover:text-[#6366f1] gap-1.5">
+                <Button onClick={connectWallet} variant="outline" className="border-[#21262d] text-[#8892b0] hover:text-[#6366f1] gap-1.5">
                   <Wallet className="size-4" /> Or connect wallet
                 </Button>
               )}
@@ -325,7 +325,7 @@ export default function CalibrationPage() {
               { label: "Confidence", val: confidence.label, color: confidence.label === "Overconfident" ? "#f59e0b" : "#22c55e", desc: confidence.over > 0 ? `${confidence.over}% miss rate` : "Well tuned" },
               { label: "Whale Rank", val: myBrier <= 0.15 ? "Top 10%" : myBrier <= 0.25 ? "Top 30%" : "Top 60%", color: "#6366f1", desc: "vs 2,847 tracked" },
             ].map((s) => (
-              <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
+              <Card key={s.label} className="bg-[#161b27] border-[#21262d]">
                 <CardContent className="p-3 text-center">
                   <div className="text-xl font-bold font-mono tabular-nums" style={{ color: s.color }}>{s.val}</div>
                   <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">{s.label}</div>
@@ -338,7 +338,7 @@ export default function CalibrationPage() {
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Calibration Scatter */}
-            <Card className="bg-[#222638] border-[#2f374f]">
+            <Card className="bg-[#161b27] border-[#21262d]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><Crosshair className="size-4 text-[#6366f1]" /> Calibration Chart</CardTitle>
                 <CardDescription className="text-[10px] text-[#8892b0]">Dots on the 45° line = perfectly calibrated</CardDescription>
@@ -347,9 +347,9 @@ export default function CalibrationPage() {
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <ScatterChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" />
-                      <XAxis type="number" dataKey="predicted" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `${v}%`} />
-                      <YAxis type="number" dataKey="actual" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `${v}%`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
+                      <XAxis type="number" dataKey="predicted" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#21262d" }} tickFormatter={(v) => `${v}%`} />
+                      <YAxis type="number" dataKey="actual" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#21262d" }} tickFormatter={(v) => `${v}%`} />
                       <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 100, y: 100 }]} stroke="#8892b0" strokeDasharray="6 4" strokeOpacity={0.4} />
                       <Scatter data={calibrationData} fillOpacity={0.8}>
                         {calibrationData.map((entry, i) => {
@@ -370,7 +370,7 @@ export default function CalibrationPage() {
             </Card>
 
             {/* P&L Curve */}
-            <Card className="bg-[#222638] border-[#2f374f]">
+            <Card className="bg-[#161b27] border-[#21262d]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="size-4 text-[#22c55e]" /> Simulated P&L</CardTitle>
                 <CardDescription className="text-[10px] text-[#8892b0]">$100 per correct bet, -$80 per incorrect</CardDescription>
@@ -385,9 +385,9 @@ export default function CalibrationPage() {
                           <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" />
-                      <XAxis dataKey="idx" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} />
-                      <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `$${v}`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
+                      <XAxis dataKey="idx" tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#21262d" }} />
+                      <YAxis tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#21262d" }} tickFormatter={(v) => `$${v}`} />
                       <ReferenceLine y={0} stroke="#8892b0" strokeDasharray="3 3" />
                       <Area type="monotone" dataKey="pnl" stroke="#22c55e" strokeWidth={2} fill="url(#calPnl)" />
                     </AreaChart>
@@ -400,7 +400,7 @@ export default function CalibrationPage() {
           {/* Category + Whale Comparison row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Category Win Rate */}
-            <Card className="bg-[#222638] border-[#2f374f]">
+            <Card className="bg-[#161b27] border-[#21262d]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="size-4 text-[#57D7BA]" /> Win Rate by Category</CardTitle>
               </CardHeader>
@@ -409,9 +409,9 @@ export default function CalibrationPage() {
                   <div className="h-48 w-full">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={catPerf} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" horizontal={false} />
-                        <XAxis type="number" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#2f374f" }} tickFormatter={(v) => `${v}%`} />
-                        <YAxis type="category" dataKey="category" tick={{ fill: "#e2e8f0", fontSize: 11 }} axisLine={{ stroke: "#2f374f" }} width={75} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262d" horizontal={false} />
+                        <XAxis type="number" domain={[0, 100]} tick={{ fill: "#8892b0", fontSize: 10 }} axisLine={{ stroke: "#21262d" }} tickFormatter={(v) => `${v}%`} />
+                        <YAxis type="category" dataKey="category" tick={{ fill: "#e2e8f0", fontSize: 11 }} axisLine={{ stroke: "#21262d" }} width={75} />
                         <ReferenceLine x={50} stroke="#8892b0" strokeDasharray="4 4" strokeOpacity={0.4} />
                         <Bar dataKey="winRate" radius={[0, 4, 4, 0]} barSize={16}>
                           {catPerf.map((c, i) => <Cell key={i} fill={catColors[c.category] || "#57D7BA"} fillOpacity={0.8} />)}
@@ -426,14 +426,14 @@ export default function CalibrationPage() {
             </Card>
 
             {/* Whale Comparison */}
-            <Card className="bg-[#222638] border-[#2f374f]">
+            <Card className="bg-[#161b27] border-[#21262d]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2"><Users className="size-4 text-[#8b5cf6]" /> You vs Top Whales</CardTitle>
               </CardHeader>
               <CardContent className="px-0 pb-2 overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#2f374f] hover:bg-transparent">
+                    <TableRow className="border-[#21262d] hover:bg-transparent">
                       <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">TRADER</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium">BRIER</TableHead>
                       <TableHead className="text-[10px] text-[#8892b0] font-medium">ACC%</TableHead>
@@ -453,7 +453,7 @@ export default function CalibrationPage() {
                       <TableCell className="pr-4 py-2"><span className="font-mono text-xs text-[#6366f1] tabular-nums">{resolved.length}</span></TableCell>
                     </TableRow>
                     {topWhales.map((w) => (
-                      <TableRow key={w.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                      <TableRow key={w.id} className="border-[#21262d]/50 hover:bg-[#57D7BA]/5 transition-colors">
                         <TableCell className="pl-4 py-2">
                           <Link href={`/whales/${w.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors">
                             <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center"><span className="text-[7px] font-bold text-[#0f1119]">#{w.rank}</span></div>
@@ -472,7 +472,7 @@ export default function CalibrationPage() {
           </div>
 
           {/* Prediction History */}
-          <Card className="bg-[#222638] border-[#2f374f]">
+          <Card className="bg-[#161b27] border-[#21262d]">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm flex items-center gap-2"><Target className="size-4 text-[#57D7BA]" /> Prediction History</CardTitle>
@@ -482,7 +482,7 @@ export default function CalibrationPage() {
             <CardContent className="px-0 pb-2 overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#2f374f] hover:bg-transparent">
+                  <TableRow className="border-[#21262d] hover:bg-transparent">
                     <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">QUESTION</TableHead>
                     <TableHead className="text-[10px] text-[#8892b0] font-medium">YOUR PROB</TableHead>
                     <TableHead className="text-[10px] text-[#8892b0] font-medium">OUTCOME</TableHead>
@@ -495,7 +495,7 @@ export default function CalibrationPage() {
                   {predictions.map((p) => {
                     const correct = p.outcome !== null && (p.outcome === "YES" ? p.probability >= 50 : p.probability < 50);
                     return (
-                      <TableRow key={p.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                      <TableRow key={p.id} className="border-[#21262d]/50 hover:bg-[#57D7BA]/5 transition-colors">
                         <TableCell className="pl-4 py-2 max-w-[200px]"><span className="text-xs text-[#e2e8f0] line-clamp-1">{p.question}</span></TableCell>
                         <TableCell className="py-2"><span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{p.probability}%</span></TableCell>
                         <TableCell className="py-2">
@@ -522,7 +522,7 @@ export default function CalibrationPage() {
         </>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

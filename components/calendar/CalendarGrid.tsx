@@ -73,12 +73,12 @@ export function CalendarGrid({ catalysts, selectedDate, onSelectDate }: Props) {
   });
 
   return (
-    <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4">
+    <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={prevMonth}
-          className="p-1.5 rounded-lg text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#2f374f] transition-colors"
+          className="p-1.5 rounded-lg text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#21262d] transition-colors"
           aria-label="Previous month"
         >
           ‹
@@ -86,7 +86,7 @@ export function CalendarGrid({ catalysts, selectedDate, onSelectDate }: Props) {
         <span className="text-sm font-semibold text-[#e2e8f0]">{monthLabel}</span>
         <button
           onClick={nextMonth}
-          className="p-1.5 rounded-lg text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#2f374f] transition-colors"
+          className="p-1.5 rounded-lg text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#21262d] transition-colors"
           aria-label="Next month"
         >
           ›
@@ -125,7 +125,7 @@ export function CalendarGrid({ catalysts, selectedDate, onSelectDate }: Props) {
                   ? "border-[#57D7BA]/40 text-[#57D7BA]"
                   : hasData
                   ? `${scoreColor(sc)} text-[#e2e8f0] hover:opacity-80`
-                  : "border-transparent text-[#4a5168] hover:bg-[#2f374f]",
+                  : "border-transparent text-[#4a5168] hover:bg-[#21262d]",
               ].join(" ")}
             >
               <span className="leading-none">{day}</span>
@@ -143,7 +143,7 @@ export function CalendarGrid({ catalysts, selectedDate, onSelectDate }: Props) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#2f374f]">
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#21262d]">
         <span className="text-[10px] text-[#4a5168]">Activity:</span>
         {[
           { label: "Low", cls: "bg-[#6366f1]/30" },

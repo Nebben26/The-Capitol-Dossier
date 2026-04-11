@@ -63,14 +63,14 @@ export function WaitlistForm({ compact = false, source }: { compact?: boolean; s
         name="name"
         placeholder="Your name"
         required
-        className="w-full px-3 py-2 bg-[#1a1e2e] border border-[#2f374f] rounded-lg text-sm text-[#e2e8f0] placeholder-[#4a5168] focus:border-[#57D7BA] outline-none transition-colors"
+        className="w-full px-3 py-2 bg-[#0d1117] border border-[#21262d] rounded-lg text-sm text-[#e2e8f0] placeholder-[#4a5168] focus:border-[#57D7BA] outline-none transition-colors"
       />
       <input
         type="email"
         name="email"
         placeholder="you@email.com"
         required
-        className="w-full px-3 py-2 bg-[#1a1e2e] border border-[#2f374f] rounded-lg text-sm text-[#e2e8f0] placeholder-[#4a5168] focus:border-[#57D7BA] outline-none transition-colors"
+        className="w-full px-3 py-2 bg-[#0d1117] border border-[#21262d] rounded-lg text-sm text-[#e2e8f0] placeholder-[#4a5168] focus:border-[#57D7BA] outline-none transition-colors"
       />
       {/* Honeypot — hidden from real users, filled by bots */}
       <input

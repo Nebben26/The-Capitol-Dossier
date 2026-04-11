@@ -49,7 +49,7 @@ export function LastUpdated({ lastFetched, refreshing, error, onRetry }: Props) 
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#222638] border border-[#2f374f] text-[10px] text-[#8892b0]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#161b27] border border-[#21262d] text-[10px] text-[#8892b0]">
       <Clock className="size-2.5" />
       Updated {label}
     </span>

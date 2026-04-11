@@ -57,7 +57,7 @@ export function SinceLastVisit() {
   const hasActivity = diff.newSpreads > 0 || diff.newSignals > 0 || diff.movedMarkets > 0;
 
   return (
-    <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#222638] border border-[#2f374f]">
+    <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
       <Clock className="size-4 text-[#57D7BA] shrink-0 mt-0.5" />
       <div className="text-xs text-[#8892b0] leading-relaxed">
         {hasActivity ? (

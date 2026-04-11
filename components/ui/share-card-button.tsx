@@ -33,13 +33,13 @@ export function ShareCardButton({
         variant="outline"
         size="sm"
         onClick={handleShare}
-        className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5"
+        className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5"
       >
         {copied ? <Check className="size-3.5 text-[#22c55e]" /> : <Share2 className="size-3.5" />}
         {copied ? "Copied!" : "Share Card"}
       </Button>
       {copied && (
-        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-64 rounded-lg bg-[#222638] border border-[#2f374f] shadow-xl shadow-black/50 z-50 overflow-hidden animate-in fade-in-0 slide-in-from-top-2 duration-300">
+        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-64 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] shadow-xl shadow-black/50 z-50 overflow-hidden animate-in fade-in-0 slide-in-from-top-2 duration-300">
           <div className="p-3 space-y-2">
             <p className="text-xs font-semibold text-[#e2e8f0] leading-snug">{title}</p>
             {(price || change) && (

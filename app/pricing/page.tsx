@@ -157,7 +157,7 @@ export default function PricingPage() {
       ],
       cta: "Start free",
       ctaHref: "/",
-      ctaStyle: "border border-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0] hover:border-[#4a5168]",
+      ctaStyle: "border border-[#21262d] text-[#8892b0] hover:text-[#e2e8f0] hover:border-[#4a5168]",
     },
     {
       id: "pro",
@@ -267,10 +267,10 @@ export default function PricingPage() {
         {tiers.map((tier) => (
           <div
             key={tier.id}
-            className={`rounded-2xl bg-[#222638] border flex flex-col transition-all ${
+            className={`rounded-2xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border flex flex-col transition-all ${
               tier.featured
                 ? "border-[#57D7BA] ring-1 ring-[#57D7BA]/20 shadow-lg shadow-[#57D7BA]/10 lg:-mt-2 lg:-mb-2"
-                : "border-[#2f374f]"
+                : "border-[#21262d]"
             }`}
           >
             <div className="p-5 flex flex-col gap-3 flex-1">
@@ -330,7 +330,7 @@ export default function PricingPage() {
 
               {/* Pro / Trader waitlist form */}
               {(tier.id === "pro" || tier.id === "trader") && (
-                <div id={tier.id === "pro" ? "waitlist" : undefined} className="pt-3 border-t border-[#2f374f] space-y-2">
+                <div id={tier.id === "pro" ? "waitlist" : undefined} className="pt-3 border-t border-[#21262d] space-y-2">
                   <p className="text-[10px] text-[#8892b0] text-center">
                     {tier.id === "pro"
                       ? "Waitlist members get $39/mo founder pricing (20% off)."
@@ -349,21 +349,21 @@ export default function PricingPage() {
         <h2 className="text-xl font-bold text-center">Full Feature Comparison</h2>
         <p className="text-[#8892b0] text-sm text-center mb-6">See exactly what&apos;s included in every tier</p>
 
-        <div className="overflow-x-auto rounded-2xl border border-[#2f374f]">
+        <div className="overflow-x-auto rounded-2xl border border-[#21262d]">
           <table className="w-full text-sm min-w-[700px]">
             <thead>
-              <tr className="border-b border-[#2f374f] bg-[#1a1e2e]">
+              <tr className="border-b border-[#21262d] bg-[#0d1117]">
                 <th className="text-left px-4 py-3 text-[#8892b0] text-xs font-semibold w-[36%]">Feature</th>
-                <th className="text-center px-3 py-3 text-[#8892b0] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Free</th>
-                <th className="text-center px-3 py-3 text-[#57D7BA] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Pro</th>
-                <th className="text-center px-3 py-3 text-[#f59e0b] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Trader</th>
-                <th className="text-center px-3 py-3 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#2f374f]">Quant API</th>
+                <th className="text-center px-3 py-3 text-[#8892b0] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Free</th>
+                <th className="text-center px-3 py-3 text-[#57D7BA] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Pro</th>
+                <th className="text-center px-3 py-3 text-[#f59e0b] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Trader</th>
+                <th className="text-center px-3 py-3 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider w-[16%] border-l border-[#21262d]">Quant API</th>
               </tr>
             </thead>
             <tbody>
               {COMPARISON.map((section) => (
                 <React.Fragment key={section.heading}>
-                  <tr className="bg-[#1a1e2e]/60">
+                  <tr className="bg-[#0d1117]/60">
                     <td colSpan={5} className="px-4 py-2 text-[10px] font-bold tracking-widest text-[#4a5168] uppercase">
                       {section.heading}
                     </td>
@@ -371,13 +371,13 @@ export default function PricingPage() {
                   {section.rows.map((row, i) => (
                     <tr
                       key={row.label}
-                      className={`border-t border-[#2f374f]/40 ${i % 2 === 0 ? "bg-[#222638]" : "bg-[#1e2235]"}`}
+                      className={`border-t border-[#21262d]/40 ${i % 2 === 0 ? "bg-[#161b27]" : "bg-[#1e2235]"}`}
                     >
                       <td className="px-4 py-2.5 text-[#8892b0] text-xs">{row.label}</td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.free} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.pro} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.trader} /></td>
-                      <td className="px-3 py-2.5 text-center border-l border-[#2f374f]/40"><CellValue val={row.quant} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.free} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.pro} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.trader} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.quant} /></td>
                     </tr>
                   ))}
                 </React.Fragment>
@@ -393,7 +393,7 @@ export default function PricingPage() {
         {FAQS.map((faq, i) => (
           <div
             key={i}
-            className="rounded-xl bg-[#222638] border border-[#2f374f] overflow-hidden"
+            className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] overflow-hidden"
           >
             <button
               onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -407,7 +407,7 @@ export default function PricingPage() {
               )}
             </button>
             {openFaq === i && (
-              <div className="px-5 pb-4 border-t border-[#2f374f]">
+              <div className="px-5 pb-4 border-t border-[#21262d]">
                 <p className="text-sm text-[#8892b0] leading-relaxed pt-3">{faq.a}</p>
               </div>
             )}
@@ -416,7 +416,7 @@ export default function PricingPage() {
       </div>
 
       {/* ─── BOTTOM CTA ──────────────────────────────────────────────────── */}
-      <div className="text-center space-y-4 py-8 border-t border-[#2f374f]">
+      <div className="text-center space-y-4 py-8 border-t border-[#21262d]">
         <h2 className="text-2xl font-bold">Still have questions?</h2>
         <p className="text-[#8892b0] text-sm">We&apos;re happy to help you find the right tier.</p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -428,7 +428,7 @@ export default function PricingPage() {
           </a>
           <Link
             href="/api-docs"
-            className="px-5 py-2.5 rounded-xl border border-[#2f374f] text-[#8892b0] text-sm hover:text-[#e2e8f0] hover:border-[#4a5168] transition-colors"
+            className="px-5 py-2.5 rounded-xl border border-[#21262d] text-[#8892b0] text-sm hover:text-[#e2e8f0] hover:border-[#4a5168] transition-colors"
           >
             View API docs
           </Link>

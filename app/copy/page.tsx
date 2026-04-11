@@ -53,7 +53,7 @@ function StatTile({
   color?: string;
 }) {
   return (
-    <div className="bg-[#1a1e2e] rounded-xl p-3 space-y-0.5">
+    <div className="bg-[#0d1117] rounded-xl p-3 space-y-0.5">
       <div className="text-[10px] text-[#8892b0] uppercase tracking-wide">{label}</div>
       <div
         className="text-lg font-bold font-mono tabular-nums"
@@ -78,10 +78,10 @@ function ConsensusMiniBar({
   height?: string;
 }) {
   const total = yes + no;
-  if (total === 0) return <div className={`w-full ${height} rounded-full bg-[#2f374f]`} />;
+  if (total === 0) return <div className={`w-full ${height} rounded-full bg-[#21262d]`} />;
   const yesPct = Math.round((yes / total) * 100);
   return (
-    <div className={`w-full ${height} rounded-full bg-[#2f374f] overflow-hidden flex`}>
+    <div className={`w-full ${height} rounded-full bg-[#21262d] overflow-hidden flex`}>
       <div
         className="h-full bg-[#22c55e] rounded-l-full"
         style={{ width: `${yesPct}%` }}
@@ -119,7 +119,7 @@ function WhaleRow({
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all cursor-pointer ${
         selected
           ? "bg-[#57D7BA]/8 border-[#57D7BA]/30"
-          : "bg-[#1a1e2e] border-transparent hover:border-[#2f374f]"
+          : "bg-[#0d1117] border-transparent hover:border-[#21262d]"
       }`}
       onClick={() => onToggle(w.id)}
     >
@@ -155,7 +155,7 @@ function WhaleRow({
           <CheckCircle className="size-4 text-[#0f1119]" />
         </div>
       ) : (
-        <div className="shrink-0 size-7 rounded-full bg-[#2f374f] flex items-center justify-center hover:bg-[#57D7BA]/20 transition-colors">
+        <div className="shrink-0 size-7 rounded-full bg-[#21262d] flex items-center justify-center hover:bg-[#57D7BA]/20 transition-colors">
           <UserPlus className="size-3.5 text-[#8892b0]" />
         </div>
       )}
@@ -205,7 +205,7 @@ function PortfolioPanel({
 }) {
   if (!summary || summary.selected_count === 0) {
     return (
-      <Card className="bg-[#222638] border-[#2f374f] h-full">
+      <Card className="bg-[#161b27] border-[#21262d] h-full">
         <CardContent className="p-0 h-full">
           <PortfolioEmpty onPreset={onPreset} />
         </CardContent>
@@ -221,7 +221,7 @@ function PortfolioPanel({
   return (
     <div className="space-y-4">
       {/* Summary tiles */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-4 space-y-3">
           <p className="text-xs font-semibold text-[#8892b0] uppercase tracking-wide">
             Portfolio Summary
@@ -231,7 +231,7 @@ function PortfolioPanel({
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-16 rounded-xl bg-[#1a1e2e] animate-pulse"
+                  className="h-16 rounded-xl bg-[#0d1117] animate-pulse"
                 />
               ))}
             </div>
@@ -264,7 +264,7 @@ function PortfolioPanel({
       </Card>
 
       {/* Consensus bar */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-[#8892b0] uppercase tracking-wide">
@@ -277,7 +277,7 @@ function PortfolioPanel({
             </p>
           </div>
           {loading ? (
-            <div className="h-3 rounded-full bg-[#1a1e2e] animate-pulse" />
+            <div className="h-3 rounded-full bg-[#0d1117] animate-pulse" />
           ) : (
             <>
               <ConsensusMiniBar yes={summary.yes_total} no={summary.no_total} height="h-3" />
@@ -291,7 +291,7 @@ function PortfolioPanel({
       </Card>
 
       {/* Top conviction plays */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-4 space-y-3">
           <p className="text-xs font-semibold text-[#8892b0] uppercase tracking-wide">
             Top Conviction Plays
@@ -299,7 +299,7 @@ function PortfolioPanel({
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-12 rounded-lg bg-[#1a1e2e] animate-pulse" />
+                <div key={i} className="h-12 rounded-lg bg-[#0d1117] animate-pulse" />
               ))}
             </div>
           ) : summary.top_plays.length === 0 ? (
@@ -311,7 +311,7 @@ function PortfolioPanel({
               {summary.top_plays.map((play) => (
                 <div
                   key={play.market_id}
-                  className="flex items-center gap-3 p-2.5 rounded-lg bg-[#1a1e2e] hover:bg-[#1a1e2e]/80 transition-colors"
+                  className="flex items-center gap-3 p-2.5 rounded-lg bg-[#0d1117] hover:bg-[#0d1117]/80 transition-colors"
                 >
                   {/* Direction badge */}
                   <span
@@ -500,7 +500,7 @@ export default function CopyWhalesPage() {
         ].map((step) => (
           <div
             key={step.n}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#222638] border border-[#2f374f]"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]"
           >
             <div className="size-8 rounded-full bg-[#57D7BA]/15 flex items-center justify-center shrink-0">
               <span className="text-sm font-bold text-[#57D7BA]">{step.n}</span>
@@ -518,7 +518,7 @@ export default function CopyWhalesPage() {
         {/* ═══ LEFT: Whale Selector (40%) ═════════════════════════════════ */}
         <div className="lg:w-[40%] space-y-3">
           {/* Presets */}
-          <Card className="bg-[#222638] border-[#2f374f]">
+          <Card className="bg-[#161b27] border-[#21262d]">
             <CardContent className="p-3 space-y-2">
               <p className="text-[10px] font-semibold text-[#8892b0] uppercase tracking-wide">
                 Quick Presets
@@ -555,7 +555,7 @@ export default function CopyWhalesPage() {
                 <Button
                   size="xs"
                   onClick={() => setSelected(() => new Set())}
-                  className="bg-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0] text-[10px]"
+                  className="bg-[#21262d] text-[#8892b0] hover:text-[#e2e8f0] text-[10px]"
                   variant="ghost"
                 >
                   <X className="size-3 mr-1" />
@@ -588,12 +588,12 @@ export default function CopyWhalesPage() {
               placeholder="Search whales..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
+              className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
             />
           </div>
 
           {/* Scrollable whale list */}
-          <div className="overflow-y-auto max-h-[600px] space-y-1 pr-1 scrollbar-thin scrollbar-thumb-[#2f374f] scrollbar-track-transparent">
+          <div className="overflow-y-auto max-h-[600px] space-y-1 pr-1 scrollbar-thin scrollbar-thumb-[#21262d] scrollbar-track-transparent">
             {filteredWhales.length === 0 ? (
               <p className="text-[11px] text-[#8892b0] text-center py-8">
                 No whales match "{search}"
@@ -622,7 +622,7 @@ export default function CopyWhalesPage() {
         </div>
       </div>
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

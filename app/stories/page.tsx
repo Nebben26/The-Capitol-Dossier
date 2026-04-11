@@ -17,7 +17,7 @@ function StoryCard({ story, canRead }: { story: Story; canRead: boolean }) {
   return (
     <Link
       href={canRead || story.tier === "free" ? `/stories/${story.slug}` : "/pricing"}
-      className="block group rounded-xl border border-[#2f374f] bg-[#222638] p-4 hover:border-[#57D7BA]/40 transition-colors"
+      className="block group rounded-xl border border-[#21262d] bg-[#161b27] p-4 hover:border-[#57D7BA]/40 transition-colors"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
@@ -107,7 +107,7 @@ export default function StoriesPage() {
         </div>
         <a
           href="/stories/rss.xml"
-          className="inline-flex items-center gap-1.5 text-xs text-[#8892b0] hover:text-[#f59e0b] border border-[#2f374f] hover:border-[#f59e0b]/40 px-2.5 py-1.5 rounded-lg transition-colors shrink-0"
+          className="inline-flex items-center gap-1.5 text-xs text-[#8892b0] hover:text-[#f59e0b] border border-[#21262d] hover:border-[#f59e0b]/40 px-2.5 py-1.5 rounded-lg transition-colors shrink-0"
         >
           <Rss className="size-3.5" />
           RSS
@@ -123,7 +123,7 @@ export default function StoriesPage() {
             className={`text-xs px-3 py-1 rounded-full border transition-colors ${
               categoryFilter === cat
                 ? "bg-[#57D7BA]/15 border-[#57D7BA]/40 text-[#57D7BA]"
-                : "border-[#2f374f] text-[#8892b0] hover:border-[#57D7BA]/30 hover:text-[#57D7BA]"
+                : "border-[#21262d] text-[#8892b0] hover:border-[#57D7BA]/30 hover:text-[#57D7BA]"
             }`}
           >
             {cat}
@@ -140,7 +140,7 @@ export default function StoriesPage() {
             className={`text-xs px-3 py-1 rounded-full border transition-colors ${
               tierFilter === t
                 ? "bg-[#fbbf24]/10 border-[#fbbf24]/30 text-[#fbbf24]"
-                : "border-[#2f374f] text-[#8892b0] hover:border-[#fbbf24]/20 hover:text-[#fbbf24]"
+                : "border-[#21262d] text-[#8892b0] hover:border-[#fbbf24]/20 hover:text-[#fbbf24]"
             }`}
           >
             {t === "all" ? "All tiers" : t === "free" ? "Free" : "Pro+"}
@@ -152,7 +152,7 @@ export default function StoriesPage() {
       {loading && stories.length === 0 ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-xl bg-[#222638] border border-[#2f374f] animate-pulse" />
+            <div key={i} className="h-28 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] animate-pulse" />
           ))}
         </div>
       ) : stories.length === 0 ? (
@@ -173,14 +173,14 @@ export default function StoriesPage() {
           <button
             onClick={() => fetchStories(false)}
             disabled={loading}
-            className="text-sm text-[#8892b0] hover:text-[#57D7BA] border border-[#2f374f] hover:border-[#57D7BA]/40 px-5 py-2 rounded-lg transition-colors disabled:opacity-50"
+            className="text-sm text-[#8892b0] hover:text-[#57D7BA] border border-[#21262d] hover:border-[#57D7BA]/40 px-5 py-2 rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? "Loading…" : "Load more"}
           </button>
         </div>
       )}
 
-      <p className="text-[10px] text-[#4a5168] pt-2 border-t border-[#2f374f]">
+      <p className="text-[10px] text-[#4a5168] pt-2 border-t border-[#21262d]">
         Stories are generated automatically from market data and do not constitute financial advice.{" "}
         <Link href="/about/stories-methodology" className="hover:text-[#57D7BA] transition-colors">
           How this works →

@@ -47,7 +47,7 @@ export function TopCatalystsHero({ catalysts }: { catalysts: CalendarMarket[] })
           <Link
             key={m.id}
             href={`/markets/${m.id}`}
-            className="block rounded-xl bg-[#222638] border border-[#2f374f] p-4 hover:border-[#57D7BA]/40 transition-colors group"
+            className="block rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4 hover:border-[#57D7BA]/40 transition-colors group"
           >
             {/* Days badge */}
             <div className={`text-2xl font-bold font-mono tabular-nums mb-1 ${daysColor(m.days_left)}`}>
@@ -81,7 +81,7 @@ export function TopCatalystsHero({ catalysts }: { catalysts: CalendarMarket[] })
             </div>
 
             {/* Why it matters */}
-            <div className="text-[9px] text-[#57D7BA] font-medium border-t border-[#2f374f] pt-2 mt-2 truncate">
+            <div className="text-[9px] text-[#57D7BA] font-medium border-t border-[#21262d] pt-2 mt-2 truncate">
               ↑ {whyItMatters(m)}
             </div>
           </Link>

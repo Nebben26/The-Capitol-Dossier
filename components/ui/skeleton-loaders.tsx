@@ -1,11 +1,11 @@
 "use client";
 
 export function SkeletonLine({ className = "" }: { className?: string }) {
-  return <div className={`h-3 rounded bg-[#2f374f] animate-pulse ${className}`} />;
+  return <div className={`h-3 rounded bg-[#21262d] animate-pulse ${className}`} />;
 }
 
 export function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`rounded-lg bg-[#2f374f] animate-pulse ${className}`} />;
+  return <div className={`rounded-lg bg-[#21262d] animate-pulse ${className}`} />;
 }
 
 export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: number }) {
@@ -24,7 +24,7 @@ export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: nu
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4 space-y-3 animate-pulse">
+    <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4 space-y-3 animate-pulse">
       <SkeletonLine className="w-3/4 h-4" />
       <SkeletonLine className="w-1/2 h-3" />
       <SkeletonBlock className="h-16 w-full" />
@@ -39,11 +39,11 @@ export function CardSkeleton() {
 
 export function ChartSkeleton({ height = "h-64" }: { height?: string }) {
   return (
-    <div className={`${height} w-full rounded-lg bg-[#222638] border border-[#2f374f] animate-pulse flex items-end px-4 pb-4 gap-1`}>
+    <div className={`${height} w-full rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] animate-pulse flex items-end px-4 pb-4 gap-1`}>
       {Array.from({ length: 20 }, (_, i) => (
         <div
           key={i}
-          className="flex-1 bg-[#2f374f] rounded-t"
+          className="flex-1 bg-[#21262d] rounded-t"
           style={{ height: `${20 + Math.random() * 60}%` }}
         />
       ))}
@@ -55,7 +55,7 @@ export function HomepageSkeleton() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
       {/* Hero */}
-      <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-5 animate-pulse">
+      <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-5 animate-pulse">
         <div className="flex flex-col lg:flex-row items-center gap-6">
           <SkeletonBlock className="size-36 rounded-full" />
           <div className="flex-1 space-y-3">
@@ -74,13 +74,13 @@ export function HomepageSkeleton() {
       {/* 3 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-5">
-          <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4">
+          <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4">
             <SkeletonLine className="w-40 h-4 mb-4" />
             <TableSkeleton rows={6} cols={4} />
           </div>
         </div>
         <div className="lg:col-span-4 space-y-3">
-          <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4">
+          <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4">
             <SkeletonLine className="w-32 h-4 mb-4" />
             {Array.from({ length: 5 }, (_, i) => (
               <div key={i} className="flex gap-3 mb-3">
@@ -130,7 +130,7 @@ export function LeaderboardSkeleton() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {Array.from({ length: 4 }, (_, i) => <SkeletonBlock key={i} className="h-20 rounded-xl" />)}
       </div>
-      <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4">
+      <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4">
         <TableSkeleton rows={10} cols={8} />
       </div>
     </div>

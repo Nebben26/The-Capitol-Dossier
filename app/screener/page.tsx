@@ -103,7 +103,7 @@ function ScreenerCard({ m, spread, insight, causeType }: {
   const isResMismatch = causeType?.label === "Resolution Mismatch";
   return (
     <Link href={`/markets/${m.id}`} className="block group">
-      <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200 h-full">
+      <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200 h-full">
         <CardContent className="p-4 flex flex-col h-full">
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{m.category}</span>
@@ -158,7 +158,7 @@ function ScreenerCard({ m, spread, insight, causeType }: {
             </div>
             <span className="font-mono text-[10px] text-[#8892b0] tabular-nums">{m.volume}</span>
           </div>
-          <div className="h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden flex">
+          <div className="h-1.5 rounded-full bg-[#0d1117] overflow-hidden flex">
             <div className="h-full bg-[#22c55e] rounded-l-full" style={{ width: `${m.price}%` }} />
             <div className="h-full bg-[#ef4444] rounded-r-full" style={{ width: `${100 - m.price}%` }} />
           </div>
@@ -315,7 +315,7 @@ export default function ScreenerPage() {
           placeholder="Search markets…"
           value={searchInput}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="w-full h-11 pl-11 pr-10 rounded-xl bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 transition-all shadow-lg shadow-black/20"
+          className="w-full h-11 pl-11 pr-10 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 transition-all shadow-lg shadow-black/20"
         />
         {searchInput && (
           <button
@@ -334,7 +334,7 @@ export default function ScreenerPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
           {CATEGORIES.slice(0, 10).map((cat) => (
             <button key={cat} onClick={() => setCategory(cat)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}>
+              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d]"}`}>
               {cat}
             </button>
           ))}
@@ -346,19 +346,19 @@ export default function ScreenerPage() {
           <div className="flex items-center gap-1">
             {PLATFORMS.map((p) => (
               <button key={p} onClick={() => setPlatform(p)}
-                className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${platform === p ? "bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
+                className={`shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${platform === p ? "bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/30" : "bg-[#161b27] text-[#8892b0] border-[#21262d]"}`}>
                 {p}
               </button>
             ))}
           </div>
 
-          <span className="text-[10px] text-[#2f374f]">|</span>
+          <span className="text-[10px] text-[#21262d]">|</span>
 
           {/* Sort */}
           <div className="flex items-center gap-1 flex-wrap">
             {sortOptions.map((opt) => (
               <button key={opt.key} onClick={() => handleSort(opt.key)}
-                className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-medium transition-all border ${sortBy === opt.key ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
+                className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-medium transition-all border ${sortBy === opt.key ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30" : "bg-[#161b27] text-[#8892b0] border-[#21262d]"}`}>
                 {opt.label}{sortBy === opt.key && (sortDir === "desc" ? " ↓" : " ↑")}
               </button>
             ))}
@@ -367,12 +367,12 @@ export default function ScreenerPage() {
           {/* Advanced + View toggle */}
           <div className="flex items-center gap-2 ml-auto">
             <button onClick={() => setShowAdvanced(!showAdvanced)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${showAdvanced ? "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/30" : "bg-[#222638] text-[#8892b0] border-[#2f374f]"}`}>
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all border ${showAdvanced ? "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/30" : "bg-[#161b27] text-[#8892b0] border-[#21262d]"}`}>
               <SlidersHorizontal className="size-3" />
               <span className="hidden sm:inline">Advanced</span>
               {activeFilterCount > 0 && <span className="size-4 rounded-full bg-[#f59e0b] text-[#0f1119] text-[8px] font-bold flex items-center justify-center">{activeFilterCount}</span>}
             </button>
-            <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2f374f]">
+            <div className="flex items-center gap-0.5 bg-[#161b27] rounded-lg p-0.5 border border-[#21262d]">
               <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0]"}`}><LayoutGrid className="size-3.5" /></button>
               <button onClick={() => setViewMode("table")} className={`p-1.5 rounded-md transition-all ${viewMode === "table" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0]"}`}><List className="size-3.5" /></button>
             </div>
@@ -381,7 +381,7 @@ export default function ScreenerPage() {
 
         {/* Advanced filter panel */}
         {showAdvanced && (
-          <Card className="bg-[#222638] border-[#f59e0b]/20">
+          <Card className="bg-[#161b27] border-[#f59e0b]/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold flex items-center gap-1.5"><SlidersHorizontal className="size-3.5 text-[#f59e0b]" />Advanced Filters <ProBadge /></span>
@@ -392,7 +392,7 @@ export default function ScreenerPage() {
                   <label className="block text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Min Price</label>
                   <div className="relative">
                     <input type="number" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="0"
-                      className="w-full h-8 px-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+                      className="w-full h-8 px-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-[#8892b0]">¢</span>
                   </div>
                 </div>
@@ -400,7 +400,7 @@ export default function ScreenerPage() {
                   <label className="block text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Max Price</label>
                   <div className="relative">
                     <input type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="100"
-                      className="w-full h-8 px-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+                      className="w-full h-8 px-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-[#8892b0]">¢</span>
                   </div>
                 </div>
@@ -409,20 +409,20 @@ export default function ScreenerPage() {
                   <div className="relative">
                     <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-[#8892b0]">$</span>
                     <input type="number" value={minVolume} onChange={(e) => setMinVolume(e.target.value)} placeholder="0"
-                      className="w-full h-8 pl-5 pr-3 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+                      className="w-full h-8 pl-5 pr-3 rounded-lg bg-[#0d1117] border border-[#21262d] text-xs text-[#e2e8f0] font-mono focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Spread ≥ 10pt</label>
                   <button onClick={() => setSpreadOnly(!spreadOnly)}
-                    className={`w-full h-8 rounded-lg text-xs font-semibold transition-all ${spreadOnly ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#1a1e2e] border border-[#2f374f] text-[#8892b0]"}`}>
+                    className={`w-full h-8 rounded-lg text-xs font-semibold transition-all ${spreadOnly ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#0d1117] border border-[#21262d] text-[#8892b0]"}`}>
                     {spreadOnly ? "ON" : "OFF"}
                   </button>
                 </div>
                 <div>
                   <label className="block text-[9px] text-[#8892b0] uppercase tracking-wider mb-1">Resolves ≤ 30d</label>
                   <button onClick={() => setResolvingSoon(!resolvingSoon)}
-                    className={`w-full h-8 rounded-lg text-xs font-semibold transition-all ${resolvingSoon ? "bg-[#ef4444] text-white" : "bg-[#1a1e2e] border border-[#2f374f] text-[#8892b0]"}`}>
+                    className={`w-full h-8 rounded-lg text-xs font-semibold transition-all ${resolvingSoon ? "bg-[#ef4444] text-white" : "bg-[#0d1117] border border-[#21262d] text-[#8892b0]"}`}>
                     {resolvingSoon ? "ON" : "OFF"}
                   </button>
                 </div>
@@ -441,11 +441,11 @@ export default function ScreenerPage() {
 
       {/* Table */}
       {viewMode === "table" && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="px-0 py-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-[#2f374f] hover:bg-transparent">
+                <TableRow className="border-[#21262d] hover:bg-transparent">
                   <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">MARKET</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium hidden sm:table-cell">TREND</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("price")}>
@@ -474,7 +474,7 @@ export default function ScreenerPage() {
                 {filtered.slice(0, displayCount).map((m) => {
                   const spread = spreadMap[m.id] || 0;
                   return (
-                    <TableRow key={m.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
+                    <TableRow key={m.id} className="border-[#21262d]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
                       <TableCell className="pl-4 py-2.5 max-w-[200px]">
                         <Link href={`/markets/${m.id}`} className="text-xs font-medium text-[#e2e8f0] hover:text-[#57D7BA] transition-colors line-clamp-1 truncate block">{m.question}</Link>
                       </TableCell>
@@ -516,7 +516,7 @@ export default function ScreenerPage() {
         <div className="flex justify-center">
           <Button
             onClick={() => setDisplayCount((c) => c + 60)}
-            className="bg-[#222638] border border-[#2f374f] text-[#e2e8f0] hover:bg-[#57D7BA]/10 hover:border-[#57D7BA]/30 px-8"
+            className="bg-[#161b27] border border-[#21262d] text-[#e2e8f0] hover:bg-[#57D7BA]/10 hover:border-[#57D7BA]/30 px-8"
           >
             Load more ({filtered.length - displayCount} remaining)
           </Button>
@@ -524,16 +524,16 @@ export default function ScreenerPage() {
       )}
 
       {filtered.length === 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-16 text-center">
-            <BarChart3 className="size-12 text-[#2f374f] mx-auto mb-4" />
+            <BarChart3 className="size-12 text-[#21262d] mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No markets match your filters</h3>
             <p className="text-sm text-[#8892b0]">Try adjusting your search, category, or advanced filters</p>
           </CardContent>
         </Card>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

@@ -72,7 +72,7 @@ function ConfidenceBar({ score }: { score: number }) {
     score >= 8 ? "#22c55e" : score >= 6 ? "#f59e0b" : "#8892b0";
   return (
     <div className="flex items-center gap-2">
-      <div className="w-20 h-1.5 rounded-full bg-[#2f374f] overflow-hidden">
+      <div className="w-20 h-1.5 rounded-full bg-[#21262d] overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -113,7 +113,7 @@ function SignalCard({ signal }: { signal: Signal }) {
     : "#8892b0";
 
   return (
-    <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/20 transition-all">
+    <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/20 transition-all">
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row sm:items-start gap-3">
           {/* Icon */}
@@ -226,7 +226,7 @@ function SignalCard({ signal }: { signal: Signal }) {
         </div>
 
         {/* Market question */}
-        <div className="mt-2.5 pt-2.5 border-t border-[#2f374f]">
+        <div className="mt-2.5 pt-2.5 border-t border-[#21262d]">
           <Link
             href={`/markets/${signal.market_id}`}
             className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors line-clamp-1"
@@ -243,7 +243,7 @@ function SignalCard({ signal }: { signal: Signal }) {
 
 function SignalsEmpty() {
   return (
-    <Card className="bg-[#222638] border-[#2f374f]">
+    <Card className="bg-[#161b27] border-[#21262d]">
       <CardContent className="py-12 flex flex-col items-center gap-3 text-center">
         <div className="size-12 rounded-xl bg-[#57D7BA]/10 flex items-center justify-center">
           <AlertCircle className="size-6 text-[#57D7BA]" />
@@ -344,7 +344,7 @@ export default function AlertsPage() {
             <span className="size-1.5 rounded-full bg-[#ef4444]" />
             LIVE
           </span>
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#222638] border border-[#2f374f] text-[10px] text-[#8892b0] font-mono tabular-nums">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#161b27] border border-[#21262d] text-[10px] text-[#8892b0] font-mono tabular-nums">
             {signals.length} active signals
           </span>
           <LastUpdated
@@ -355,7 +355,7 @@ export default function AlertsPage() {
           />
           {signalFreshnessStr && (
             <span
-              className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#222638] border border-[#2f374f] text-[10px] font-mono tabular-nums"
+              className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#161b27] border border-[#21262d] text-[10px] font-mono tabular-nums"
               style={{ color: signalFreshnessColor }}
             >
               <Clock className="size-3 shrink-0" />
@@ -377,7 +377,7 @@ export default function AlertsPage() {
         ).map((s) => (
           <Card
             key={s.type}
-            className="bg-[#222638] border-[#2f374f] cursor-pointer hover:border-[#57D7BA]/20 transition-all"
+            className="bg-[#161b27] border-[#21262d] cursor-pointer hover:border-[#57D7BA]/20 transition-all"
             onClick={() =>
               setActiveFilter((prev) =>
                 prev === s.type ? "all" : s.type
@@ -413,7 +413,7 @@ export default function AlertsPage() {
             className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors ${
               activeFilter === chip.key
                 ? "bg-[#57D7BA] text-[#0f1119]"
-                : "bg-[#222638] border border-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0]"
+                : "bg-[#161b27] border border-[#21262d] text-[#8892b0] hover:text-[#e2e8f0]"
             }`}
           >
             {chip.label}
@@ -435,7 +435,7 @@ export default function AlertsPage() {
             className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-colors ${
               activeCategory === cat
                 ? "bg-[#6366f1] text-white"
-                : "bg-[#222638] border border-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0]"
+                : "bg-[#161b27] border border-[#21262d] text-[#8892b0] hover:text-[#e2e8f0]"
             }`}
           >
             {cat}
@@ -448,14 +448,14 @@ export default function AlertsPage() {
         {signalsLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-[#222638] border-[#2f374f]">
+              <Card key={i} className="bg-[#161b27] border-[#21262d]">
                 <CardContent className="p-4">
                   <div className="animate-pulse flex gap-3">
-                    <div className="size-10 rounded-xl bg-[#2f374f]" />
+                    <div className="size-10 rounded-xl bg-[#21262d]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 w-24 bg-[#2f374f] rounded" />
-                      <div className="h-4 w-3/4 bg-[#2f374f] rounded" />
-                      <div className="h-3 w-1/2 bg-[#2f374f] rounded" />
+                      <div className="h-3 w-24 bg-[#21262d] rounded" />
+                      <div className="h-4 w-3/4 bg-[#21262d] rounded" />
+                      <div className="h-3 w-1/2 bg-[#21262d] rounded" />
                     </div>
                   </div>
                 </CardContent>

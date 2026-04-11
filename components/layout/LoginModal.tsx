@@ -29,9 +29,9 @@ export function LoginModal() {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLogin(false)} />
-      <div className="relative w-full max-w-sm rounded-xl bg-[#222638] border border-[#2f374f] shadow-2xl shadow-black/50 overflow-hidden">
+      <div className="relative w-full max-w-sm rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] shadow-2xl shadow-black/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#2f374f]">
+        <div className="flex items-center justify-between p-4 border-b border-[#21262d]">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-lg bg-[#57D7BA] flex items-center justify-center">
               <Activity className="size-3 text-[#0f1119]" />
@@ -69,7 +69,7 @@ export function LoginModal() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full h-10 pl-10 pr-4 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/50 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
+                    className="w-full h-10 pl-10 pr-4 rounded-lg bg-[#0d1117] border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/50 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all"
                     autoFocus
                   />
                 </div>

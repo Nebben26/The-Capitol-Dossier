@@ -281,7 +281,7 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
   const methodColor = ep.method === "GET" ? "text-[#22c55e] bg-[#22c55e]/10" : "text-[#f59e0b] bg-[#f59e0b]/10";
 
   return (
-    <Card className="bg-[#222638] border-[#2f374f]">
+    <Card className="bg-[#161b27] border-[#21262d]">
       <CardContent className="p-0">
         <button
           onClick={() => setOpen(!open)}
@@ -298,7 +298,7 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
         </button>
 
         {open && (
-          <div className="px-4 pb-4 space-y-4 border-t border-[#2f374f] pt-4">
+          <div className="px-4 pb-4 space-y-4 border-t border-[#21262d] pt-4">
             <p className="text-sm text-[#8892b0]">{ep.description}</p>
 
             {ep.tierNote && (
@@ -311,10 +311,10 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
             {ep.params && ep.params.length > 0 && (
               <div>
                 <p className="text-[10px] font-semibold text-[#8892b0] uppercase tracking-wide mb-2">Parameters</p>
-                <div className="rounded-lg overflow-hidden border border-[#2f374f]">
+                <div className="rounded-lg overflow-hidden border border-[#21262d]">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="bg-[#1a1e2e] border-b border-[#2f374f]">
+                      <tr className="bg-[#0d1117] border-b border-[#21262d]">
                         <th className="text-left px-3 py-2 text-[10px] text-[#8892b0] font-medium">NAME</th>
                         <th className="text-left px-3 py-2 text-[10px] text-[#8892b0] font-medium">TYPE</th>
                         <th className="text-left px-3 py-2 text-[10px] text-[#8892b0] font-medium">REQ</th>
@@ -323,7 +323,7 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
                     </thead>
                     <tbody>
                       {ep.params.map((p) => (
-                        <tr key={p.name} className="border-b border-[#2f374f]/50 last:border-0">
+                        <tr key={p.name} className="border-b border-[#21262d]/50 last:border-0">
                           <td className="px-3 py-2 font-mono text-[#57D7BA]">{p.name}</td>
                           <td className="px-3 py-2 text-[#8892b0]">{p.type}</td>
                           <td className="px-3 py-2">
@@ -342,7 +342,7 @@ function EndpointCard({ ep }: { ep: Endpoint }) {
 
             <div>
               <p className="text-[10px] font-semibold text-[#8892b0] uppercase tracking-wide mb-2">Response</p>
-              <pre className="bg-[#1a1e2e] rounded-lg p-4 text-[11px] font-mono text-[#57D7BA] overflow-x-auto leading-relaxed">
+              <pre className="bg-[#0d1117] rounded-lg p-4 text-[11px] font-mono text-[#57D7BA] overflow-x-auto leading-relaxed">
                 {ep.response}
               </pre>
             </div>
@@ -399,7 +399,7 @@ export default function ApiDocsPage() {
         ].map((t) => (
           <Card
             key={t.tier}
-            className={`bg-[#222638] transition-all ${t.featured ? "border-[#57D7BA]/40 ring-1 ring-[#57D7BA]/20" : "border-[#2f374f]"}`}
+            className={`bg-[#161b27] transition-all ${t.featured ? "border-[#57D7BA]/40 ring-1 ring-[#57D7BA]/20" : "border-[#21262d]"}`}
           >
             <CardContent className="p-5 space-y-4">
               <div>
@@ -419,7 +419,7 @@ export default function ApiDocsPage() {
                   </div>
                 ))}
               </div>
-              <div className="space-y-1.5 pt-2 border-t border-[#2f374f]">
+              <div className="space-y-1.5 pt-2 border-t border-[#21262d]">
                 {t.endpoints.map((e) => (
                   <div key={e} className="flex items-start gap-2 text-[11px] text-[#8892b0]">
                     <CheckCircle className="size-3 shrink-0 mt-0.5 text-[#22c55e]" />
@@ -440,13 +440,13 @@ export default function ApiDocsPage() {
       </div>
 
       {/* Quick start */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center gap-2">
             <Code className="size-4 text-[#57D7BA]" />
             <p className="text-sm font-semibold text-[#e2e8f0]">Quick Start</p>
           </div>
-          <pre className="bg-[#1a1e2e] rounded-lg p-4 text-[11px] font-mono text-[#57D7BA] overflow-x-auto leading-relaxed">
+          <pre className="bg-[#0d1117] rounded-lg p-4 text-[11px] font-mono text-[#57D7BA] overflow-x-auto leading-relaxed">
 {`# 1. Get your API key (email hello@quivermarkets.com)
 
 # 2. Make your first request
@@ -474,7 +474,7 @@ curl -H "Authorization: Bearer qm_pro_your_key_here" \\
 
       {/* Auth + Rate Limiting */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Shield className="size-4 text-[#57D7BA]" />
@@ -484,7 +484,7 @@ curl -H "Authorization: Bearer qm_pro_your_key_here" \\
               All endpoints (except <code className="text-[#57D7BA]">/health</code>) require an API key.
               Pass it as a Bearer token in the <code className="text-[#57D7BA]">Authorization</code> header.
             </p>
-            <pre className="bg-[#1a1e2e] rounded-lg p-3 text-[10px] font-mono text-[#57D7BA]">
+            <pre className="bg-[#0d1117] rounded-lg p-3 text-[10px] font-mono text-[#57D7BA]">
 {`Authorization: Bearer qm_free_a1b2c3d4...`}
             </pre>
             <p className="text-[10px] text-[#8892b0]">
@@ -493,7 +493,7 @@ curl -H "Authorization: Bearer qm_pro_your_key_here" \\
           </CardContent>
         </Card>
 
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Zap className="size-4 text-[#57D7BA]" />
@@ -503,7 +503,7 @@ curl -H "Authorization: Bearer qm_pro_your_key_here" \\
               Rate limit info is returned in every response header. When you hit the limit,
               you receive a <code className="text-[#57D7BA]">429 Too Many Requests</code> with a message explaining the reset time.
             </p>
-            <pre className="bg-[#1a1e2e] rounded-lg p-3 text-[10px] font-mono text-[#57D7BA]">
+            <pre className="bg-[#0d1117] rounded-lg p-3 text-[10px] font-mono text-[#57D7BA]">
 {`X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 87
 X-RateLimit-Reset: 1744070400  # Unix timestamp (midnight UTC)
@@ -514,7 +514,7 @@ X-RateLimit-Tier: free`}
       </div>
 
       {/* Coming soon */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5 flex items-start gap-3">
           <Globe className="size-5 text-[#8b5cf6] shrink-0 mt-0.5" />
           <div>

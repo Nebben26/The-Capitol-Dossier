@@ -44,18 +44,18 @@ export function CandlestickChartComponent({
 
     const chart = createChart(el, {
       layout: {
-        background: { type: ColorType.Solid, color: "#1a1e2e" },
+        background: { type: ColorType.Solid, color: "#0d1117" },
         textColor: "#8892b0",
       },
       grid: {
-        vertLines: { color: "#2f374f" },
-        horzLines: { color: "#2f374f" },
+        vertLines: { color: "#21262d" },
+        horzLines: { color: "#21262d" },
       },
-      rightPriceScale: { borderColor: "#2f374f" },
-      timeScale: { borderColor: "#2f374f", timeVisible: true },
+      rightPriceScale: { borderColor: "#21262d" },
+      timeScale: { borderColor: "#21262d", timeVisible: true },
       crosshair: {
-        vertLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#222638" },
-        horzLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#222638" },
+        vertLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#161b27" },
+        horzLine: { color: "#57D7BA", width: 1, labelBackgroundColor: "#161b27" },
       },
       width: el.clientWidth,
       height,

@@ -79,7 +79,7 @@ function CustomTreemapContent(props: { x?: number; y?: number; width?: number; h
   const bgOpacity = Math.max(0.15, Math.min(Math.abs(change) / 8, 0.85));
   return (
     <g className="cursor-pointer" style={{ filter: "brightness(1)" }}>
-      <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={bgOpacity} stroke="#1a1e2e" strokeWidth={2} rx={6} />
+      <rect x={x} y={y} width={width} height={height} fill={color} fillOpacity={bgOpacity} stroke="#0d1117" strokeWidth={2} rx={6} />
       {width > 70 && height > 40 && (
         <>
           <text x={x + width / 2} y={y + height / 2 - (width > 100 && height > 55 ? 8 : 2)} textAnchor="middle" fill="#ffffff" fontSize={width > 140 ? 11 : 9} fontWeight={600} opacity={0.9}>
@@ -291,7 +291,7 @@ export default function HomePage() {
       <MorningBriefCard />
 
       {/* ─── WAITLIST ────────────────────────────────────────── */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5">
           <p className="text-xs font-semibold text-[#57D7BA] uppercase tracking-widest mb-1">Founder cohort</p>
           <p className="text-sm text-[#8892b0] mb-3">
@@ -305,7 +305,7 @@ export default function HomePage() {
       </Card>
 
       {/* ─── HERO: MARKET PULSE ──────────────────────────────── */}
-      <Card className="bg-[#222638] border-[#2f374f] overflow-hidden relative">
+      <Card className="bg-[#161b27] border-[#21262d] overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[#57D7BA]/5 via-transparent to-[#ef4444]/5 pointer-events-none" />
         <CardContent className="p-5 relative">
           <div className="flex flex-col lg:flex-row items-center gap-6">
@@ -355,7 +355,7 @@ export default function HomePage() {
 
       {/* ─── MARKET DISAGREES ──────────────────────────────────── */}
       {disagreements.length > 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-sm">
@@ -371,7 +371,7 @@ export default function HomePage() {
           <CardContent className="pb-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {disagreements.slice(0, 3).map((d) => (
-                <div key={d.id} className="p-3 rounded-lg border border-[#2f374f] hover:border-[#f59e0b]/30 transition-all">
+                <div key={d.id} className="p-3 rounded-lg border border-[#21262d] hover:border-[#f59e0b]/30 transition-all">
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="px-1.5 py-0.5 rounded bg-[#f59e0b]/10 text-[#f59e0b] text-[8px] font-bold flex items-center gap-0.5">
                       <AlertTriangle className="size-2.5" /> ARBITRAGE
@@ -384,14 +384,14 @@ export default function HomePage() {
                     </p>
                   </Link>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="flex-1 text-center p-1.5 rounded bg-[#1a1e2e]">
+                    <div className="flex-1 text-center p-1.5 rounded bg-[#0d1117]">
                       <div className="text-[8px] text-[#8892b0] mb-0.5">Polymarket</div>
                       <div className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{d.polyPrice}¢</div>
                     </div>
                     <div className="shrink-0 px-2 py-1 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] text-xs font-bold font-mono tabular-nums">
                       {d.spread}pt
                     </div>
-                    <div className="flex-1 text-center p-1.5 rounded bg-[#1a1e2e]">
+                    <div className="flex-1 text-center p-1.5 rounded bg-[#0d1117]">
                       <div className="text-[8px] text-[#8892b0] mb-0.5">Kalshi</div>
                       <div className="font-mono text-sm font-bold tabular-nums text-[#e2e8f0]">{d.kalshiPrice}¢</div>
                     </div>
@@ -419,7 +419,7 @@ export default function HomePage() {
             className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
               activeCategory === cat
                 ? "bg-[#57D7BA] text-[#0f1119] shadow-lg shadow-[#57D7BA]/20"
-                : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f] hover:border-[#57D7BA]/30"
+                : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d] hover:border-[#57D7BA]/30"
             }`}
           >
             {cat}
@@ -431,7 +431,7 @@ export default function HomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* ─── LEFT: BIGGEST MOVERS TABLE ────────────────────── */}
         <div className="lg:col-span-5">
-          <Card className="bg-[#222638] border-[#2f374f]">
+          <Card className="bg-[#161b27] border-[#21262d]">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-sm">
@@ -447,7 +447,7 @@ export default function HomePage() {
             <CardContent className="px-0 pb-2 overflow-x-hidden">
               <Table className="table-fixed w-full">
                 <TableHeader>
-                  <TableRow className="border-[#2f374f] hover:bg-transparent">
+                  <TableRow className="border-[#21262d] hover:bg-transparent">
                     <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4">CONTRACT</TableHead>
                     <TableHead className="text-[10px] text-[#8892b0] font-medium w-16 hidden sm:table-cell">TREND</TableHead>
                     <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA] transition-colors w-14" onClick={() => handleSort("price")}>
@@ -463,7 +463,7 @@ export default function HomePage() {
                 </TableHeader>
                 <TableBody>
                   {sortedMovers.map((m, i) => (
-                    <TableRow key={m.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
+                    <TableRow key={m.id} className="border-[#21262d]/50 hover:bg-[#57D7BA]/5 cursor-pointer transition-colors">
                       <TableCell className="pl-4 py-2.5 max-w-[180px]">
                         <Tooltip>
                           <TooltipTrigger>
@@ -471,7 +471,7 @@ export default function HomePage() {
                               {m.q}
                             </Link>
                           </TooltipTrigger>
-                          <TooltipContent side="right" className="bg-[#222638] border-[#2f374f] text-[#e2e8f0] p-3 max-w-xs">
+                          <TooltipContent side="right" className="bg-[#161b27] border-[#21262d] text-[#e2e8f0] p-3 max-w-xs">
                             <div className="space-y-2">
                               <p className="text-xs font-medium">{m.q}</p>
                               <div className="h-12 w-40">
@@ -528,7 +528,7 @@ export default function HomePage() {
 
         {/* ─── CENTER: HIGHEST VOLUME MARKETS ────────────────── */}
         <div className="lg:col-span-4">
-          <Card className="bg-[#222638] border-[#2f374f]">
+          <Card className="bg-[#161b27] border-[#21262d]">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <BarChart3 className="size-4 text-[#f59e0b]" />
@@ -555,7 +555,7 @@ export default function HomePage() {
 
         {/* ─── RIGHT: TOP WHALES BY P&L ───────────────────── */}
         <div className="lg:col-span-3">
-          <Card className="bg-[#222638] border-[#2f374f]">
+          <Card className="bg-[#161b27] border-[#21262d]">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-sm">
@@ -568,7 +568,7 @@ export default function HomePage() {
             <CardContent className="space-y-2 pb-3">
               {filteredWhales.map((w, i) => (
                 <Link key={`${w.id}-${i}`} href={`/whales/${w.id}`} className="group block">
-                  <div className="flex items-center gap-2.5 p-2.5 rounded-lg border border-[#2f374f] hover:border-[#57D7BA]/20 transition-all">
+                  <div className="flex items-center gap-2.5 p-2.5 rounded-lg border border-[#21262d] hover:border-[#57D7BA]/20 transition-all">
                     <div className="size-6 rounded-full bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center text-[8px] font-bold text-[#0f1119] shrink-0">#{w.rank}</div>
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors">{w.name}</span>
@@ -585,7 +585,7 @@ export default function HomePage() {
       </div>
 
       {/* ─── TREEMAP / MOBILE LIST: MARKET VOLUME HEATMAP ───── */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm">
@@ -618,7 +618,7 @@ export default function HomePage() {
                 ))}
             </div>
           ) : (
-            <div className="h-64 sm:h-80 w-full rounded-lg border border-[#2f374f] overflow-hidden">
+            <div className="h-64 sm:h-80 w-full rounded-lg border border-[#21262d] overflow-hidden">
               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <Treemap data={treemapData.filter(t => t.name && t.size >= 100 && typeof t.change === "number")} dataKey="size" aspectRatio={4 / 3} content={<CustomTreemapContent />} />
               </ResponsiveContainer>
@@ -629,7 +629,7 @@ export default function HomePage() {
 
 
       {/* ─── FOOTER ──────────────────────────────────────────── */}
-      <footer className="py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0] space-y-3">
+      <footer className="py-4 border-t border-[#21262d] text-[10px] text-[#8892b0] space-y-3">
         {/* Platform track record */}
         {sysStats && (sysStats.marketsCount > 0 || sysStats.signalsCount > 0) && (
           <div className="flex flex-wrap items-center justify-center gap-3 py-2 px-4 rounded-lg bg-[#57D7BA]/5 border border-[#57D7BA]/10 text-[10px] font-mono tabular-nums">

@@ -34,7 +34,7 @@ function RelatedStoryCard({ story }: { story: Story }) {
   return (
     <Link
       href={`/stories/${story.slug}`}
-      className="block group rounded-lg border border-[#2f374f] bg-[#222638] p-3 hover:border-[#57D7BA]/40 transition-colors"
+      className="block group rounded-lg border border-[#21262d] bg-[#161b27] p-3 hover:border-[#57D7BA]/40 transition-colors"
     >
       <p className="text-xs font-medium text-[#e2e8f0] group-hover:text-[#57D7BA] transition-colors line-clamp-2 leading-snug">
         {story.headline}
@@ -84,12 +84,12 @@ export default function StoryDetailPage() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-4">
-        <div className="h-6 w-40 bg-[#222638] rounded animate-pulse" />
-        <div className="h-8 bg-[#222638] rounded animate-pulse" />
-        <div className="h-4 bg-[#222638] rounded animate-pulse" />
+        <div className="h-6 w-40 bg-[#161b27] rounded animate-pulse" />
+        <div className="h-8 bg-[#161b27] rounded animate-pulse" />
+        <div className="h-4 bg-[#161b27] rounded animate-pulse" />
         <div className="space-y-2 mt-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-4 bg-[#222638] rounded animate-pulse" style={{ width: `${85 + (i % 3) * 5}%` }} />
+            <div key={i} className="h-4 bg-[#161b27] rounded animate-pulse" style={{ width: `${85 + (i % 3) * 5}%` }} />
           ))}
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function StoryDetailPage() {
           <span className="text-[11px] text-[#4a5168]">{date}</span>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 text-xs text-[#8892b0] hover:text-[#57D7BA] border border-[#2f374f] hover:border-[#57D7BA]/40 px-2.5 py-1.5 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-[#8892b0] hover:text-[#57D7BA] border border-[#21262d] hover:border-[#57D7BA]/40 px-2.5 py-1.5 rounded-lg transition-colors"
           >
             <Share2 className="size-3" />
             {copied ? "Copied!" : "Share"}
@@ -150,7 +150,7 @@ export default function StoryDetailPage() {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-[#2f374f]" />
+      <div className="border-t border-[#21262d]" />
 
       {/* Body */}
       <div className="space-y-4">
@@ -164,14 +164,14 @@ export default function StoryDetailPage() {
 
       {/* Source markets */}
       {story.source_market_ids.length > 0 && canReadFull && (
-        <div className="pt-4 border-t border-[#2f374f]">
+        <div className="pt-4 border-t border-[#21262d]">
           <p className="text-[10px] text-[#4a5168] font-medium uppercase tracking-wide mb-2">Source markets</p>
           <div className="flex flex-wrap gap-2">
             {story.source_market_ids.map(id => (
               <Link
                 key={id}
                 href={`/markets/${id}`}
-                className="text-xs text-[#8892b0] hover:text-[#57D7BA] border border-[#2f374f] hover:border-[#57D7BA]/40 px-2 py-1 rounded-md font-mono transition-colors"
+                className="text-xs text-[#8892b0] hover:text-[#57D7BA] border border-[#21262d] hover:border-[#57D7BA]/40 px-2 py-1 rounded-md font-mono transition-colors"
               >
                 {id.length > 20 ? `${id.slice(0, 8)}…` : id}
               </Link>
@@ -182,7 +182,7 @@ export default function StoryDetailPage() {
 
       {/* Related */}
       {related.length > 0 && (
-        <div className="pt-4 border-t border-[#2f374f] space-y-3">
+        <div className="pt-4 border-t border-[#21262d] space-y-3">
           <div className="flex items-center gap-2">
             <BookOpen className="size-3.5 text-[#57D7BA]" />
             <p className="text-xs font-semibold text-[#8892b0] uppercase tracking-wide">More stories</p>
@@ -195,7 +195,7 @@ export default function StoryDetailPage() {
         </div>
       )}
 
-      <p className="text-[10px] text-[#4a5168] pt-4 border-t border-[#2f374f]">
+      <p className="text-[10px] text-[#4a5168] pt-4 border-t border-[#21262d]">
         Auto-generated from live market data. Not financial advice.{" "}
         <Link href="/about/stories-methodology" className="hover:text-[#57D7BA] transition-colors">
           Methodology →

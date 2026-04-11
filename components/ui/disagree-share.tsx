@@ -38,7 +38,7 @@ export function DisagreeShareButton({ d }: { d: Disagreement }) {
         variant="outline"
         size="xs"
         onClick={handleCopy}
-        className="border-[#2f374f] text-[#8892b0] hover:text-[#f59e0b] hover:border-[#f59e0b]/30 gap-1"
+        className="border-[#21262d] text-[#8892b0] hover:text-[#f59e0b] hover:border-[#f59e0b]/30 gap-1"
       >
         {copied ? <Check className="size-3 text-[#22c55e]" /> : <Share2 className="size-3" />}
         {copied ? "Copied!" : "Share"}
@@ -47,7 +47,7 @@ export function DisagreeShareButton({ d }: { d: Disagreement }) {
         href={tgHref}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center h-7 px-2 rounded-md border border-[#2f374f] text-[#8892b0] hover:text-[#2AABEE] hover:border-[#2AABEE]/30 transition-colors"
+        className="inline-flex items-center justify-center h-7 px-2 rounded-md border border-[#21262d] text-[#8892b0] hover:text-[#2AABEE] hover:border-[#2AABEE]/30 transition-colors"
         title="Send to Telegram"
       >
         <svg viewBox="0 0 24 24" className="size-3" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
@@ -56,26 +56,26 @@ export function DisagreeShareButton({ d }: { d: Disagreement }) {
         href={xHref}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-[#2f374f] text-[#8892b0] hover:text-[#e2e8f0] hover:border-[#e2e8f0]/30 transition-colors text-[10px] font-medium"
+        className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-[#21262d] text-[#8892b0] hover:text-[#e2e8f0] hover:border-[#e2e8f0]/30 transition-colors text-[10px] font-medium"
       >
         <XLogo className="size-3" />
         Post
       </a>
 
       {copied && (
-        <div className="absolute bottom-full mb-2 left-0 w-72 rounded-lg bg-[#222638] border border-[#2f374f] shadow-xl shadow-black/50 z-50 overflow-hidden animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        <div className="absolute bottom-full mb-2 left-0 w-72 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] shadow-xl shadow-black/50 z-50 overflow-hidden animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
           <div className="p-3 space-y-2">
             <p className="text-[10px] font-semibold text-[#f59e0b] uppercase tracking-widest">The Market Disagrees</p>
             <p className="text-xs font-semibold text-[#e2e8f0] leading-snug">{d.question}</p>
             <div className="flex items-center gap-2">
-              <div className="flex-1 text-center p-1.5 rounded bg-[#1a1e2e]">
+              <div className="flex-1 text-center p-1.5 rounded bg-[#0d1117]">
                 <div className="text-[8px] text-[#8892b0]">Polymarket</div>
                 <div className="font-mono text-base font-bold tabular-nums text-[#e2e8f0]">{d.polyPrice}¢</div>
               </div>
               <div className="px-2 py-1 rounded-full bg-[#f59e0b]/15 text-[#f59e0b] text-sm font-bold font-mono tabular-nums border border-[#f59e0b]/20">
                 {d.spread}pt
               </div>
-              <div className="flex-1 text-center p-1.5 rounded bg-[#1a1e2e]">
+              <div className="flex-1 text-center p-1.5 rounded bg-[#0d1117]">
                 <div className="text-[8px] text-[#8892b0]">Kalshi</div>
                 <div className="font-mono text-base font-bold tabular-nums text-[#e2e8f0]">{d.kalshiPrice}¢</div>
               </div>

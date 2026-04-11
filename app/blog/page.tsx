@@ -19,7 +19,7 @@ export default function BlogIndexPage() {
       <div className="space-y-4">
         {POSTS.map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="block group">
-            <div className="p-5 rounded-xl bg-[#222638] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-all">
+            <div className="p-5 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] hover:border-[#57D7BA]/30 transition-all">
               <div className="text-[10px] text-[#8892b0] font-mono mb-2">
                 {new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
               </div>

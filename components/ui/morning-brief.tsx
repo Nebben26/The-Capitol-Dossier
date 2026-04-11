@@ -47,7 +47,7 @@ function Chip({
   href?: string;
 }) {
   const inner = (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors whitespace-nowrap shrink-0">
+    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0d1117] border border-[#21262d] hover:border-[#57D7BA]/30 transition-colors whitespace-nowrap shrink-0">
       <Icon className="size-3.5 shrink-0" style={{ color }} />
       <span className="text-[9px] text-[#8892b0] uppercase tracking-wide font-medium">{label}</span>
       <span className="text-[11px] font-bold font-mono tabular-nums" style={{ color }}>{value}</span>
@@ -92,9 +92,9 @@ export function MorningBriefCard() {
   const age = brief ? fmtAge(brief.generatedAt) : null;
 
   return (
-    <div className="rounded-xl bg-[#222638] border border-[#2f374f] overflow-hidden">
+    <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] overflow-hidden">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#2f374f]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#21262d]">
         <div className="flex items-center gap-2">
           <Sunrise className="size-4 text-[#57D7BA]" />
           <span className="text-sm font-semibold text-[#e2e8f0]">Morning Brief</span>
@@ -128,11 +128,11 @@ export function MorningBriefCard() {
           {loading ? (
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 px-6">
               {[120, 90, 110].map((w, i) => (
-                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f] shrink-0 animate-pulse" style={{ width: `${w}px` }}>
-                  <div className="size-3.5 rounded-full bg-[#2f374f]" />
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0d1117] border border-[#21262d] shrink-0 animate-pulse" style={{ width: `${w}px` }}>
+                  <div className="size-3.5 rounded-full bg-[#21262d]" />
                   <div className="flex-1 space-y-1.5">
-                    <div className="h-1.5 rounded bg-[#2f374f] w-2/3" />
-                    <div className="h-2 rounded bg-[#2f374f] w-full" />
+                    <div className="h-1.5 rounded bg-[#21262d] w-2/3" />
+                    <div className="h-2 rounded bg-[#21262d] w-full" />
                   </div>
                 </div>
               ))}
@@ -142,16 +142,16 @@ export function MorningBriefCard() {
               {/* Scroll buttons */}
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#1a1e2e] border border-[#2f374f] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#0d1117] border border-[#21262d] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="size-3" />
               </button>
               {/* Right gradient fade */}
-              <div className="absolute right-5 top-0 bottom-0 w-12 bg-gradient-to-l from-[#222638] to-transparent pointer-events-none z-10" />
+              <div className="absolute right-5 top-0 bottom-0 w-12 bg-gradient-to-l from-[#161b27] to-transparent pointer-events-none z-10" />
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#1a1e2e] border border-[#2f374f] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 size-5 rounded-full bg-[#0d1117] border border-[#21262d] flex items-center justify-center text-[#8892b0] hover:text-[#e2e8f0] transition-colors"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="size-3" />

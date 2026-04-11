@@ -55,17 +55,17 @@ export function SearchBox() {
         onFocus={() => query.length >= 2 && setOpen(true)}
         aria-label="Search markets"
         placeholder="Search 6,500+ markets — Trump, Bitcoin, World Cup..."
-        className="w-full h-12 pl-12 pr-4 rounded-xl bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 focus:border-[#57D7BA]/50 transition-all shadow-lg shadow-black/20"
+        className="w-full h-12 pl-12 pr-4 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-2 focus:ring-[#57D7BA]/40 focus:border-[#57D7BA]/50 transition-all shadow-lg shadow-black/20"
       />
 
       {open && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl bg-[#222638] border border-[#2f374f] shadow-xl shadow-black/40 overflow-hidden z-50">
+        <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] shadow-xl shadow-black/40 overflow-hidden z-50">
           {results.map((m) => (
             <button
               key={m.id}
               onClick={() => navigate(m.id)}
               aria-label={`Go to market: ${m.question}`}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#57D7BA]/5 transition-colors text-left border-b border-[#2f374f]/50 last:border-0"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#57D7BA]/5 transition-colors text-left border-b border-[#21262d]/50 last:border-0"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-[#e2e8f0] truncate">{m.question}</p>
@@ -79,7 +79,7 @@ export function SearchBox() {
               </span>
             </button>
           ))}
-          <div className="px-4 py-2 border-t border-[#2f374f] text-center">
+          <div className="px-4 py-2 border-t border-[#21262d] text-center">
             <button
               onClick={() => { setOpen(false); router.push(`/screener`); }}
               className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors"

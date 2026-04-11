@@ -174,7 +174,7 @@ export default function TermsPage() {
         </p>
       </Section>
 
-      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#2f374f]">
+      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#21262d]">
         © 2026 Quiver Markets. Not financial advice.
       </p>
     </div>

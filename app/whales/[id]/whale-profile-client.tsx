@@ -105,7 +105,7 @@ function HoldingsTab({ whaleId }: { whaleId: string }) {
   if (positions.length === 0) return <div className="py-12 text-center text-sm text-[#8892b0]">No active positions found.</div>;
 
   return (
-    <Card className="bg-[#222638] border-[#2a2f45]">
+    <Card className="bg-[#161b27] border-[#2a2f45]">
       <CardContent className="px-0 pb-2">
         <Table>
           <TableHeader>
@@ -174,7 +174,7 @@ function TradesTab({ whaleId }: { whaleId: string }) {
   };
 
   return (
-    <Card className="bg-[#222638] border-[#2a2f45]">
+    <Card className="bg-[#161b27] border-[#2a2f45]">
       <CardContent className="px-0 pb-2">
         <Table>
           <TableHeader>
@@ -270,7 +270,7 @@ export default function WhaleProfilePage() {
 
   if (notFound || !whale) return (
     <div className="max-w-[1440px] mx-auto px-4 py-20 text-center">
-      <div className="text-6xl font-bold font-mono text-[#2f374f] mb-4">404</div>
+      <div className="text-6xl font-bold font-mono text-[#21262d] mb-4">404</div>
       <h1 className="text-xl font-bold mb-2">Whale Not Found</h1>
       <p className="text-sm text-[#8892b0] mb-6">The wallet &quot;{id}&quot; isn&apos;t in our leaderboard yet.</p>
       <Link href="/whales" className="text-sm text-[#57D7BA] hover:underline">Browse all whales →</Link>
@@ -280,23 +280,23 @@ export default function WhaleProfilePage() {
   if (loading) return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">
       <div className="flex gap-5">
-        <div className="size-20 rounded-2xl bg-[#2f374f] animate-pulse" />
+        <div className="size-20 rounded-2xl bg-[#21262d] animate-pulse" />
         <div className="flex-1 space-y-3">
-          <div className="h-8 w-48 bg-[#2f374f] rounded animate-pulse" />
-          <div className="h-4 w-96 bg-[#2f374f] rounded animate-pulse" />
+          <div className="h-8 w-48 bg-[#21262d] rounded animate-pulse" />
+          <div className="h-4 w-96 bg-[#21262d] rounded animate-pulse" />
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({length: 4}, (_, i) => <div key={i} className="h-20 bg-[#222638] border border-[#2f374f] rounded-xl animate-pulse" />)}
+        {Array.from({length: 4}, (_, i) => <div key={i} className="h-20 bg-[#161b27] border border-[#21262d] rounded-xl animate-pulse" />)}
       </div>
-      <div className="h-64 bg-[#222638] border border-[#2f374f] rounded-xl animate-pulse" />
+      <div className="h-64 bg-[#161b27] border border-[#21262d] rounded-xl animate-pulse" />
     </div>
   );
 
   return (
     <>
       {/* ─── TOP NAV ──────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 h-12 bg-[#1a1e2e]/95 backdrop-blur-md border-b border-[#2a2f45] flex items-center gap-3 px-4">
+      <div className="sticky top-0 z-20 h-12 bg-[#0d1117]/95 backdrop-blur-md border-b border-[#2a2f45] flex items-center gap-3 px-4">
         <Link href="/" className="flex items-center gap-1.5 text-[#8892b0] hover:text-[#57D7BA] transition-colors text-sm">
           <ArrowLeft className="size-4" />
           <span className="hidden sm:inline">Home</span>
@@ -337,7 +337,7 @@ export default function WhaleProfilePage() {
                       {whale.streak}-trade win streak
                     </span>
                   )}
-                  <span className="px-2 py-0.5 rounded-full bg-[#222638] text-[#8892b0] text-[10px] font-medium border border-[#2a2f45] flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full bg-[#161b27] text-[#8892b0] text-[10px] font-medium border border-[#2a2f45] flex items-center gap-1">
                     <Clock className="size-2.5" />
                     Since {whale.memberSince}
                   </span>
@@ -352,7 +352,7 @@ export default function WhaleProfilePage() {
           </div>
 
           {/* Key Stats */}
-          <Card className="bg-[#222638] border-[#2a2f45] lg:min-w-[260px] shrink-0">
+          <Card className="bg-[#161b27] border-[#2a2f45] lg:min-w-[260px] shrink-0">
             <CardContent className="p-5 flex flex-col items-center">
               <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full">
                 <div className="text-center">
@@ -390,7 +390,7 @@ export default function WhaleProfilePage() {
             { label: "Best Category", val: whale.bestCategory, icon: Trophy, color: "#22c55e" },
             { label: "Worst Category", val: whale.worstCategory, icon: Target, color: "#ef4444" },
           ].map((stat) => (
-            <Card key={stat.label} className="bg-[#222638] border-[#2a2f45]">
+            <Card key={stat.label} className="bg-[#161b27] border-[#2a2f45]">
               <CardContent className="p-3 flex items-center gap-3">
                 <div className="size-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${stat.color}15` }}>
                   <stat.icon className="size-4" style={{ color: stat.color }} />
@@ -406,7 +406,7 @@ export default function WhaleProfilePage() {
 
         {/* ─── ACCURACY BY CATEGORY ───────────────────────────────── */}
         {accuracyProfile && accuracyProfile.totalResolved >= 3 && (
-          <Card className="bg-[#222638] border-[#2a2f45]">
+          <Card className="bg-[#161b27] border-[#2a2f45]">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -426,7 +426,7 @@ export default function WhaleProfilePage() {
                 {accuracyProfile.byCategory.map((cat) => (
                   <div key={cat.category} className="flex items-center gap-3">
                     <div className="w-20 text-[11px] text-[#8892b0] truncate shrink-0">{cat.category}</div>
-                    <div className="flex-1 h-2 bg-[#1a1e2e] rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-[#0d1117] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
@@ -484,7 +484,7 @@ export default function WhaleProfilePage() {
 
           {/* ─── ON-CHAIN POSITIONS TAB ──────────────────────────── */}
           <TabsContent value="onchain" className="pt-5 space-y-4">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -536,16 +536,16 @@ export default function WhaleProfilePage() {
               </CardContent>
             </Card>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Card className="bg-[#222638] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#57D7BA]">{whale.positionsValue}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Total Value</div></CardContent></Card>
-              <Card className="bg-[#222638] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#6366f1]">{currentPositions.length}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Open Positions</div></CardContent></Card>
-              <Card className="bg-[#222638] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#f59e0b]">{whale.accuracy}%</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Accuracy</div></CardContent></Card>
-              <Card className="bg-[#222638] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#22c55e]">{whale.totalPnl}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Total P&L</div></CardContent></Card>
+              <Card className="bg-[#161b27] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#57D7BA]">{whale.positionsValue}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Total Value</div></CardContent></Card>
+              <Card className="bg-[#161b27] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#6366f1]">{currentPositions.length}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Open Positions</div></CardContent></Card>
+              <Card className="bg-[#161b27] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#f59e0b]">{whale.accuracy}%</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Accuracy</div></CardContent></Card>
+              <Card className="bg-[#161b27] border-[#2a2f45]"><CardContent className="p-3 text-center"><div className="text-lg font-bold font-mono tabular-nums text-[#22c55e]">{whale.totalPnl}</div><div className="text-[9px] text-[#8892b0] uppercase tracking-wider mt-0.5">Total P&L</div></CardContent></Card>
             </div>
           </TabsContent>
 
           {/* ─── CURRENT POSITIONS TAB ─────────────────────────────── */}
           <TabsContent value="positions" className="pt-5">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -619,7 +619,7 @@ export default function WhaleProfilePage() {
 
           {/* ─── HISTORICAL TRADES TAB ─────────────────────────────── */}
           <TabsContent value="history" className="pt-5">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -715,7 +715,7 @@ export default function WhaleProfilePage() {
 
           {/* ─── CATEGORY PERFORMANCE TAB ──────────────────────────── */}
           <TabsContent value="categories" className="pt-5 space-y-4">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <BarChart3 className="size-4 text-[#57D7BA]" />
@@ -746,7 +746,7 @@ export default function WhaleProfilePage() {
             </Card>
 
             {/* Detailed breakdown table */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Target className="size-4 text-[#6366f1]" />
@@ -774,7 +774,7 @@ export default function WhaleProfilePage() {
                         </TableCell>
                         <TableCell className="py-2.5">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden">
+                            <div className="w-16 h-1.5 rounded-full bg-[#0d1117] overflow-hidden">
                               <div className="h-full rounded-full transition-all" style={{ width: `${c.winRate}%`, backgroundColor: c.color }} />
                             </div>
                             <span className="font-mono text-xs font-semibold" style={{ color: c.color }}>{c.winRate}%</span>
@@ -800,7 +800,7 @@ export default function WhaleProfilePage() {
 
           {/* ─── CALIBRATION TAB ───────────────────────────────────── */}
           <TabsContent value="calibration" className="pt-5 space-y-4">
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -863,7 +863,7 @@ export default function WhaleProfilePage() {
                 { label: "Overconfidence", val: "Slight", color: "#f59e0b", desc: "Tends to bid 3-5% too high" },
                 { label: "Calibration Rank", val: "#8", color: "#6366f1", desc: "Out of 2,847 tracked wallets" },
               ].map((s) => (
-                <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
+                <Card key={s.label} className="bg-[#161b27] border-[#2a2f45]">
                   <CardContent className="p-4 text-center">
                     <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.val}</div>
                     <div className="text-[10px] text-[#8892b0] uppercase tracking-wider mt-1">{s.label}</div>
@@ -871,7 +871,7 @@ export default function WhaleProfilePage() {
                       <TooltipTrigger>
                         <div className="text-[9px] text-[#8892b0]/60 mt-1 underline decoration-dotted cursor-help">{s.desc}</div>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-[#222638] border-[#2a2f45] text-[#e2e8f0] text-xs">
+                      <TooltipContent className="bg-[#161b27] border-[#2a2f45] text-[#e2e8f0] text-xs">
                         {s.desc}
                       </TooltipContent>
                     </Tooltip>
@@ -881,7 +881,7 @@ export default function WhaleProfilePage() {
             </div>
 
             {/* Legend */}
-            <Card className="bg-[#222638] border-[#2a2f45]">
+            <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-center gap-6 text-xs">
                   <div className="flex items-center gap-1.5">

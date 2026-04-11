@@ -189,7 +189,7 @@ export default function InsightsPage() {
             <Button
               onClick={fetchArticles}
               variant="outline"
-              className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-2"
+              className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-2"
             >
               <RefreshCw className="size-4" />
               Retry
@@ -217,7 +217,7 @@ export default function InsightsPage() {
           onClick={fetchArticles}
           variant="outline"
           size="sm"
-          className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5"
+          className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5"
         >
           <RefreshCw className="size-3.5" />
           Refresh
@@ -233,7 +233,7 @@ export default function InsightsPage() {
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
               activeSource === src
                 ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30"
-                : "bg-[#222638] text-[#8892b0] border-[#2f374f] hover:text-[#57D7BA] hover:border-[#57D7BA]/20"
+                : "bg-[#161b27] text-[#8892b0] border-[#21262d] hover:text-[#57D7BA] hover:border-[#57D7BA]/20"
             }`}
           >
             {src}
@@ -254,7 +254,7 @@ export default function InsightsPage() {
           <Button
             onClick={() => setDisplayCount((n) => n + 20)}
             variant="outline"
-            className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30"
+            className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30"
           >
             Load more ({filtered.length - displayCount} remaining)
           </Button>
@@ -277,13 +277,13 @@ function PriceChange({ change }: { change: number | null }) {
 }
 
 function ArticleCard({ article }: { article: NewsArticle }) {
-  const sourceClass = SOURCE_COLORS[article.source] || "bg-[#2f374f] text-[#8892b0] border-[#2f374f]";
+  const sourceClass = SOURCE_COLORS[article.source] || "bg-[#21262d] text-[#8892b0] border-[#21262d]";
 
   return (
-    <div className="bg-[#222638] border border-[#2f374f] rounded-xl p-4 flex flex-col gap-3 hover:border-[#57D7BA]/30 transition-colors overflow-hidden">
+    <div className="bg-[#161b27] border border-[#21262d] rounded-xl p-4 flex flex-col gap-3 hover:border-[#57D7BA]/30 transition-colors overflow-hidden">
       {/* Thumbnail */}
       {article.image_url && (
-        <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#1a1e2e] -mt-4 -mx-4 mb-2" style={{ width: "calc(100% + 2rem)" }}>
+        <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#0d1117] -mt-4 -mx-4 mb-2" style={{ width: "calc(100% + 2rem)" }}>
           <img src={article.image_url} alt="" className="w-full h-full object-cover" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         </div>
       )}
@@ -317,7 +317,7 @@ function ArticleCard({ article }: { article: NewsArticle }) {
       )}
 
       {/* Tagged markets with price movement */}
-      <div className="flex flex-col gap-1.5 pt-1 border-t border-[#2f374f]">
+      <div className="flex flex-col gap-1.5 pt-1 border-t border-[#21262d]">
         <span className="text-[10px] text-[#8892b0] flex items-center gap-1">
           <Tag className="size-3" />
           Markets moving
@@ -327,7 +327,7 @@ function ArticleCard({ article }: { article: NewsArticle }) {
             <Link
               key={tag.market_id}
               href={`/markets/${tag.market_id}`}
-              className="flex items-center justify-between gap-2 text-[10px] bg-[#1a1e2e] border border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 rounded px-2 py-1 transition-colors"
+              className="flex items-center justify-between gap-2 text-[10px] bg-[#0d1117] border border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 rounded px-2 py-1 transition-colors"
               title={tag.question || tag.market_id}
             >
               <span className="truncate">
@@ -357,7 +357,7 @@ function ArticleCard({ article }: { article: NewsArticle }) {
 
 function Footer() {
   return (
-    <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+    <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
       <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
       <div className="flex items-center gap-3">
         <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

@@ -60,7 +60,7 @@ function SimilarityBar({ score }: { score: number }) {
         <span>Similarity</span>
         <span className="font-mono font-bold" style={{ color }}>{pct}%</span>
       </div>
-      <div className="h-1.5 rounded-full bg-[#2f374f] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-[#21262d] overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -82,7 +82,7 @@ export function ResolutionCriteriaDiff({
   // ─── Not available case ────────────────────────────────────────────────
   if (isUnavailable) {
     return (
-      <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4 space-y-3">
+      <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4 space-y-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="size-4 text-[#8892b0]" />
           <span className="text-xs font-semibold text-[#e2e8f0]">Resolution Criteria Verification</span>
@@ -96,7 +96,7 @@ export function ResolutionCriteriaDiff({
               href={polymarketUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#1a1e2e] border border-[#2f374f] text-[10px] text-[#8892b0] hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0d1117] border border-[#21262d] text-[10px] text-[#8892b0] hover:text-[#6366f1] hover:border-[#6366f1]/30 transition-all"
             >
               <ExternalLink className="size-3" /> Open on Polymarket
             </a>
@@ -106,7 +106,7 @@ export function ResolutionCriteriaDiff({
               href={kalshiUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#1a1e2e] border border-[#2f374f] text-[10px] text-[#8892b0] hover:text-[#22c55e] hover:border-[#22c55e]/30 transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0d1117] border border-[#21262d] text-[10px] text-[#8892b0] hover:text-[#22c55e] hover:border-[#22c55e]/30 transition-all"
             >
               <ExternalLink className="size-3" /> Open on Kalshi
             </a>
@@ -118,7 +118,7 @@ export function ResolutionCriteriaDiff({
 
   // ─── Full diff view ────────────────────────────────────────────────────
   return (
-    <div className="rounded-xl bg-[#222638] border border-[#2f374f] p-4 space-y-3">
+    <div className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center gap-2">
         {result.differencesFound ? (
@@ -163,7 +163,7 @@ export function ResolutionCriteriaDiff({
               </a>
             )}
           </div>
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f] font-mono text-[10px] text-[#e2e8f0] leading-relaxed min-h-[60px]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d] font-mono text-[10px] text-[#e2e8f0] leading-relaxed min-h-[60px]">
             {highlightDiffs(result.polymarketCriteria, result.keyDifferences)}
           </div>
         </div>
@@ -182,7 +182,7 @@ export function ResolutionCriteriaDiff({
               </a>
             )}
           </div>
-          <div className="p-2 rounded-lg bg-[#1a1e2e] border border-[#2f374f] font-mono text-[10px] text-[#e2e8f0] leading-relaxed min-h-[60px]">
+          <div className="p-2 rounded-lg bg-[#0d1117] border border-[#21262d] font-mono text-[10px] text-[#e2e8f0] leading-relaxed min-h-[60px]">
             {highlightDiffs(result.kalshiCriteria, result.keyDifferences)}
           </div>
         </div>

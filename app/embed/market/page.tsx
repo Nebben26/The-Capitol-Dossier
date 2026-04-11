@@ -13,7 +13,7 @@ function MarketEmbed() {
   const positive = m.change >= 0;
 
   return (
-    <div className="bg-[#1a1e2e] text-[#e2e8f0] p-4 rounded-xl border border-[#2f374f] font-sans max-w-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div className="bg-[#0d1117] text-[#e2e8f0] p-4 rounded-xl border border-[#21262d] font-sans max-w-sm" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
       <div className="flex items-center gap-1.5 mb-2">
         <div className="size-4 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2.5 text-[#0f1119]" /></div>
         <span className="text-[8px] text-[#8892b0] uppercase tracking-wider font-semibold">Quiver Markets</span>

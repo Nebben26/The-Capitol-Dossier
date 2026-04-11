@@ -69,7 +69,7 @@ export default function AboutPage() {
       {/* Stats strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {statItems.map((s) => (
-          <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
+          <Card key={s.label} className="bg-[#161b27] border-[#21262d]">
             <CardContent className="p-4 flex flex-col gap-2">
               <s.icon className="size-4" style={{ color: s.color }} />
               <div className="text-2xl font-bold text-[#e2e8f0] font-mono">{s.value}</div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
       </div>
 
       {/* CTA */}
-      <div className="pt-4 border-t border-[#2f374f] flex items-center gap-4">
+      <div className="pt-4 border-t border-[#21262d] flex items-center gap-4">
         <Link
           href="/contact"
           className="px-5 py-2.5 rounded-xl bg-[#57D7BA] text-[#0f1119] text-sm font-bold hover:bg-[#57D7BA]/90 transition-colors"

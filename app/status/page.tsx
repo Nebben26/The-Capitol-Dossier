@@ -31,7 +31,7 @@ interface StatRowProps {
 
 function StatRow({ label, value, sub, color }: StatRowProps) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[#2f374f]/60 last:border-0">
+    <div className="flex items-center justify-between py-2.5 border-b border-[#21262d]/60 last:border-0">
       <span className="text-[13px] text-[#8892b0]">{label}</span>
       <div className="text-right">
         <span className="text-sm font-mono font-semibold tabular-nums" style={{ color: color || "#e2e8f0" }}>
@@ -110,14 +110,14 @@ export default function StatusPage() {
       </div>
 
       {/* Data pipeline health */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5 space-y-1">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="size-4 text-[#57D7BA]" />
             <h2 className="text-sm font-semibold text-[#e2e8f0]">Data Pipeline</h2>
           </div>
 
-          <div className="flex items-center justify-between py-2.5 border-b border-[#2f374f]/60">
+          <div className="flex items-center justify-between py-2.5 border-b border-[#21262d]/60">
             <span className="text-[13px] text-[#8892b0]">Market ingest</span>
             <div className="flex items-center gap-2">
               {ingestOk !== null && (
@@ -144,7 +144,7 @@ export default function StatusPage() {
       </Card>
 
       {/* Database counts */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <Database className="size-4 text-[#57D7BA]" />
@@ -153,7 +153,7 @@ export default function StatusPage() {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-8 bg-[#2f374f] rounded animate-pulse" />
+                <div key={i} className="h-8 bg-[#21262d] rounded animate-pulse" />
               ))}
             </div>
           ) : (
@@ -168,7 +168,7 @@ export default function StatusPage() {
       </Card>
 
       {/* Uptime */}
-      <Card className="bg-[#222638] border-[#2f374f]">
+      <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="size-4 text-[#57D7BA]" />

@@ -15,7 +15,7 @@ function SparklineEmbed() {
   const color = positive ? "#22c55e" : "#ef4444";
 
   return (
-    <div className="bg-[#1a1e2e] text-[#e2e8f0] p-3 rounded-xl border border-[#2f374f] font-sans" style={{ fontFamily: "Inter, system-ui, sans-serif", width: 280, height: 120 }}>
+    <div className="bg-[#0d1117] text-[#e2e8f0] p-3 rounded-xl border border-[#21262d] font-sans" style={{ fontFamily: "Inter, system-ui, sans-serif", width: 280, height: 120 }}>
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1">
           <div className="size-3 rounded bg-[#57D7BA] flex items-center justify-center"><Activity className="size-2 text-[#0f1119]" /></div>

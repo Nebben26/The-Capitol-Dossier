@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <p className="text-[#8892b0] leading-relaxed">{post.excerpt}</p>
         </div>
 
-        <hr className="border-[#2f374f]" />
+        <hr className="border-[#21262d]" />
 
         {/* Body */}
         <div className="space-y-5">
@@ -77,7 +77,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           })}
         </div>
 
-        <hr className="border-[#2f374f]" />
+        <hr className="border-[#21262d]" />
 
         {/* Footer */}
         <div className="text-sm text-[#8892b0]">

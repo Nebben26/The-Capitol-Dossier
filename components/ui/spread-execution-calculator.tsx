@@ -109,7 +109,7 @@ export function SpreadExecutionCalculator({
 
   return (
     <Card
-      className="bg-[#1a1e2e] transition-all"
+      className="bg-[#0d1117] transition-all"
       style={{
         borderColor: isPositive ? "rgba(87,215,186,0.2)" : "rgba(47,55,79,0.8)",
         borderWidth: 1,
@@ -143,7 +143,7 @@ export function SpreadExecutionCalculator({
                 { platform: "Polymarket", side: polymarketSide, price: polymarketPrice, color: "#6366f1" },
                 { platform: "Kalshi",     side: kalshiSide,     price: kalshiPrice,     color: "#22c55e" },
               ].map(({ platform, side, price, color }) => (
-                <div key={platform} className="p-3 rounded-lg bg-[#222638] border border-[#2f374f]">
+                <div key={platform} className="p-3 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
                   <div className="text-[9px] text-[#8892b0] mb-1">{platform}</div>
                   <div className="font-mono font-bold text-lg tabular-nums" style={{ color }}>
                     Buy {side}
@@ -166,7 +166,7 @@ export function SpreadExecutionCalculator({
                 step={100}
                 value={capital}
                 onChange={(e) => setCapital(Number(e.target.value))}
-                className="w-full h-1.5 rounded-full appearance-none bg-[#2f374f] accent-[#57D7BA] cursor-pointer"
+                className="w-full h-1.5 rounded-full appearance-none bg-[#21262d] accent-[#57D7BA] cursor-pointer"
               />
               <div className="flex justify-between text-[9px] text-[#8892b0] mt-0.5 font-mono">
                 <span>$100</span>
@@ -185,7 +185,7 @@ export function SpreadExecutionCalculator({
                     className={`px-2 py-1 rounded text-[9px] font-medium transition-all ${
                       feeKey === k
                         ? "bg-[#57D7BA] text-[#0f1119]"
-                        : "bg-[#222638] text-[#8892b0] border border-[#2f374f] hover:text-[#e2e8f0]"
+                        : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"
                     }`}
                   >
                     {FEE_REGIMES[k].label}
@@ -203,19 +203,19 @@ export function SpreadExecutionCalculator({
             ) : result ? (
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="p-2.5 rounded-lg bg-[#222638] border border-[#2f374f]">
+                  <div className="p-2.5 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
                     <div className="text-[9px] text-[#8892b0] mb-0.5">Contracts (each side)</div>
                     <div className="font-mono font-bold tabular-nums text-[#e2e8f0]">{result.nContracts.toLocaleString()}</div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#222638] border border-[#2f374f]">
+                  <div className="p-2.5 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
                     <div className="text-[9px] text-[#8892b0] mb-0.5">Gross Profit</div>
                     <div className="font-mono font-bold tabular-nums text-[#e2e8f0]">{fmt(result.grossProfit)}</div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#222638] border border-[#2f374f]">
+                  <div className="p-2.5 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
                     <div className="text-[9px] text-[#8892b0] mb-0.5">Total Fees</div>
                     <div className="font-mono font-bold tabular-nums text-[#ef4444]">−{fmt(result.totalFees)}</div>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-[#222638] border border-[#2f374f]">
+                  <div className="p-2.5 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
                     <div className="text-[9px] text-[#8892b0] mb-0.5">Net Profit</div>
                     <div
                       className="font-mono font-bold tabular-nums"
@@ -237,7 +237,7 @@ export function SpreadExecutionCalculator({
                 {(() => {
                   const formatted = formatAnnReturn(result.annReturn, daysToResolution);
                   return (
-                    <div className="p-3 rounded-lg bg-[#222638] border border-[#2f374f] flex items-center justify-between">
+                    <div className="p-3 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] flex items-center justify-between">
                       <div>
                         <div className="text-[9px] text-[#8892b0] mb-0.5 flex items-center gap-1">
                           <TrendingUp className="size-3" /> Annualized Return

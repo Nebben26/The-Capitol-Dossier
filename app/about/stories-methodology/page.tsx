@@ -64,7 +64,7 @@ export default function StoriesMethodologyPage() {
           <p>
             Causation analysis (Information Lag, Liquidity Gap, Resolution Mismatch, etc.) is computed by a rule-based
             heuristic engine in{" "}
-            <code className="text-[10px] font-mono bg-[#1a1e2e] px-1.5 py-0.5 rounded text-[#57D7BA]">
+            <code className="text-[10px] font-mono bg-[#0d1117] px-1.5 py-0.5 rounded text-[#57D7BA]">
               lib/causation.ts
             </code>{" "}
             — seven ordered rules applied to spread age, volume ratio, convergence velocity, and market category.
@@ -83,7 +83,7 @@ export default function StoriesMethodologyPage() {
         </section>
       </div>
 
-      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#2f374f]">
+      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#21262d]">
         Stories are generated automatically and do not constitute financial or investment advice.{" "}
         <Link href="/stories" className="hover:text-[#57D7BA] transition-colors">
           Browse stories →

@@ -55,7 +55,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#1a1e2e] text-[#e2e8f0]">
+      <body className="min-h-full flex flex-col bg-[#0d1117] text-[#e2e8f0]">
         <TooltipProvider>
           <AppShell>{children}</AppShell>
         </TooltipProvider>

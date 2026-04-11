@@ -182,7 +182,7 @@ export function FirstVisitHero() {
       className="overflow-hidden transition-all duration-300 ease-in-out"
       style={{ maxHeight: collapsing ? "0px" : "2000px", opacity: collapsing ? 0 : 1 }}
     >
-      <div className="rounded-xl bg-gradient-to-br from-[#1e2235] to-[#222638] border border-[#2f374f] overflow-hidden mb-5">
+      <div className="rounded-xl bg-gradient-to-br from-[#1e2235] to-[#161b27] border border-[#21262d] overflow-hidden mb-5">
 
         {/* ── SECTION A: VALUE PROP ────────────────────────────────────── */}
         <div className="relative px-4 sm:px-5 pt-5 sm:pt-6 pb-4 sm:pb-5">
@@ -220,7 +220,7 @@ export function FirstVisitHero() {
               </button>
               <button
                 onClick={() => dismiss(false)}
-                className="px-4 py-2.5 rounded-lg border border-[#2f374f] text-[#8892b0] text-sm font-medium hover:border-[#57D7BA]/30 hover:text-[#e2e8f0] transition-colors"
+                className="px-4 py-2.5 rounded-lg border border-[#21262d] text-[#8892b0] text-sm font-medium hover:border-[#57D7BA]/30 hover:text-[#e2e8f0] transition-colors"
               >
                 Dismiss
               </button>
@@ -234,7 +234,7 @@ export function FirstVisitHero() {
                 { label: "whales monitored", val: stats.whales },
                 { label: "in whale capital", val: stats.capital },
               ].map((s) => (
-                <div key={s.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a1e2e] border border-[#2f374f] text-xs">
+                <div key={s.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0d1117] border border-[#21262d] text-xs">
                   <span className="font-mono font-bold tabular-nums text-[#57D7BA]">{s.val}</span>
                   <span className="text-[#8892b0]">{s.label}</span>
                 </div>
@@ -243,7 +243,7 @@ export function FirstVisitHero() {
           </div>
         </div>
 
-        <div className="border-t border-[#2f374f]" />
+        <div className="border-t border-[#21262d]" />
 
         {/* ── SECTION B: FEATURE CARDS ─────────────────────────────────── */}
         <div className="px-4 sm:px-5 py-4 sm:py-5">
@@ -251,7 +251,7 @@ export function FirstVisitHero() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {featureCards.map((card) => (
               <Link key={card.title} href={card.href} className="group block">
-                <div className="p-4 rounded-lg bg-[#1a1e2e] border border-[#2f374f] hover:border-[#57D7BA]/20 transition-all h-full">
+                <div className="p-4 rounded-lg bg-[#0d1117] border border-[#21262d] hover:border-[#57D7BA]/20 transition-all h-full">
                   <div className="flex items-start gap-3">
                     <div className="size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: `${card.color}15` }}>
                       <card.icon className="size-4" style={{ color: card.color }} />
@@ -271,7 +271,7 @@ export function FirstVisitHero() {
           </div>
         </div>
 
-        <div className="border-t border-[#2f374f]" />
+        <div className="border-t border-[#21262d]" />
 
         {/* ── SECTION C: HOW IT WORKS ──────────────────────────────────── */}
         <div className="px-4 sm:px-5 py-4">
@@ -279,7 +279,7 @@ export function FirstVisitHero() {
             {steps.map((step, i) => (
               <div key={step.n} className="flex items-start sm:items-center gap-3 flex-1 sm:min-w-0">
                 {i > 0 && (
-                  <div className="hidden sm:block h-px flex-1 bg-[#2f374f] mx-3 shrink-0" style={{ minWidth: "16px" }} />
+                  <div className="hidden sm:block h-px flex-1 bg-[#21262d] mx-3 shrink-0" style={{ minWidth: "16px" }} />
                 )}
                 <div className="flex items-start sm:items-center gap-2.5 min-w-0">
                   <div className="size-6 rounded-full bg-[#57D7BA]/10 border border-[#57D7BA]/30 flex items-center justify-center shrink-0 text-[10px] font-bold text-[#57D7BA]">{step.n}</div>
@@ -290,7 +290,7 @@ export function FirstVisitHero() {
           </div>
         </div>
 
-        <div className="border-t border-[#2f374f]" />
+        <div className="border-t border-[#21262d]" />
 
         {/* ── SECTION D: PRIMARY CTA ───────────────────────────────────── */}
         <div className="px-4 sm:px-5 py-4 flex justify-center">

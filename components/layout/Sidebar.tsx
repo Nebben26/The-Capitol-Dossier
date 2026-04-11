@@ -98,7 +98,7 @@ export function Sidebar({
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
                   active
                     ? "bg-[#57D7BA]/10 text-[#57D7BA] font-medium"
-                    : "text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#222638]"
+                    : "text-[#8892b0] hover:text-[#e2e8f0] hover:bg-[#161b27]"
                 }`}
               >
                 <item.icon className="size-4" />

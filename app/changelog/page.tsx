@@ -132,7 +132,7 @@ export default function ChangelogPage() {
 
       <div className="relative">
         {/* Timeline line */}
-        <div className="absolute left-[7.5rem] top-0 bottom-0 w-px bg-[#2f374f]" />
+        <div className="absolute left-[7.5rem] top-0 bottom-0 w-px bg-[#21262d]" />
 
         <div className="space-y-8">
           {ENTRIES.map((entry) => (
@@ -144,7 +144,7 @@ export default function ChangelogPage() {
 
               {/* Dot */}
               <div className="relative shrink-0 flex items-start pt-1.5">
-                <div className="size-3 rounded-full bg-[#57D7BA] border-2 border-[#1a1e2e] z-10" />
+                <div className="size-3 rounded-full bg-[#57D7BA] border-2 border-[#0d1117] z-10" />
               </div>
 
               {/* Right: content */}
@@ -159,7 +159,7 @@ export default function ChangelogPage() {
         </div>
       </div>
 
-      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#2f374f]">
+      <p className="text-[11px] text-[#4a5168] pt-4 border-t border-[#21262d]">
         © 2026 Quiver Markets.{" "}
         <Link href="/roadmap" className="hover:text-[#57D7BA] transition-colors">
           See what&apos;s coming next →

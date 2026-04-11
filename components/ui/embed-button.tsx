@@ -32,19 +32,19 @@ export function EmbedButton({
         variant="outline"
         size="xs"
         onClick={() => setShowCode(!showCode)}
-        className="border-[#2f374f] text-[#8892b0] hover:text-[#6366f1] hover:border-[#6366f1]/30 gap-1"
+        className="border-[#21262d] text-[#8892b0] hover:text-[#6366f1] hover:border-[#6366f1]/30 gap-1"
       >
         <Code className="size-3" />
         {label}
       </Button>
       {showCode && (
-        <div className="absolute top-full mt-1.5 right-0 w-72 p-3 rounded-lg bg-[#0f1119] border border-[#2f374f] shadow-xl z-50 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+        <div className="absolute top-full mt-1.5 right-0 w-72 p-3 rounded-lg bg-[#0f1119] border border-[#21262d] shadow-xl z-50 animate-in fade-in-0 slide-in-from-top-1 duration-200">
           <p className="text-[10px] font-semibold text-[#e2e8f0] mb-2">Embed this market</p>
           <textarea
             readOnly
             value={code}
             rows={3}
-            className="w-full text-[9px] text-[#57D7BA] font-mono bg-[#1a1e2e] border border-[#2f374f] rounded p-2 resize-none focus:outline-none"
+            className="w-full text-[9px] text-[#57D7BA] font-mono bg-[#0d1117] border border-[#21262d] rounded p-2 resize-none focus:outline-none"
             onClick={(e) => (e.target as HTMLTextAreaElement).select()}
           />
           <Button

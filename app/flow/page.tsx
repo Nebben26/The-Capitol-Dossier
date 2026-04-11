@@ -81,7 +81,7 @@ export default function SmartMoneyFlowPage() {
         </div>
         <button
           onClick={load}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#2f374f] text-[#8892b0] text-xs hover:text-[#57D7BA] hover:border-[#57D7BA]/30 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#21262d] text-[#8892b0] text-xs hover:text-[#57D7BA] hover:border-[#57D7BA]/30 transition-colors"
         >
           <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
           Refresh
@@ -100,7 +100,7 @@ export default function SmartMoneyFlowPage() {
           { label: "YES Positions", val: formatUsd(totalYes), color: "#22c55e" },
           { label: "NO Positions",  val: formatUsd(totalNo),  color: "#ef4444" },
         ].map((s) => (
-          <Card key={s.label} className="bg-[#222638] border-[#2f374f]">
+          <Card key={s.label} className="bg-[#161b27] border-[#21262d]">
             <CardContent className="p-4">
               <div className="text-[10px] text-[#8892b0] uppercase tracking-wide">{s.label}</div>
               <div className="flex items-center gap-1">
@@ -140,7 +140,7 @@ export default function SmartMoneyFlowPage() {
             return (
               <Card
                 key={flow.category}
-                className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 transition-all"
+                className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 transition-all"
               >
                 <CardContent className="p-5">
                   {/* Category header */}
@@ -174,7 +174,7 @@ export default function SmartMoneyFlowPage() {
                   <div className="space-y-1.5 mb-4">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-[#22c55e] font-mono w-6">YES</span>
-                      <div className="flex-1 h-3.5 bg-[#1a1e2e] rounded-sm overflow-hidden">
+                      <div className="flex-1 h-3.5 bg-[#0d1117] rounded-sm overflow-hidden">
                         <div className="h-full bg-[#22c55e]/60 rounded-sm transition-all" style={{ width: `${yesPct}%` }} />
                       </div>
                       <span className="text-[10px] font-mono text-[#22c55e] w-16 text-right tabular-nums">
@@ -183,7 +183,7 @@ export default function SmartMoneyFlowPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-[#ef4444] font-mono w-6">NO</span>
-                      <div className="flex-1 h-3.5 bg-[#1a1e2e] rounded-sm overflow-hidden">
+                      <div className="flex-1 h-3.5 bg-[#0d1117] rounded-sm overflow-hidden">
                         <div className="h-full bg-[#ef4444]/60 rounded-sm transition-all" style={{ width: `${noPct}%` }} />
                       </div>
                       <span className="text-[10px] font-mono text-[#ef4444] w-16 text-right tabular-nums">
@@ -194,7 +194,7 @@ export default function SmartMoneyFlowPage() {
 
                   {/* Top markets */}
                   {flow.topMarkets.length > 0 && (
-                    <div className="border-t border-[#2f374f] pt-3">
+                    <div className="border-t border-[#21262d] pt-3">
                       <div className="text-[10px] text-[#8892b0] uppercase tracking-wide mb-2">
                         Top markets by flow
                       </div>
@@ -222,7 +222,7 @@ export default function SmartMoneyFlowPage() {
         </div>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

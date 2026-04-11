@@ -80,7 +80,7 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
 
   return (
     <Link href={`/whales/${w.id}`} className="block group">
-      <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/20 transition-all h-full">
+      <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/20 transition-all h-full">
         <CardContent className="p-4">
           <div className="flex items-start gap-3 mb-3">
             <RankBadge rank={w.rank} />
@@ -101,7 +101,7 @@ function WhaleCard({ w, liveAccuracy }: { w: Whale; liveAccuracy?: { accuracy: n
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{displayAccuracy}</div><div className="text-[8px] text-[#8892b0]">Accuracy</div></div>
             <div><div className="text-xs font-bold font-mono tabular-nums text-[#e2e8f0]">{hasLiveData ? `${liveAccuracy.accuracy}%` : isNew ? "New" : w.winRate > 0 ? `${w.winRate}%` : "—"}</div><div className="text-[8px] text-[#8892b0]">Win Rate</div></div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#2f374f]">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#21262d]">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${w.bestCatColor}15`, color: w.bestCatColor }}><Trophy className="size-2.5" />{w.bestCategory}</span>
             <span className="text-[9px] text-[#8892b0] font-mono tabular-nums">{w.totalTrades} trades</span>
           </div>
@@ -194,19 +194,19 @@ export default function WhalesBrowsePage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#8892b0]" />
           <input type="text" placeholder="Search whales..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
+            className="w-full h-9 pl-9 pr-4 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 transition-all" />
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {catFilters.map((cat) => (
             <button key={cat} onClick={() => setCategory(cat)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2f374f]"}`}>
+              className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${category === cat ? "bg-[#57D7BA] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#21262d]"}`}>
               {cat}
             </button>
           ))}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-[#8892b0] font-mono">{filtered.length} results</span>
-          <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2f374f]">
+          <div className="flex items-center gap-0.5 bg-[#161b27] rounded-lg p-0.5 border border-[#21262d]">
             <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0]"}`}><LayoutGrid className="size-3.5" /></button>
             <button onClick={() => setViewMode("table")} className={`p-1.5 rounded-md transition-all ${viewMode === "table" ? "bg-[#57D7BA] text-[#0f1119]" : "text-[#8892b0]"}`}><List className="size-3.5" /></button>
           </div>
@@ -222,11 +222,11 @@ export default function WhalesBrowsePage() {
 
       {/* Table view */}
       {viewMode === "table" && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="px-0 py-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-[#2f374f] hover:bg-transparent">
+                <TableRow className="border-[#21262d] hover:bg-transparent">
                   <TableHead className="text-[10px] text-[#8892b0] font-medium pl-4 cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("rank")}><span className="flex items-center gap-0.5">RANK <SortIcon col="rank" /></span></TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium">TRADER</TableHead>
                   <TableHead className="text-[10px] text-[#8892b0] font-medium cursor-pointer hover:text-[#57D7BA]" onClick={() => handleSort("pnl")}><span className="flex items-center gap-0.5">P&L <SortIcon col="pnl" /></span></TableHead>
@@ -239,7 +239,7 @@ export default function WhalesBrowsePage() {
               </TableHeader>
               <TableBody>
                 {filtered.map((w) => (
-                  <TableRow key={w.id} className="border-[#2f374f]/50 hover:bg-[#57D7BA]/5 transition-colors">
+                  <TableRow key={w.id} className="border-[#21262d]/50 hover:bg-[#57D7BA]/5 transition-colors">
                     <TableCell className="pl-4 py-3"><RankBadge rank={w.rank} /></TableCell>
                     <TableCell className="py-3">
                       <Link href={`/whales/${w.id}`} className="flex items-center gap-2 hover:text-[#57D7BA] transition-colors">
@@ -258,7 +258,7 @@ export default function WhalesBrowsePage() {
                         const acc = live && live.total >= 1 ? live.accuracy : w.accuracy > 0 ? w.accuracy : null;
                         return acc !== null ? (
                           <div className="flex items-center gap-1.5">
-                            <div className="w-10 h-1.5 rounded-full bg-[#1a1e2e] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${acc}%` }} /></div>
+                            <div className="w-10 h-1.5 rounded-full bg-[#0d1117] overflow-hidden"><div className="h-full rounded-full bg-[#57D7BA]" style={{ width: `${acc}%` }} /></div>
                             <span className="font-mono text-xs font-semibold tabular-nums text-[#e2e8f0]">{acc}%</span>
                           </div>
                         ) : (
@@ -278,16 +278,16 @@ export default function WhalesBrowsePage() {
       )}
 
       {filtered.length === 0 && (
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-16 text-center">
-            <Wallet className="size-12 text-[#2f374f] mx-auto mb-4" />
+            <Wallet className="size-12 text-[#21262d] mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No whales found</h3>
             <p className="text-sm text-[#8892b0]">Try adjusting your search or filters</p>
           </CardContent>
         </Card>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

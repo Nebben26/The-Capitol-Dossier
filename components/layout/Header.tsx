@@ -46,7 +46,7 @@ function MiniPulseGauge() {
             <stop offset="100%" stopColor="#ef4444" />
           </linearGradient>
         </defs>
-        <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="#2f374f" strokeWidth="5" strokeLinecap="round" />
+        <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="#21262d" strokeWidth="5" strokeLinecap="round" />
         <path d="M 10 46 A 40 40 0 0 1 90 46" fill="none" stroke="url(#miniGaugeG)" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(value / 100) * 126} 126`} />
         <circle cx={dotX} cy={dotY} r={3} fill="#fff" stroke={color} strokeWidth={1.5} />
         <text x="50" y="42" textAnchor="middle" fill="#e2e8f0" fontSize="11" fontWeight="700">{value}</text>
@@ -101,7 +101,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const navigate = (href: string) => { setOpen(false); setQuery(""); router.push(href); };
 
   return (
-    <header className="sticky top-0 z-30 h-14 bg-[#1a1e2e]/95 backdrop-blur-md border-b border-[#2f374f] flex items-center gap-3 px-4">
+    <header className="sticky top-0 z-30 h-14 bg-[#0d1117]/95 backdrop-blur-md border-b border-[#21262d] flex items-center gap-3 px-4">
       <button onClick={onMenuClick} aria-label="Open navigation menu" className="lg:hidden text-[#8892b0] hover:text-[#e2e8f0]">
         <Menu className="size-5" />
       </button>
@@ -116,17 +116,17 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          className="w-full h-9 pl-9 pr-12 rounded-lg bg-[#222638] border border-[#2f374f] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all"
+          className="w-full h-9 pl-9 pr-12 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-sm text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all"
         />
-        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-[#2f374f] bg-[#1a1e2e] px-1.5 text-[10px] text-[#8892b0] font-mono">⌘K</kbd>
+        <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-[#21262d] bg-[#0d1117] px-1.5 text-[10px] text-[#8892b0] font-mono">⌘K</kbd>
 
         {/* Results dropdown — full-screen sheet on mobile, inline dropdown on sm+ */}
         {open && (
-          <div className="fixed top-14 inset-x-0 bottom-0 sm:absolute sm:top-full sm:bottom-auto sm:mt-1.5 sm:max-h-[420px] rounded-none sm:rounded-lg bg-[#222638] border-t sm:border border-[#2f374f] shadow-xl shadow-black/40 overflow-y-auto z-50">
+          <div className="fixed top-14 inset-x-0 bottom-0 sm:absolute sm:top-full sm:bottom-auto sm:mt-1.5 sm:max-h-[420px] rounded-none sm:rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border-t sm:border border-[#21262d] shadow-xl shadow-black/40 overflow-y-auto z-50">
             {/* Empty state — no query entered yet */}
             {!query.trim() && (
               <div className="px-4 py-8 text-center">
-                <Search className="size-8 text-[#2f374f] mx-auto mb-3" />
+                <Search className="size-8 text-[#21262d] mx-auto mb-3" />
                 <p className="text-sm font-medium text-[#8892b0]">Search 5,800+ markets and 200+ whales</p>
                 <p className="text-xs text-[#4a5168] mt-1">Start typing to see results</p>
               </div>
@@ -134,7 +134,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             {/* No results */}
             {query.trim() && !hasResults && (
               <div className="px-4 py-6 text-center">
-                <Search className="size-8 text-[#2f374f] mx-auto mb-2" />
+                <Search className="size-8 text-[#21262d] mx-auto mb-2" />
                 <p className="text-xs text-[#8892b0]">No results for &ldquo;{query}&rdquo;</p>
                 <p className="text-[10px] text-[#4a5168] mt-1">Try different keywords or browse the screener</p>
               </div>
@@ -142,7 +142,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             {/* Market results */}
             {results.markets.length > 0 && (
               <div>
-                <div className="px-3 py-2 border-b border-[#2f374f] flex items-center gap-1.5">
+                <div className="px-3 py-2 border-b border-[#21262d] flex items-center gap-1.5">
                   <Target className="size-3 text-[#57D7BA]" />
                   <span className="text-[10px] text-[#8892b0] uppercase tracking-wider font-semibold">Markets</span>
                   <span className="text-[10px] text-[#8892b0]/50 ml-auto">{results.markets.length} found</span>
@@ -170,7 +170,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             {/* Whale results */}
             {results.whales.length > 0 && (
               <div>
-                <div className="px-3 py-2 border-b border-[#2f374f] border-t flex items-center gap-1.5">
+                <div className="px-3 py-2 border-b border-[#21262d] border-t flex items-center gap-1.5">
                   <Wallet className="size-3 text-[#8b5cf6]" />
                   <span className="text-[10px] text-[#8892b0] uppercase tracking-wider font-semibold">Whales</span>
                   <span className="text-[10px] text-[#8892b0]/50 ml-auto">{results.whales.length} found</span>
@@ -196,7 +196,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
               </div>
             )}
             {hasResults && (
-              <div className="px-3 py-2 border-t border-[#2f374f] text-center">
+              <div className="px-3 py-2 border-t border-[#21262d] text-center">
                 <Link href="/screener" onClick={() => { setOpen(false); setQuery(""); }} className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">Browse all markets →</Link>
               </div>
             )}

@@ -51,7 +51,7 @@ interface WatchlistSignal {
 function MarketWatchCard({ market, onRemove, signal }: { market: Market; onRemove: () => void; signal?: WatchlistSignal }) {
   const positive = market.change >= 0;
   return (
-    <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200">
+    <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-center gap-1.5 mb-2 flex-wrap">
           <span className="px-1.5 py-0.5 rounded text-[8px] font-semibold bg-[#57D7BA]/10 text-[#57D7BA]">{market.category}</span>
@@ -92,7 +92,7 @@ function MarketWatchCard({ market, onRemove, signal }: { market: Market; onRemov
             <span className="text-[#22c55e] tabular-nums">YES {market.price}¢</span>
             <span className="text-[#ef4444] tabular-nums">NO {100 - market.price}¢</span>
           </div>
-          <div className="h-2 rounded-full bg-[#1a1e2e] overflow-hidden flex">
+          <div className="h-2 rounded-full bg-[#0d1117] overflow-hidden flex">
             <div className="h-full bg-[#22c55e] rounded-l-full" style={{ width: `${market.price}%` }} />
             <div className="h-full bg-[#ef4444] rounded-r-full" style={{ width: `${100 - market.price}%` }} />
           </div>
@@ -121,7 +121,7 @@ function MarketWatchCard({ market, onRemove, signal }: { market: Market; onRemov
 function WhaleWatchCard({ whale, onRemove }: { whale: Whale; onRemove: () => void }) {
   const positive = whale.totalPnlNum >= 0;
   return (
-    <Card className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200">
+    <Card className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 hover:shadow-lg hover:shadow-[#57D7BA]/5 hover:scale-[1.02] transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-start gap-3 mb-3">
           <div className="size-10 rounded-xl bg-gradient-to-br from-[#57D7BA] to-[#8b5cf6] flex items-center justify-center shrink-0 relative">
@@ -168,7 +168,7 @@ function WhaleWatchCard({ whale, onRemove }: { whale: Whale; onRemove: () => voi
           </div>
         </div>
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-[#2f374f]">
+        <div className="flex items-center justify-between pt-2 border-t border-[#21262d]">
           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold" style={{ backgroundColor: `${whale.bestCatColor}15`, color: whale.bestCatColor }}>
             <Trophy className="size-2.5" />{whale.bestCategory}
           </span>
@@ -258,7 +258,7 @@ export default function WatchlistPage() {
 
       {/* Not signed in prompt */}
       {!user && loaded && (
-        <Card className="bg-[#222638] border-[#6366f1]/20">
+        <Card className="bg-[#161b27] border-[#6366f1]/20">
           <CardContent className="p-4 flex items-center gap-3">
             <Wallet className="size-5 text-[#6366f1] shrink-0" />
             <div className="flex-1">
@@ -275,10 +275,10 @@ export default function WatchlistPage() {
         <>
           {/* Mini-brief strip */}
           {(biggestMover || signals.length > 0) && (
-            <div className="flex flex-wrap items-center gap-2 px-4 py-3 rounded-xl bg-[#222638] border border-[#2f374f] text-xs text-[#8892b0]">
+            <div className="flex flex-wrap items-center gap-2 px-4 py-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] text-xs text-[#8892b0]">
               <span className="font-semibold text-[#e2e8f0] text-[11px]">Since yesterday:</span>
               {biggestMover && (
-                <Link href={`/markets/${biggestMover.id}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1a1e2e] border border-[#2f374f] hover:border-[#57D7BA]/30 transition-colors text-[10px]">
+                <Link href={`/markets/${biggestMover.id}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#0d1117] border border-[#21262d] hover:border-[#57D7BA]/30 transition-colors text-[10px]">
                   {biggestMover.change >= 0
                     ? <TrendingUp className="size-3 text-[#22c55e]" />
                     : <TrendingDown className="size-3 text-[#ef4444]" />}
@@ -298,7 +298,7 @@ export default function WatchlistPage() {
           )}
 
         <Tabs defaultValue="markets">
-          <div className="border-b border-[#2f374f] -mx-4 px-4">
+          <div className="border-b border-[#21262d] -mx-4 px-4">
             <TabsList variant="line" className="bg-transparent gap-0">
               <TabsTrigger value="markets" className="px-4 py-2.5 text-xs gap-1.5 data-active:text-[#57D7BA] text-[#8892b0] hover:text-[#e2e8f0]">
                 <Target className="size-3.5" />
@@ -323,9 +323,9 @@ export default function WatchlistPage() {
                 ))}
               </div>
             ) : (
-              <Card className="bg-[#222638] border-[#2f374f]">
+              <Card className="bg-[#161b27] border-[#21262d]">
                 <CardContent className="py-12 text-center">
-                  <Target className="size-10 text-[#2f374f] mx-auto mb-3" />
+                  <Target className="size-10 text-[#21262d] mx-auto mb-3" />
                   <h3 className="text-base font-semibold mb-1">No markets watched yet</h3>
                   <p className="text-xs text-[#8892b0] mb-4">Click the star icon on any market to add it here.</p>
                   <Link href="/markets"><Button size="sm" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">Browse Markets</Button></Link>
@@ -342,9 +342,9 @@ export default function WatchlistPage() {
                 ))}
               </div>
             ) : (
-              <Card className="bg-[#222638] border-[#2f374f]">
+              <Card className="bg-[#161b27] border-[#21262d]">
                 <CardContent className="py-12 text-center">
-                  <Users className="size-10 text-[#2f374f] mx-auto mb-3" />
+                  <Users className="size-10 text-[#21262d] mx-auto mb-3" />
                   <h3 className="text-base font-semibold mb-1">No whales watched yet</h3>
                   <p className="text-xs text-[#8892b0] mb-4">Click the star icon on any whale profile to track them here.</p>
                   <Link href="/whales"><Button size="sm" className="bg-[#57D7BA] text-[#0f1119] hover:bg-[#57D7BA]/80">Browse Whales</Button></Link>
@@ -361,7 +361,7 @@ export default function WatchlistPage() {
                   const ageMs = Date.now() - new Date(s.detected_at).getTime();
                   const ageStr = ageMs < 3600000 ? `${Math.floor(ageMs / 60000)}m ago` : `${Math.floor(ageMs / 3600000)}h ago`;
                   return (
-                    <Card key={s.id} className="bg-[#222638] border-[#2f374f] hover:border-[#57D7BA]/30 transition-all">
+                    <Card key={s.id} className="bg-[#161b27] border-[#21262d] hover:border-[#57D7BA]/30 transition-all">
                       <CardContent className="p-4 flex items-start gap-3">
                         <div className="size-7 rounded-full bg-[#57D7BA]/10 flex items-center justify-center shrink-0 mt-0.5">
                           <Zap className="size-3.5 text-[#57D7BA]" />
@@ -381,9 +381,9 @@ export default function WatchlistPage() {
                 })}
               </div>
             ) : (
-              <Card className="bg-[#222638] border-[#2f374f]">
+              <Card className="bg-[#161b27] border-[#21262d]">
                 <CardContent className="py-12 text-center">
-                  <Zap className="size-10 text-[#2f374f] mx-auto mb-3" />
+                  <Zap className="size-10 text-[#21262d] mx-auto mb-3" />
                   <h3 className="text-base font-semibold mb-1">No signals in the last 24h</h3>
                   <p className="text-xs text-[#8892b0]">Signals appear when whale activity or price anomalies are detected on your watched markets.</p>
                 </CardContent>
@@ -394,7 +394,7 @@ export default function WatchlistPage() {
         </>
       ) : (
         /* Full empty state */
-        <Card className="bg-[#222638] border-[#2f374f]">
+        <Card className="bg-[#161b27] border-[#21262d]">
           <CardContent className="py-16 text-center space-y-5">
             <div className="relative mx-auto w-20 h-20">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#f59e0b]/20 to-[#57D7BA]/20 animate-pulse" />
@@ -415,7 +415,7 @@ export default function WatchlistPage() {
                 </Button>
               </Link>
               <Link href="/whales">
-                <Button variant="outline" className="border-[#2f374f] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5 h-10 px-5">
+                <Button variant="outline" className="border-[#21262d] text-[#8892b0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 gap-1.5 h-10 px-5">
                   <Users className="size-4" /> Browse Whales
                 </Button>
               </Link>
@@ -429,7 +429,7 @@ export default function WatchlistPage() {
         </Card>
       )}
 
-      <footer className="flex items-center justify-between py-4 border-t border-[#2f374f] text-[10px] text-[#8892b0]">
+      <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>
         <div className="flex items-center gap-3">
           <Link href="/terms" className="hover:text-[#57D7BA] transition-colors">Terms</Link>

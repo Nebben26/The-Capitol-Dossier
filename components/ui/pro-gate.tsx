@@ -30,7 +30,7 @@ export function TrialBanner() {
 
   if (!isPro) {
     return (
-      <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-[#222638] border border-[#2f374f] rounded-lg">
+      <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-[#161b27] border border-[#21262d] rounded-lg">
         <div className="flex items-center gap-2">
           <Lock className="size-3.5 text-[#8892b0]" />
           <span className="text-xs text-[#8892b0]">This feature requires <span className="text-[#f59e0b] font-semibold">Pro</span></span>
@@ -56,7 +56,7 @@ export function ProGate({ children, feature }: { children: React.ReactNode; feat
   return (
     <div className="relative">
       <div className="pointer-events-none select-none opacity-30 blur-[2px]">{children}</div>
-      <div className="absolute inset-0 flex items-center justify-center bg-[#1a1e2e]/60 backdrop-blur-sm rounded-xl">
+      <div className="absolute inset-0 flex items-center justify-center bg-[#0d1117]/60 backdrop-blur-sm rounded-xl">
         <div className="text-center space-y-3 p-6 max-w-xs">
           <div className="size-12 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center mx-auto">
             <Lock className="size-6 text-[#f59e0b]" />
@@ -80,7 +80,7 @@ export function SidebarUpgradeCard() {
 
   if (isPro && trialDaysLeft !== null && trialDaysLeft > 0) {
     return (
-      <div className="p-3 rounded-xl bg-[#222638] border border-[#f59e0b]/20">
+      <div className="p-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#f59e0b]/20">
         <div className="flex items-center gap-2 mb-1">
           <Crown className="size-3.5 text-[#f59e0b]" />
           <span className="text-xs font-semibold text-[#f59e0b]">Pro Trial</span>
@@ -93,7 +93,7 @@ export function SidebarUpgradeCard() {
 
   if (isPro) {
     return (
-      <div className="p-3 rounded-xl bg-[#222638] border border-[#57D7BA]/20">
+      <div className="p-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#57D7BA]/20">
         <div className="flex items-center gap-2">
           <Crown className="size-3.5 text-[#57D7BA]" />
           <span className="text-xs font-semibold text-[#57D7BA]">Pro Active</span>
@@ -104,7 +104,7 @@ export function SidebarUpgradeCard() {
   }
 
   return (
-    <div className="p-3 rounded-xl bg-[#222638] border border-[#2f374f]">
+    <div className="p-3 rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d]">
       <div className="flex items-center gap-2 mb-2">
         <Zap className="size-3.5 text-[#57D7BA]" />
         <span className="text-xs font-medium">Unlock Pro</span>

@@ -39,7 +39,7 @@ interface SectionProps {
 
 function RoadmapSection({ icon, title, color, items }: SectionProps) {
   return (
-    <Card className="bg-[#222638] border-[#2f374f]">
+    <Card className="bg-[#161b27] border-[#21262d]">
       <CardContent className="p-6 space-y-4">
         <div className="flex items-center gap-2.5">
           {icon}

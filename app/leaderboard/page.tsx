@@ -136,7 +136,7 @@ function MiniCalibration({ data }: { data: { predicted: number; actual: number }
 // ─── MOBILE CARD ──────────────────────────────────────────────────────
 function TraderCard({ t, followed, onFollow, liveAccuracy }: { t: Whale; followed: boolean; onFollow: () => void; liveAccuracy?: { accuracy: number; total: number } }) {
   return (
-    <Card className="bg-[#222638] border-[#2a2f45]">
+    <Card className="bg-[#161b27] border-[#2a2f45]">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <RankBadge rank={t.rank} />
@@ -269,7 +269,7 @@ export default function LeaderboardPage() {
             <div className="flex flex-col gap-2">
               {/* Row 1: Time range + search */}
               <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-0.5 bg-[#222638] rounded-lg p-0.5 border border-[#2a2f45]">
+                <div className="flex items-center gap-0.5 bg-[#161b27] rounded-lg p-0.5 border border-[#2a2f45]">
                   {timeFilters.map((tf) => (
                     <button
                       key={tf}
@@ -292,7 +292,7 @@ export default function LeaderboardPage() {
                     placeholder="Search traders…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9 pl-8 pr-3 rounded-lg bg-[#222638] border border-[#2a2f45] text-xs text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all w-full sm:w-44"
+                    className="h-9 pl-8 pr-3 rounded-lg bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#2a2f45] text-xs text-[#e2e8f0] placeholder:text-[#8892b0]/60 focus:outline-none focus:ring-1 focus:ring-[#57D7BA]/50 focus:border-[#57D7BA]/50 transition-all w-full sm:w-44"
                   />
                 </div>
               </div>
@@ -305,7 +305,7 @@ export default function LeaderboardPage() {
                     className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-medium transition-all ${
                       category === cat
                         ? "bg-[#57D7BA] text-[#0f1119] shadow-lg shadow-[#57D7BA]/20"
-                        : "bg-[#222638] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2a2f45] hover:border-[#57D7BA]/30"
+                        : "bg-[#161b27] text-[#8892b0] hover:text-[#e2e8f0] border border-[#2a2f45] hover:border-[#57D7BA]/30"
                     }`}
                   >
                     {cat}
@@ -335,7 +335,7 @@ export default function LeaderboardPage() {
                   { label: "Most Positions", val: `${mostActive?.totalTrades || 0}`, icon: Flame, color: "#ec4899", sub: mostActive?.name || "—" },
                 ];
               })().map((s) => (
-                <Card key={s.label} className="bg-[#222638] border-[#2a2f45]">
+                <Card key={s.label} className="bg-[#161b27] border-[#2a2f45]">
                   <CardContent className="p-3 flex items-center gap-3">
                     <div className="size-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${s.color}15` }}>
                       <s.icon className="size-4" style={{ color: s.color }} />
@@ -351,7 +351,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* ─── DESKTOP TABLE ────────────────────────────────────── */}
-            <Card className="bg-[#222638] border-[#2a2f45] hidden lg:block">
+            <Card className="bg-[#161b27] border-[#2a2f45] hidden lg:block">
               <CardContent className="px-0 py-0">
                 <Table>
                   <TableHeader>
@@ -411,7 +411,7 @@ export default function LeaderboardPage() {
                                 </div>
                               </Link>
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="bg-[#222638] border-[#2a2f45] text-[#e2e8f0] p-3 max-w-xs">
+                            <TooltipContent side="right" className="bg-[#161b27] border-[#2a2f45] text-[#e2e8f0] p-3 max-w-xs">
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-xs font-semibold">{t.name}</span>

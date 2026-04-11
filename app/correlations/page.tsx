@@ -107,10 +107,10 @@ function ExpandedChart({
   }
 
   return (
-    <div className="mt-3 pt-3 border-t border-[#2f374f]">
+    <div className="mt-3 pt-3 border-t border-[#21262d]">
       <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
         <LineChart data={data} margin={{ top: 4, right: 12, left: 0, bottom: 4 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2f374f" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
           <XAxis
             dataKey="ts"
             tick={{ fill: "#8892b0", fontSize: 9 }}
@@ -126,7 +126,7 @@ function ExpandedChart({
             width={28}
           />
           <Tooltip
-            contentStyle={{ background: "#222638", border: "1px solid #2f374f", borderRadius: 8, fontSize: 11 }}
+            contentStyle={{ background: "#161b27", border: "1px solid #21262d", borderRadius: 8, fontSize: 11 }}
             labelStyle={{ color: "#8892b0" }}
           />
           <Line
@@ -226,7 +226,7 @@ export default function CorrelationsPage() {
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
               filter === f
                 ? "bg-[#57D7BA]/15 text-[#57D7BA] border-[#57D7BA]/40"
-                : "text-[#8892b0] border-[#2f374f] hover:text-[#e2e8f0] hover:border-[#4a5168]"
+                : "text-[#8892b0] border-[#21262d] hover:text-[#e2e8f0] hover:border-[#4a5168]"
             }`}
           >
             {f === "all" ? "All" : f === "positive" ? "Positive (+)" : "Negative (−)"}
@@ -252,7 +252,7 @@ export default function CorrelationsPage() {
             return (
               <div
                 key={row.id}
-                className="rounded-xl bg-[#222638] border border-[#2f374f] hover:border-[#4a5168] transition-colors"
+                className="rounded-xl bg-[#161b27] shadow-card hover:shadow-card-hover hover:-translate-y-px transition-all duration-200 border border-[#21262d] hover:border-[#4a5168] transition-colors"
               >
                 {/* Row header */}
                 <button
