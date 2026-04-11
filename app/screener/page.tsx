@@ -58,6 +58,8 @@ import { analyzeCausation, getCausationLabel } from "@/lib/causation";
 import { DataFreshness } from "@/components/ui/data-freshness";
 import { generateThesis, thesisSignalColor } from "@/lib/market-thesis";
 import { Sparkles } from "lucide-react";
+import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -200,6 +202,8 @@ export default function ScreenerPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [displayCount, setDisplayCount] = useState(60);
+  const { searches, saveSearch, deleteSearch } = useSavedSearches("screener");
+  const [showSaved, setShowSaved] = useState(false);
 
   // Advanced filters
   const [minPrice, setMinPrice] = useState("");
@@ -318,6 +322,60 @@ export default function ScreenerPage() {
           <DataFreshness timestamp={lastFetched} />
           <LastUpdated lastFetched={lastFetched} refreshing={refreshing} error={error} onRetry={retry} />
           <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#57D7BA]/10 text-[#57D7BA] text-[10px] font-bold tabular-nums">{filtered.length} results</span>
+          {/* Saved searches */}
+          <div className="relative">
+            <button
+              onClick={() => setShowSaved((v) => !v)}
+              title="Saved searches"
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${searches.length > 0 ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30" : "bg-[#161b27] text-[#8892b0] border-[#21262d] hover:text-[#e2e8f0]"}`}
+            >
+              {searches.length > 0 ? <BookmarkCheck className="size-3" /> : <Bookmark className="size-3" />}
+              {searches.length > 0 && <span>{searches.length}</span>}
+            </button>
+            {showSaved && (
+              <div className="absolute right-0 top-full mt-1 z-30 w-64 bg-[#161b27] border border-[#21262d] rounded-xl shadow-2xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-[#21262d] flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#484f58]">Saved Searches</span>
+                  <button
+                    onClick={() => saveSearch(`${category} · ${sortBy}`, { category, platform, searchQuery, sortBy, sortDir, minPrice, maxPrice, minVolume, spreadOnly, resolvingSoon })}
+                    className="text-[9px] text-[#57D7BA] hover:underline"
+                  >
+                    Save current
+                  </button>
+                </div>
+                {searches.length === 0 ? (
+                  <p className="text-[11px] text-[#484f58] text-center py-4">No saved searches yet</p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto">
+                    {searches.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between px-3 py-2 hover:bg-[#21262d]/50">
+                        <button
+                          className="text-xs text-[#f0f6fc] text-left flex-1 truncate"
+                          onClick={() => {
+                            const p = s.params as any;
+                            if (p.category) setCategory(p.category);
+                            if (p.platform) setPlatform(p.platform);
+                            if (p.searchQuery !== undefined) { setSearchInput(p.searchQuery); setSearchQuery(p.searchQuery); }
+                            if (p.sortBy) setSortBy(p.sortBy);
+                            if (p.sortDir) setSortDir(p.sortDir);
+                            if (p.minPrice !== undefined) setMinPrice(p.minPrice);
+                            if (p.maxPrice !== undefined) setMaxPrice(p.maxPrice);
+                            if (p.minVolume !== undefined) setMinVolume(p.minVolume);
+                            if (p.spreadOnly !== undefined) setSpreadOnly(p.spreadOnly);
+                            if (p.resolvingSoon !== undefined) setResolvingSoon(p.resolvingSoon);
+                            setShowSaved(false);
+                          }}
+                        >
+                          {s.name}
+                        </button>
+                        <button onClick={() => deleteSearch(s.id)} className="text-[9px] text-[#484f58] hover:text-[#f85149] ml-2">×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

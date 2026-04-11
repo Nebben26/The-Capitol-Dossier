@@ -63,6 +63,10 @@ import { ArbCalculatorModal } from "@/components/disagrees/arb-calculator-modal"
 import { scoreOpportunity } from "@/lib/opportunity-score";
 import { generateThesis, thesisSignalColor } from "@/lib/market-thesis";
 import { Sparkles } from "lucide-react";
+import { useUserTier } from "@/hooks/useUserTier";
+import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { canAccess } from "@/lib/tiers";
+import { Download, Bookmark, BookmarkCheck } from "lucide-react";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
@@ -291,6 +295,9 @@ function DisagreesContent() {
   const [eliteOnly, setEliteOnly]     = useState(false);
   const [arbModalId, setArbModalId]   = useState<string | null>(null);
   const [activeTab, setActiveTab]     = useState<"active" | "resolved">("active");
+  const { tier } = useUserTier();
+  const { searches, saveSearch, deleteSearch } = useSavedSearches("disagrees");
+  const [showSaved, setShowSaved] = useState(false);
 
   // Dynamic tab title
   useEffect(() => {
@@ -659,6 +666,112 @@ function DisagreesContent() {
             </button>
           </div>
           <span className="text-[10px] text-[#8892b0] font-mono">{filtered.length} results</span>
+
+          {/* Saved searches */}
+          <div className="relative">
+            <button
+              onClick={() => setShowSaved((v) => !v)}
+              title="Saved searches"
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold transition-all border ${
+                searches.length > 0
+                  ? "bg-[#57D7BA]/10 text-[#57D7BA] border-[#57D7BA]/30"
+                  : "bg-[#161b27] text-[#8892b0] border-[#21262d] hover:text-[#e2e8f0]"
+              }`}
+            >
+              {searches.length > 0 ? <BookmarkCheck className="size-3" /> : <Bookmark className="size-3" />}
+              {searches.length > 0 && <span>{searches.length}</span>}
+            </button>
+            {showSaved && (
+              <div className="absolute right-0 top-full mt-1 z-30 w-64 bg-[#161b27] border border-[#21262d] rounded-xl shadow-2xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-[#21262d] flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#484f58]">Saved Searches</span>
+                  <button
+                    onClick={() => {
+                      saveSearch(
+                        `${category} · ${sortBy}`,
+                        { category, searchQuery, causeFilter, sortBy, sortDir, eliteOnly }
+                      );
+                    }}
+                    className="text-[9px] text-[#57D7BA] hover:underline"
+                  >
+                    Save current
+                  </button>
+                </div>
+                {searches.length === 0 ? (
+                  <p className="text-[11px] text-[#484f58] text-center py-4">No saved searches yet</p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto">
+                    {searches.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between px-3 py-2 hover:bg-[#21262d]/50">
+                        <button
+                          className="text-xs text-[#f0f6fc] text-left flex-1 truncate"
+                          onClick={() => {
+                            const p = s.params as any;
+                            if (p.category) setCategory(p.category);
+                            if (p.searchQuery !== undefined) setSearchQuery(p.searchQuery);
+                            if (p.causeFilter) setCauseFilter(p.causeFilter);
+                            if (p.sortBy) setSortBy(p.sortBy);
+                            if (p.sortDir) setSortDir(p.sortDir);
+                            if (p.eliteOnly !== undefined) setEliteOnly(p.eliteOnly);
+                            setShowSaved(false);
+                          }}
+                        >
+                          {s.name}
+                        </button>
+                        <button
+                          onClick={() => deleteSearch(s.id)}
+                          className="text-[9px] text-[#484f58] hover:text-[#f85149] ml-2"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* CSV Export — Pro+ only */}
+          <button
+            onClick={() => {
+              if (!canAccess(tier, "pro")) {
+                window.location.href = "/pricing";
+                return;
+              }
+              const rows = [
+                ["Question", "Spread", "Polymarket", "Kalshi", "Category", "Days Left", "Volume Poly", "Volume Kalshi"],
+                ...filtered.map((d) => [
+                  `"${d.question.replace(/"/g, '""')}"`,
+                  d.spread,
+                  d.polyPrice,
+                  d.kalshiPrice,
+                  d.category,
+                  d.daysLeft,
+                  d.polyVol,
+                  d.kalshiVol,
+                ]),
+              ];
+              const csv = rows.map((r) => r.join(",")).join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `quiver-disagrees-${new Date().toISOString().split("T")[0]}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            title={canAccess(tier, "pro") ? "Export CSV" : "Export CSV (Pro+)"}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold transition-all border ${
+              canAccess(tier, "pro")
+                ? "bg-[#161b27] text-[#8892b0] border-[#21262d] hover:text-[#57D7BA] hover:border-[#57D7BA]/30"
+                : "bg-[#161b27] text-[#484f58] border-[#21262d] cursor-pointer"
+            }`}
+          >
+            <Download className="size-3" />
+            {!canAccess(tier, "pro") && <span className="text-[8px] text-[#d29922]">PRO</span>}
+          </button>
+
           <div className="flex items-center gap-0.5 bg-[#161b27] rounded-lg p-0.5 border border-[#21262d]">
             <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-[#f59e0b] text-[#0f1119]" : "text-[#8892b0]"}`}><LayoutGrid className="size-3.5" /></button>
             <button onClick={() => setViewMode("table")} className={`p-1.5 rounded-md transition-all ${viewMode === "table" ? "bg-[#f59e0b] text-[#0f1119]" : "text-[#8892b0]"}`}><List className="size-3.5" /></button>

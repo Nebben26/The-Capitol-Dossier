@@ -64,7 +64,9 @@ import {
   CandlestickChart,
   LineChart as LineChartIcon,
 } from "lucide-react";
-import { useMarketDetail } from "@/hooks/useData";
+import { useMarketDetail, useMarkets } from "@/hooks/useData";
+import { getRelatedMarkets } from "@/lib/related-markets";
+import { RelatedMarkets } from "@/components/markets/related-markets";
 import { supabase } from "@/lib/supabase";
 import { Sparkline } from "@/components/ui/sparkline";
 import { SpreadExecutionCalculator } from "@/components/ui/spread-execution-calculator";
@@ -126,6 +128,7 @@ export default function MarketDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { market: loadedMarket, whaleFlows, crossPlatformPrices, orderbookBids, orderbookAsks, resolutionHistory, source, refreshing, lastFetched } = useMarketDetail(id);
+  const { markets: allMarkets } = useMarkets();
   const [notFound, setNotFound] = useState(false);
   const placeholder: Market = { id, question: "Loading...", price: 50, change: 0, volume: "$0", volNum: 0, category: "Economics", platform: "Polymarket", resolution: "TBD", daysLeft: 0, trending: false, whaleCount: 0, traders: 0, spark: [], desc: "", creator: "", created: "", liquidity: "$0" };
   const market = loadedMarket ?? placeholder;
@@ -1190,6 +1193,13 @@ export default function MarketDetailPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Related Markets */}
+        {allMarkets.length > 0 && loadedMarket && (
+          <div className="mt-6">
+            <RelatedMarkets markets={getRelatedMarkets(loadedMarket, allMarkets, 4)} />
+          </div>
+        )}
 
       </div>
     </>

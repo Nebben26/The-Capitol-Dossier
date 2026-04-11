@@ -26,6 +26,8 @@ import type { Whale } from "@/lib/mockData";
 import { formatUsd, formatPct } from "@/lib/format";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { MarketsBrowseSkeleton } from "@/components/ui/skeleton-loaders";
+import { TierGate } from "@/components/ui/tier-gate";
+import { useUserTier } from "@/hooks/useUserTier";
 
 const LS_KEY = "qm_copy_whales";
 
@@ -366,6 +368,7 @@ function PortfolioPanel({
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function CopyWhalesPage() {
+  const { tier, loading: tierLoading } = useUserTier();
   const { whales, lastFetched, refreshing, error, retry } = useWhales();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
@@ -468,6 +471,22 @@ export default function CopyWhalesPage() {
   });
 
   if (!pageReady) return <MarketsBrowseSkeleton />;
+
+  // Full-page tier gate — shows upgrade prompt when user doesn't have Pro+
+  if (!tierLoading && tier === "free") {
+    return (
+      <TierGate
+        requiredTier="pro"
+        userTier={tier}
+        loading={false}
+        fullPage={true}
+        title="Smart Money Watch is a Pro feature"
+        description="Build a virtual portfolio of whale positions, track combined P&L, and see top conviction plays across the whales you follow."
+      >
+        <div />
+      </TierGate>
+    );
+  }
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-5 space-y-5">

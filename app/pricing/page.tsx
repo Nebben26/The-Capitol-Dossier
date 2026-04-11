@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2 } from "lucide-react";
+import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2, Loader2 } from "lucide-react";
 import { PRICING } from "@/lib/pricing";
 import { WaitlistModal } from "@/components/pricing/waitlist-modal";
+import { CheckoutSuccess } from "@/components/pricing/checkout-success";
+import { AuthModal } from "@/components/auth/auth-modal";
+import { TestModeBanner } from "@/components/ui/test-mode-banner";
+import { supabase } from "@/lib/supabase";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -165,6 +169,80 @@ export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [waitlistOpen, setWaitlistOpen] = useState<string | null>(null);
 
+  // Stripe checkout state
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState<{ tier: "pro" | "trader"; cycle: "monthly" | "annual" } | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // Handle success/cancel redirect params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") {
+      setShowSuccess(true);
+      window.history.replaceState({}, "", "/pricing");
+    } else if (params.get("canceled") === "true") {
+      window.history.replaceState({}, "", "/pricing");
+    }
+  }, []);
+
+  // After auth: fire pending checkout
+  useEffect(() => {
+    if (!pendingCheckout) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user && pendingCheckout) {
+        const { tier, cycle } = pendingCheckout;
+        setPendingCheckout(null);
+        handleCheckout(tier, cycle);
+      }
+    });
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingCheckout]);
+
+  const handleCheckout = async (tier: "pro" | "trader", cycle: "monthly" | "annual") => {
+    const key = `${tier}_${cycle}`;
+    setCheckoutLoading(key);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setPendingCheckout({ tier, cycle });
+        setAuthModalOpen(true);
+        setCheckoutLoading(null);
+        return;
+      }
+
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tier,
+          cycle,
+          userId: user.id,
+          userEmail: user.email,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        alert(data.error);
+        setCheckoutLoading(null);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      alert(err.message || "Checkout failed. Please try again.");
+      setCheckoutLoading(null);
+    }
+  };
+
+  const isStripeEnabled = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY &&
+    !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.includes("PLACEHOLDER");
+
   const tiers = [
     {
       id: "free",
@@ -188,8 +266,8 @@ export default function PricingPage() {
       ],
       cta: "Start free",
       ctaHref: "/",
-      ctaStyle: "border border-[#21262d] text-[#8d96a0] hover:text-[#f0f6fc] hover:border-[#484f58]",
       ctaIsLink: true,
+      ctaStyle: "border border-[#21262d] text-[#8d96a0] hover:text-[#f0f6fc] hover:border-[#484f58]",
     },
     {
       id: "pro",
@@ -211,9 +289,10 @@ export default function PricingPage() {
         { label: "Market Insights stories (all tiers)", included: true },
         { label: "Priority support + CSV export", included: true },
       ],
-      cta: "Join the waitlist",
+      cta: isStripeEnabled ? "Subscribe to Pro" : "Join the waitlist",
       ctaStyle: "bg-[#57D7BA] text-[#0d1117] hover:bg-[#57D7BA]/90 font-bold shadow-glow-brand",
       ctaIsLink: false,
+      tierId: "pro" as const,
     },
     {
       id: "trader",
@@ -233,9 +312,10 @@ export default function PricingPage() {
         { label: "Priority Slack support", included: true },
         { label: "REST API access (coming soon)", included: false },
       ],
-      cta: "Join the waitlist",
+      cta: isStripeEnabled ? "Subscribe to Trader" : "Join the waitlist",
       ctaStyle: "bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30 hover:bg-[#f59e0b]/20 font-semibold",
       ctaIsLink: false,
+      tierId: "trader" as const,
     },
     {
       id: "quant",
@@ -275,14 +355,26 @@ export default function PricingPage() {
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
+      {/* Modals */}
       <WaitlistModal
         open={waitlistOpen !== null}
         onClose={() => setWaitlistOpen(null)}
         tier={waitlistOpen ?? undefined}
       />
+      <AuthModal
+        open={authModalOpen}
+        onClose={() => { setAuthModalOpen(false); setCheckoutLoading(null); }}
+        title="Sign in to subscribe"
+        subtitle="Create a free account or sign in to continue checkout"
+        onSuccess={() => { /* pendingCheckout useEffect handles the rest */ }}
+      />
+      {showSuccess && <CheckoutSuccess onClose={() => setShowSuccess(false)} />}
 
       {/* ─── HEADER ─────────────────────────────────────────────────────── */}
       <div className="text-center space-y-3">
+        <div className="flex justify-center mb-2">
+          <TestModeBanner />
+        </div>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#57D7BA]/10 border border-[#57D7BA]/20 text-[11px] text-[#57D7BA] font-semibold">
           <Zap className="size-3" /> Transparent Pricing
         </div>
@@ -334,7 +426,6 @@ export default function PricingPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         {tiers.map((tier) => (
           <div key={tier.id} className="relative">
-            {/* Floating "Most Popular" badge for Pro */}
             {tier.featured && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                 <div className="inline-flex items-center gap-1.5 bg-[#57D7BA] text-[#0d1117] text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-glow-brand">
@@ -390,13 +481,24 @@ export default function PricingPage() {
                 </ul>
 
                 {/* CTA */}
-                {tier.ctaIsLink ? (
+                {"ctaIsLink" in tier && tier.ctaIsLink && "ctaHref" in tier ? (
                   <a
-                    href={tier.ctaHref}
+                    href={tier.ctaHref as string}
                     className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center active:scale-[0.97] ${tier.ctaStyle}`}
                   >
                     {tier.cta}
                   </a>
+                ) : "tierId" in tier && tier.tierId && isStripeEnabled ? (
+                  <button
+                    onClick={() => handleCheckout(tier.tierId as "pro" | "trader", billingCycle)}
+                    disabled={checkoutLoading === `${tier.tierId}_${billingCycle}`}
+                    className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center active:scale-[0.97] disabled:opacity-70 gap-2 ${tier.ctaStyle}`}
+                  >
+                    {checkoutLoading === `${tier.tierId}_${billingCycle}` && (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    )}
+                    {checkoutLoading === `${tier.tierId}_${billingCycle}` ? "Loading..." : tier.cta}
+                  </button>
                 ) : (
                   <button
                     onClick={() => setWaitlistOpen(tier.badge)}
@@ -406,8 +508,8 @@ export default function PricingPage() {
                   </button>
                 )}
 
-                {/* Waitlist pricing note */}
-                {(tier.id === "pro" || tier.id === "trader") && (
+                {/* Waitlist pricing note (only when Stripe not configured) */}
+                {!isStripeEnabled && (tier.id === "pro" || tier.id === "trader") && (
                   <p className="text-[10px] text-[#8d96a0] text-center pt-1">
                     {tier.id === "pro"
                       ? "Waitlist members get $39/mo founder pricing (20% off)."

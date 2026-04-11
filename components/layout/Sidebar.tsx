@@ -27,6 +27,7 @@ import {
   Zap,
   Mail,
   Info,
+  Settings,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -64,6 +65,7 @@ const navGroups = [
       { label: "Watchlist", icon: Star, href: "/watchlist" },
       { label: "Calibration", icon: Crosshair, href: "/calibration" },
       { label: "Alerts", icon: Bell, href: "/alerts" },
+      { label: "Settings", icon: Settings, href: "/settings" },
     ],
   },
   {

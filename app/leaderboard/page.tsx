@@ -59,7 +59,10 @@ import {
   BadgeCheck,
   Flame,
   Inbox,
+  Download,
 } from "lucide-react";
+import { useUserTier } from "@/hooks/useUserTier";
+import { canAccess } from "@/lib/tiers";
 import { getWhaleGradientStyle } from "@/lib/whale-colors";
 import { LastUpdated } from "@/components/layout/LastUpdated";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
@@ -194,6 +197,7 @@ export default function LeaderboardPage() {
   const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [accuracyMap, setAccuracyMap] = useState<Record<string, { accuracy: number; total: number }>>({});
+  const { tier } = useUserTier();
 
   useEffect(() => { const t = setTimeout(() => setLoading(false), 1200); return () => clearTimeout(t); }, []);
 
@@ -266,6 +270,32 @@ export default function LeaderboardPage() {
                   <Users className="size-3" />
                   {traders.length} tracked
                 </span>
+                <button
+                  onClick={() => {
+                    if (!canAccess(tier, "pro")) { window.location.href = "/pricing"; return; }
+                    const rows = [
+                      ["Rank", "Name", "P&L", "Win Rate", "Volume", "Brier", "Best Category"],
+                      ...sorted.map((t) => {
+                        const la = accuracyMap[t.id];
+                        return [t.rank, `"${t.name}"`, t.totalPnl, la && la.total >= 1 ? `${la.accuracy}%` : t.winRate > 0 ? `${t.winRate}%` : "—", t.totalVolume, t.brier > 0 ? t.brier.toFixed(2) : "—", t.bestCategory];
+                      }),
+                    ];
+                    const csv = rows.map((r) => r.join(",")).join("\n");
+                    const blob = new Blob([csv], { type: "text/csv" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `quiver-leaderboard-${new Date().toISOString().split("T")[0]}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  title={canAccess(tier, "pro") ? "Export CSV" : "Export CSV (Pro+)"}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${canAccess(tier, "pro") ? "bg-[#161b27] text-[#8d96a0] border-[#21262d] hover:text-[#57D7BA] hover:border-[#57D7BA]/30" : "bg-[#161b27] text-[#484f58] border-[#21262d]"}`}
+                >
+                  <Download className="size-3" />
+                  Export
+                  {!canAccess(tier, "pro") && <span className="text-[8px] text-[#d29922]">PRO</span>}
+                </button>
               </div>
             </div>
 
