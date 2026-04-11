@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2, Loader2 } from "lucide-react";
+import { Check, X, Star, ChevronDown, ChevronUp, Zap, Building2, BarChart2, Loader2, Send } from "lucide-react";
 import { PRICING } from "@/lib/pricing";
 import { WaitlistModal } from "@/components/pricing/waitlist-modal";
 import { CheckoutSuccess } from "@/components/pricing/checkout-success";
@@ -20,6 +20,7 @@ interface Feature {
   free: TierVal;
   pro: TierVal;
   trader: TierVal;
+  signal_desk: TierVal;
   quant: TierVal;
 }
 
@@ -34,57 +35,69 @@ const COMPARISON: FeatureSection[] = [
   {
     heading: "INTELLIGENCE",
     rows: [
-      { label: "Cross-platform arbitrage scanner", free: true, pro: true, trader: true, quant: true },
-      { label: "AI Market Thesis (preview)", free: true, pro: true, trader: true, quant: true },
-      { label: "AI Market Thesis (full)", free: false, pro: true, trader: true, quant: true },
-      { label: "Smart Signal Alerts (top 5)", free: true, pro: true, trader: true, quant: true },
-      { label: "Smart Signal Alerts (all 180+)", free: false, pro: true, trader: true, quant: true },
-      { label: "Whale leaderboard", free: true, pro: true, trader: true, quant: true },
-      { label: "Whale position history", free: false, pro: true, trader: true, quant: true },
-      { label: "Smart Money Watch", free: true, pro: true, trader: true, quant: true },
-      { label: "Market Insights stories", free: "Free only", pro: true, trader: true, quant: true },
+      { label: "Cross-platform arbitrage scanner", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "AI Market Thesis (preview)", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "AI Market Thesis (full)", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Smart Signal Alerts (top 5)", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Smart Signal Alerts (all 180+)", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Whale leaderboard", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Whale position history", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Smart Money Watch", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Market Insights stories", free: "Free only", pro: true, trader: true, signal_desk: true, quant: true },
     ],
   },
   {
     heading: "EXECUTION",
     rows: [
-      { label: "Spread execution calculator", free: true, pro: true, trader: true, quant: true },
-      { label: "Causation analysis", free: true, pro: true, trader: true, quant: true },
-      { label: "Resolution criteria diff", free: false, pro: true, trader: true, quant: true },
-      { label: "Spread velocity indicator", free: false, pro: true, trader: true, quant: true },
-      { label: "Spread history", free: false, pro: "7d", trader: "30d", quant: "90d" },
-      { label: "Capital efficiency ranker", free: false, pro: true, trader: true, quant: true },
-      { label: "Best annualized return strip", free: false, pro: true, trader: true, quant: true },
+      { label: "Spread execution calculator", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Causation analysis", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Resolution criteria diff", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Spread velocity indicator", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Spread history", free: false, pro: "7d", trader: "30d", signal_desk: "30d", quant: "90d" },
+      { label: "Capital efficiency ranker", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Best annualized return strip", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+    ],
+  },
+  {
+    heading: "REAL-TIME ALERTS",
+    rows: [
+      { label: "Telegram push alerts", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Configurable spread thresholds (3–30pt)", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Whale position alerts ($10K–$500K)", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Category-specific alert filters", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Up to 50 alerts/day", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Private Discord/Telegram community", free: false, pro: false, trader: false, signal_desk: true, quant: true },
+      { label: "Weekly recap PDF", free: false, pro: false, trader: false, signal_desk: true, quant: true },
     ],
   },
   {
     heading: "DATA",
     rows: [
-      { label: "6,500+ markets", free: true, pro: true, trader: true, quant: true },
-      { label: "300+ disagreements", free: true, pro: true, trader: true, quant: true },
-      { label: "200+ whale wallets", free: true, pro: true, trader: true, quant: true },
-      { label: "News catalysts", free: true, pro: true, trader: true, quant: true },
-      { label: "Historical archive", free: false, pro: false, trader: "90d", quant: "Full" },
-      { label: "CSV export", free: false, pro: true, trader: true, quant: true },
+      { label: "6,500+ markets", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "300+ disagreements", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "200+ whale wallets", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "News catalysts", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Historical archive", free: false, pro: false, trader: "90d", signal_desk: "90d", quant: "Full" },
+      { label: "CSV export", free: false, pro: true, trader: true, signal_desk: true, quant: true },
     ],
   },
   {
     heading: "API",
     rows: [
-      { label: "REST endpoints", free: false, pro: false, trader: false, quant: true },
-      { label: "Rate limit / minute", free: false, pro: false, trader: false, quant: "60" },
-      { label: "Rate limit / day", free: false, pro: false, trader: false, quant: "5,000" },
-      { label: "Webhooks", free: false, pro: false, trader: false, quant: "Soon" },
+      { label: "REST endpoints", free: false, pro: false, trader: false, signal_desk: false, quant: true },
+      { label: "Rate limit / minute", free: false, pro: false, trader: false, signal_desk: false, quant: "60" },
+      { label: "Rate limit / day", free: false, pro: false, trader: false, signal_desk: false, quant: "5,000" },
+      { label: "Webhooks", free: false, pro: false, trader: false, signal_desk: false, quant: "Soon" },
     ],
   },
   {
     heading: "SUPPORT",
     rows: [
-      { label: "Email support", free: true, pro: true, trader: true, quant: true },
-      { label: "Priority support", free: false, pro: true, trader: true, quant: true },
-      { label: "Slack channel", free: false, pro: false, trader: true, quant: true },
-      { label: "Custom data requests", free: false, pro: false, trader: false, quant: true },
-      { label: "Weekly Smart Money Report", free: false, pro: false, trader: true, quant: true },
+      { label: "Email support", free: true, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Priority support", free: false, pro: true, trader: true, signal_desk: true, quant: true },
+      { label: "Slack channel", free: false, pro: false, trader: true, signal_desk: true, quant: true },
+      { label: "Custom data requests", free: false, pro: false, trader: false, signal_desk: false, quant: true },
+      { label: "Weekly Smart Money Report", free: false, pro: false, trader: true, signal_desk: true, quant: true },
     ],
   },
 ];
@@ -99,6 +112,18 @@ const FAQS = [
     a: "Pro gives you full intelligence and execution tools — ideal for active market followers. Trader adds 30-day spread history, resolution criteria diff, Slack access, and the Weekly Smart Money Report — built for professionals who execute regularly.",
   },
   {
+    q: "What makes Signal Desk different from Trader?",
+    a: "Signal Desk is for traders who deploy capital and need to act fast. It adds real-time Telegram push alerts the moment arbitrage spreads open or whale wallets take large positions. You set your own thresholds (3–30pt spreads, $10K–$500K whale size) and get alerted instantly — no refreshing required. It also includes private Discord/Telegram community access and a weekly closed-arb recap PDF.",
+  },
+  {
+    q: "How do the Telegram alerts work?",
+    a: "After subscribing to Signal Desk, go to Settings → Telegram Alerts and generate a connection link. Open it in Telegram, tap Start, and you're linked. Alerts fire in real-time as our ingest pipeline runs (every 30 minutes). You can adjust thresholds, pause alerts, or unsubscribe at any time via bot commands.",
+  },
+  {
+    q: "What is the Signal Desk founder price?",
+    a: "The first 25 Signal Desk subscribers lock in $149/mo forever — a $50/mo discount off the $199/mo list price. This pricing is locked for life and won't increase when you renew. After 25 spots are filled, the price moves to $199/mo.",
+  },
+  {
     q: "What payment methods do you accept?",
     a: "We accept all major credit cards via Stripe. Bank transfer available for Quant API on request.",
   },
@@ -108,7 +133,7 @@ const FAQS = [
   },
   {
     q: "Is there a discount for annual billing?",
-    a: "Yes — 2 months free when billed annually on any paid tier. Pro: $490/yr, Trader: $1,490/yr, Quant API: $2,990/yr.",
+    a: "Yes — 2 months free when billed annually on any paid tier. Pro: $490/yr, Trader: $1,490/yr, Signal Desk: $1,990/yr, Quant API: $3,990/yr.",
   },
   {
     q: "What does the Quant API tier include?",
@@ -178,7 +203,7 @@ export default function PricingPage() {
   // Stripe checkout state
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [pendingCheckout, setPendingCheckout] = useState<{ tier: "pro" | "trader"; cycle: "monthly" | "annual" } | null>(null);
+  const [pendingCheckout, setPendingCheckout] = useState<{ tier: "pro" | "trader" | "signal_desk"; cycle: "monthly" | "annual" } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Handle success/cancel redirect params
@@ -206,7 +231,7 @@ export default function PricingPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingCheckout]);
 
-  const handleCheckout = async (tier: "pro" | "trader", cycle: "monthly" | "annual") => {
+  const handleCheckout = async (tier: "pro" | "trader" | "signal_desk", cycle: "monthly" | "annual") => {
     trackEvent(AnalyticsEvents.CLICK_SUBSCRIBE, { tier, cycle });
     const key = `${tier}_${cycle}`;
     setCheckoutLoading(key);
@@ -269,7 +294,7 @@ export default function PricingPage() {
         { label: "AI thesis bull case (preview)", included: true },
         { label: "Execution calculator", included: true },
         { label: "Full AI thesis + spread history", included: false },
-        { label: "REST API access", included: false },
+        { label: "Real-time Telegram alerts", included: false },
       ],
       cta: "Start free",
       ctaHref: "/",
@@ -310,19 +335,44 @@ export default function PricingPage() {
       monthlyPrice: PRICING.trader.price,
       description: "For professionals who execute regularly",
       featured: false,
-      isNew: true,
       features: [
         { label: "Everything in Pro", included: true },
         { label: "30-day spread history", included: true },
         { label: "Slack channel access", included: true },
         { label: "Weekly Smart Money Report PDF", included: true },
         { label: "Priority Slack support", included: true },
-        { label: "REST API access (coming soon)", included: false },
+        { label: "Real-time Telegram alerts", included: false },
       ],
       cta: isStripeEnabled ? "Subscribe to Trader" : "Join the waitlist",
       ctaStyle: "bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30 hover:bg-[#f59e0b]/20 font-semibold",
       ctaIsLink: false,
       tierId: "trader" as const,
+    },
+    {
+      id: "signal_desk",
+      badge: "Signal Desk",
+      badgeColor: "#d29922",
+      badgeBg: "#d2992218",
+      icon: <Send className="size-3 text-[#d29922]" />,
+      monthlyPrice: PRICING.signal_desk.price,
+      description: "Real-time push alerts for traders who deploy capital",
+      featured: false,
+      isNew: true,
+      founderPrice: PRICING.signal_desk.founderPrice,
+      founderSpots: PRICING.signal_desk.founderSpots,
+      features: [
+        { label: "Everything in Trader", included: true },
+        { label: "Real-time Telegram push alerts", included: true },
+        { label: "Configurable spread thresholds (3–30pt)", included: true },
+        { label: "Whale position alerts ($10K–$500K)", included: true },
+        { label: "Up to 50 alerts per day", included: true },
+        { label: "Private Discord/Telegram community", included: true },
+        { label: "Weekly recap PDF (closed arb performance)", included: true },
+      ],
+      cta: isStripeEnabled ? "Subscribe to Signal Desk" : "Join the waitlist",
+      ctaStyle: "bg-[#d29922]/10 text-[#d29922] border border-[#d29922]/30 hover:bg-[#d29922]/20 font-semibold",
+      ctaIsLink: false,
+      tierId: "signal_desk" as const,
     },
     {
       id: "quant",
@@ -334,7 +384,7 @@ export default function PricingPage() {
       description: "For quants, hedge funds, and system builders",
       featured: false,
       features: [
-        { label: "Everything in Trader", included: true },
+        { label: "Everything in Signal Desk", included: true },
         { label: "REST API: 60 req/min, 5,000/day", included: true },
         { label: "90-day spread history", included: true },
         { label: "Full historical archive", included: true },
@@ -359,7 +409,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 space-y-16">
+    <div className="max-w-7xl mx-auto px-4 py-10 space-y-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* Modals */}
@@ -387,7 +437,7 @@ export default function PricingPage() {
         </div>
         <h1 className="text-4xl font-bold tracking-tight">Pricing</h1>
         <p className="text-[#8d96a0] max-w-xl mx-auto">
-          Four tiers, no hidden fees. Start free, upgrade when you see the alpha.
+          Five tiers, no hidden fees. Start free, upgrade when you see the alpha.
         </p>
         <p className="text-[11px] text-[#484f58]">
           All prices in USD · Cancel anytime · No overage charges
@@ -430,7 +480,7 @@ export default function PricingPage() {
       </div>
 
       {/* ─── PRICING CARDS ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 items-start">
         {tiers.map((tier) => (
           <div key={tier.id} className="relative">
             {tier.featured && (
@@ -449,7 +499,7 @@ export default function PricingPage() {
               }`}
             >
               <div className="p-5 flex flex-col gap-3 flex-1">
-                {/* Badge — skip inline badge for featured tier (it has the floating pill instead) */}
+                {/* Badge */}
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {!tier.featured && (
                     <div
@@ -461,7 +511,7 @@ export default function PricingPage() {
                     </div>
                   )}
                   {"isNew" in tier && tier.isNew && (
-                    <span className="text-[8px] font-bold uppercase tracking-wide text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">
+                    <span className="text-[8px] font-bold uppercase tracking-wide text-[#d29922] bg-[#d29922]/10 border border-[#d29922]/20 px-1.5 py-0.5 rounded-full">
                       NEW
                     </span>
                   )}
@@ -469,6 +519,13 @@ export default function PricingPage() {
 
                 {/* Price */}
                 <PriceDisplay monthlyPrice={tier.monthlyPrice} billingCycle={billingCycle} />
+
+                {/* Founder price note for signal_desk */}
+                {"founderPrice" in tier && tier.founderPrice && (
+                  <p className="text-[10px] text-[#d29922] leading-relaxed -mt-1">
+                    First {tier.founderSpots} customers lock in ${tier.founderPrice}/mo forever
+                  </p>
+                )}
 
                 {/* Description */}
                 <p className="text-[11px] text-[#8d96a0] leading-relaxed">{tier.description}</p>
@@ -499,7 +556,7 @@ export default function PricingPage() {
                   </a>
                 ) : "tierId" in tier && tier.tierId && isStripeEnabled ? (
                   <button
-                    onClick={() => handleCheckout(tier.tierId as "pro" | "trader", billingCycle)}
+                    onClick={() => handleCheckout(tier.tierId as "pro" | "trader" | "signal_desk", billingCycle)}
                     disabled={checkoutLoading === `${tier.tierId}_${billingCycle}`}
                     className={`w-full py-3 rounded-xl text-xs text-center transition-all block mt-2 min-h-[44px] flex items-center justify-center active:scale-[0.97] disabled:opacity-70 gap-2 ${tier.ctaStyle}`}
                   >
@@ -518,11 +575,11 @@ export default function PricingPage() {
                 )}
 
                 {/* Waitlist pricing note (only when Stripe not configured) */}
-                {!isStripeEnabled && (tier.id === "pro" || tier.id === "trader") && (
+                {!isStripeEnabled && (tier.id === "pro" || tier.id === "signal_desk") && (
                   <p className="text-[10px] text-[#8d96a0] text-center pt-1">
                     {tier.id === "pro"
-                      ? "Waitlist members get $39/mo founder pricing (20% off)."
-                      : "Waitlist members get $119/mo founder pricing (20% off)."}
+                      ? "Founder cohort: $39/mo locked in for life."
+                      : "Founder cohort: first 25 get $149/mo locked in for life."}
                   </p>
                 )}
               </div>
@@ -531,27 +588,52 @@ export default function PricingPage() {
         ))}
       </div>
 
+      {/* ─── SIGNAL DESK CALLOUT ─────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-[#d29922]/30 bg-gradient-to-r from-[#d29922]/5 via-[#161b27] to-[#161b27] p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div className="w-10 h-10 rounded-xl bg-[#d29922]/15 flex items-center justify-center shrink-0">
+          <Send className="w-5 h-5 text-[#d29922]" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-bold text-[#d29922]">Signal Desk</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-[#d29922] bg-[#d29922]/10 border border-[#d29922]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+          </div>
+          <p className="text-sm text-[#8d96a0] leading-relaxed">
+            The moment an arb spread opens or a whale takes a $50K+ position, you get a Telegram message.
+            Set your own thresholds, filter by category, get up to 50 alerts/day. No dashboard refreshing required.
+          </p>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="text-2xl font-bold text-[#d29922] font-mono">$199<span className="text-sm font-normal text-[#8d96a0]">/mo</span></div>
+          <p className="text-[10px] text-[#d29922] mt-0.5">First 25 spots: $149/mo forever</p>
+        </div>
+      </div>
+
       {/* ─── COMPARISON TABLE ────────────────────────────────────────────── */}
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-[#f0f6fc] text-center mb-2 tracking-tight">Compare plans</h2>
         <p className="text-sm text-[#8d96a0] text-center mb-8">Every feature at a glance.</p>
 
         <div className="overflow-x-auto rounded-xl border border-[#21262d] shadow-card">
-          <table className="w-full text-sm min-w-[700px]">
+          <table className="w-full text-sm min-w-[900px]">
             <thead>
               <tr className="border-b border-[#21262d] bg-[#161b27]">
-                <th className="text-left px-6 py-4 text-[#8d96a0] font-medium w-[36%]">Feature</th>
-                <th className="text-center px-6 py-4 text-[#f0f6fc] font-semibold w-[16%] border-l border-[#21262d]">Free</th>
-                <th className="text-center px-6 py-4 text-[#57D7BA] font-semibold w-[16%] border-l border-[#21262d]">Pro</th>
-                <th className="text-center px-6 py-4 text-[#f59e0b] font-semibold w-[16%] border-l border-[#21262d]">Trader</th>
-                <th className="text-center px-6 py-4 text-[#8b5cf6] font-semibold w-[16%] border-l border-[#21262d]">Quant API</th>
+                <th className="text-left px-4 py-4 text-[#8d96a0] font-medium w-[26%]">Feature</th>
+                <th className="text-center px-3 py-4 text-[#f0f6fc] font-semibold w-[12%] border-l border-[#21262d]">Free</th>
+                <th className="text-center px-3 py-4 text-[#57D7BA] font-semibold w-[13%] border-l border-[#21262d]">Pro</th>
+                <th className="text-center px-3 py-4 text-[#f59e0b] font-semibold w-[13%] border-l border-[#21262d]">Trader</th>
+                <th className="text-center px-3 py-4 text-[#d29922] font-semibold w-[14%] border-l border-[#21262d]">
+                  Signal Desk
+                  <span className="ml-1 text-[8px] font-bold bg-[#d29922]/15 px-1 py-0.5 rounded">NEW</span>
+                </th>
+                <th className="text-center px-3 py-4 text-[#8b5cf6] font-semibold w-[13%] border-l border-[#21262d]">Quant API</th>
               </tr>
             </thead>
             <tbody>
               {COMPARISON.map((section) => (
                 <React.Fragment key={section.heading}>
                   <tr className="bg-[#0d1117]/60">
-                    <td colSpan={5} className="px-6 py-2 text-[10px] font-bold tracking-widest text-[#484f58] uppercase">
+                    <td colSpan={6} className="px-4 py-2 text-[10px] font-bold tracking-widest text-[#484f58] uppercase">
                       {section.heading}
                     </td>
                   </tr>
@@ -560,11 +642,12 @@ export default function PricingPage() {
                       key={row.label}
                       className={`border-t border-[#21262d]/40 ${i % 2 === 0 ? "bg-[#161b27]" : "bg-[#1c2333]"}`}
                     >
-                      <td className="px-6 py-2.5 text-[#8d96a0] text-xs">{row.label}</td>
-                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.free} /></td>
-                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.pro} /></td>
-                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.trader} /></td>
-                      <td className="px-6 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.quant} /></td>
+                      <td className="px-4 py-2.5 text-[#8d96a0] text-xs">{row.label}</td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.free} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.pro} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.trader} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.signal_desk} /></td>
+                      <td className="px-3 py-2.5 text-center border-l border-[#21262d]/40"><CellValue val={row.quant} /></td>
                     </tr>
                   ))}
                 </React.Fragment>

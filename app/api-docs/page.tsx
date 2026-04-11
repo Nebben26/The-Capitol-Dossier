@@ -376,7 +376,7 @@ export default function ApiDocsPage() {
         {[
           {
             tier: PRICING.pro.name,
-            price: PRICING.pro.priceLabel,
+            price: `$${PRICING.pro.price}`,
             sub: "per month",
             color: "#57D7BA",
             limits: ["20 req/min", "1,000 req/day"],
@@ -387,7 +387,7 @@ export default function ApiDocsPage() {
           },
           {
             tier: PRICING.quant.name,
-            price: PRICING.quant.priceLabel,
+            price: `$${PRICING.quant.price}`,
             sub: "per month",
             color: "#8b5cf6",
             limits: ["60 req/min", "5,000 req/day"],

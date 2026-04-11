@@ -55,7 +55,7 @@ export function WaitlistForm({ compact = false, source }: { compact?: boolean; s
     >
       {!compact && (
         <h3 className="text-base font-bold text-[#e2e8f0]">
-          Join the founder cohort — lock in $39/mo before Pro launches at $49/mo
+          Join the founder cohort — lock in Pro at $39/mo or Signal Desk at $149/mo, for life
         </h3>
       )}
       <input

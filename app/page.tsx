@@ -47,6 +47,7 @@ import {
   Database,
   Users,
   Activity,
+  Send,
 } from "lucide-react";
 import { useHomepageData, useDisagreements } from "@/hooks/useData";
 import { HOMEPAGE_CATEGORIES as categories, sparkGen } from "@/lib/mockData";
@@ -459,6 +460,26 @@ export default function HomePage() {
       {/* ─── MORNING BRIEF ───────────────────────────────────── */}
       <MorningBriefCard />
 
+      {/* ─── SIGNAL DESK CALLOUT ─────────────────────────────── */}
+      <div className="rounded-xl border border-[#d29922]/30 bg-gradient-to-r from-[#d29922]/8 to-[#161b27] p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#d29922]/15 flex items-center justify-center shrink-0">
+            <Send className="w-3.5 h-3.5 text-[#d29922]" />
+          </div>
+          <span className="text-xs font-bold text-[#d29922]">Signal Desk</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#d29922] bg-[#d29922]/10 border border-[#d29922]/20 px-1.5 py-0.5 rounded-full">NEW · $199/mo</span>
+        </div>
+        <p className="text-[11px] text-[#8d96a0] leading-relaxed">
+          Get a Telegram push the instant an arb spread opens or a whale takes a $50K+ position. Set your own thresholds. First 25 spots: $149/mo locked for life.
+        </p>
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-1.5 text-[11px] text-[#d29922] font-semibold hover:text-[#d29922]/80 transition-colors"
+        >
+          Learn about Signal Desk →
+        </Link>
+      </div>
+
       {/* ─── WAITLIST ────────────────────────────────────────── */}
       <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5">
@@ -466,7 +487,7 @@ export default function HomePage() {
           <p className="text-sm text-[#8892b0] mb-3">
             {waitlistCount !== null && waitlistCount >= 10
               ? `Join ${waitlistCount.toLocaleString()} others who've locked in founder pricing.`
-              : "Be one of the first to lock in founder pricing."}
+              : "Lock in Pro at $39/mo or Signal Desk at $149/mo — founder pricing, for life."}
           </p>
           <WaitlistForm source="homepage" />
         </CardContent>

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, email, source, website } = body;
+    const { name, email, source, website, tier } = body;
 
     // Honeypot check — bots fill hidden fields, humans don't
     if (website) {
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from("waitlist")
-      .insert({ name, email, source: source || "homepage" });
+      .insert({ name, email, source: source || "homepage", tier: tier || "pro" });
 
     if (error) {
       // Duplicate email — treat as success

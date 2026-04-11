@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { tier, cycle, userId, userEmail } = body as {
-      tier: "pro" | "trader";
+      tier: "pro" | "trader" | "signal_desk";
       cycle: "monthly" | "annual";
       userId: string;
       userEmail: string;

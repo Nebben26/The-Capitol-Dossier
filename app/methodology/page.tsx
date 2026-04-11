@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, AlertTriangle } from "lucide-react";
+import { BookOpen, AlertTriangle, Send } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Methodology",
@@ -224,6 +224,55 @@ Lower is better: 0.0 = perfect | 0.25 = random | >0.25 = worse than random`}</Fo
             We do not provide execution — we show you the opportunity; you trade on Polymarket and Kalshi directly.
           </Body>
         </div>
+      </Section>
+
+      {/* ─── Signal Desk Alerts ─── */}
+      <Section title="Signal Desk — Real-Time Alert Methodology">
+        <Card>
+          <div className="flex items-center gap-2 mb-1">
+            <Send className="size-3.5 text-[#d29922]" />
+            <Label>How alerts fire</Label>
+          </div>
+          <FormulaBlock>{`Alert triggers when:
+  arb_spread alert:    spread_pt >= subscriber.min_spread_pt
+                       AND subscriber.alert_arb_spreads = true
+                       AND category matches subscriber.category_filter (if set)
+
+  whale_activity alert: position_usd >= subscriber.min_whale_position_usd
+                        AND subscriber.alert_whale_activity = true
+
+Rate limiting:
+  alerts_today counter resets at UTC midnight
+  max_alerts_per_day = 50 (configurable per subscriber)
+  if paused_until > NOW(): alert skipped
+
+Latency:
+  ingest pipeline runs every ~30 minutes
+  alert dispatch runs immediately after ingest completes
+  Telegram delivery: typically < 1 second after dispatch`}</FormulaBlock>
+          <Body>
+            Signal Desk alerts fire from the ingest pipeline after each 30-minute data refresh.
+            They are <strong className="text-[#f0f6fc]">not true real-time</strong> in the sense of
+            millisecond WebSocket feeds — they fire within one ingest cycle of the opportunity appearing.
+            For most arb opportunities that persist for hours or days, this latency is immaterial.
+          </Body>
+          <Body>
+            <strong className="text-[#f0f6fc]">Whale alerts</strong> trigger when the ingest pipeline
+            detects a new whale trade above the subscriber&apos;s configured minimum position size.
+            The alert includes the wallet address, market name, side (YES/NO), and approximate size.
+          </Body>
+          <Body>
+            <strong className="text-[#f0f6fc]">Arb spread alerts</strong> trigger when a disagreement row
+            has <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">spread_pt</code> at or above the subscriber&apos;s
+            configured threshold. We send alerts for the top 10 disagreements by spread size per ingest run,
+            filtered by subscriber preferences.
+          </Body>
+          <Body>
+            Subscribers can adjust thresholds, pause alerts, or unsubscribe at any time via Telegram bot commands
+            (<code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">/pause</code>, <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">/resume</code>, <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">/settings</code>).
+            Auto-deactivation occurs if the bot is blocked by the user in Telegram.
+          </Body>
+        </Card>
       </Section>
 
       {/* Footer link */}

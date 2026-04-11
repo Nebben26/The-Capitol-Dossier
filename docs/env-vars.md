@@ -89,6 +89,31 @@ Variables must be set in both `.env.local` (local dev) **and** Netlify (producti
 - **If missing/placeholder:** Trader Annual checkout throws error
 - **Set in:** `.env.local` + Netlify
 
+### `STRIPE_PRICE_SIGNAL_DESK_MONTHLY`
+- **Required:** Yes (for Signal Desk Monthly checkout)
+- **Service:** Stripe Price ID
+- **Where to get it:** Stripe Dashboard → Products → Signal Desk plan → Monthly price → Copy price ID
+- **Format:** `price_xxx`
+- **If missing/placeholder:** Signal Desk Monthly checkout throws error
+- **Set in:** `.env.local` + Netlify
+
+### `STRIPE_PRICE_SIGNAL_DESK_ANNUAL`
+- **Required:** Yes
+- **Format:** `price_xxx`
+- **If missing/placeholder:** Signal Desk Annual checkout throws error
+- **Set in:** `.env.local` + Netlify
+
+### `STRIPE_PRICE_QUANT_MONTHLY`
+- **Required:** No (Quant tier uses sales email, not self-serve checkout)
+- **Format:** `price_xxx`
+- **If missing/placeholder:** Quant checkout falls back to contact sales link
+- **Set in:** `.env.local` + Netlify
+
+### `STRIPE_PRICE_QUANT_ANNUAL`
+- **Required:** No
+- **Format:** `price_xxx`
+- **Set in:** `.env.local` + Netlify
+
 ---
 
 ## Resend (Email)
@@ -234,6 +259,10 @@ Set at: GitHub repo → Settings → Secrets and variables → Actions → New r
 | `STRIPE_PRICE_PRO_ANNUAL` | **Critical** | Pro Annual checkout fails |
 | `STRIPE_PRICE_TRADER_MONTHLY` | **Critical** | Trader Monthly checkout fails |
 | `STRIPE_PRICE_TRADER_ANNUAL` | **Critical** | Trader Annual checkout fails |
+| `STRIPE_PRICE_SIGNAL_DESK_MONTHLY` | **Critical** | Signal Desk Monthly checkout fails |
+| `STRIPE_PRICE_SIGNAL_DESK_ANNUAL` | **Critical** | Signal Desk Annual checkout fails |
+| `STRIPE_PRICE_QUANT_MONTHLY` | Low | Quant uses contact sales; optional |
+| `STRIPE_PRICE_QUANT_ANNUAL` | Low | Quant uses contact sales; optional |
 | `RESEND_API_KEY` | High | Morning brief never sends |
 | `MORNING_BRIEF_CRON_SECRET` | High | Morning brief cron aborts |
 | `ALERT_EVALUATOR_SECRET` | High | Alerts never fire |

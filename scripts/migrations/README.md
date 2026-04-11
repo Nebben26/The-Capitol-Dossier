@@ -212,6 +212,14 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 25. `session19-waitlist-tier.sql`
+**What it does:** Adds a `tier` column to the `waitlist` table (default `'pro'`) to track which founder cohort (pro or signal_desk) each subscriber wants. Adds an index on the new column.
+**Idempotent:** Yes (`ADD COLUMN IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`)
+**Dependencies:** `waitlist` table must exist (`session335_waitlist.sql` applied first)
+**Tables modified:** `waitlist` (one new column)
+
+---
+
 ### 23. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
@@ -248,5 +256,6 @@ Mark each migration as ✅ once applied to production.
 | 22 | `session15-stripe-events.sql` | ☐ |
 | 23 | `backfill-resolved.sql` *(run last)* | ☐ |
 | 24 | `session18-telegram.sql` | ☐ |
+| 25 | `session19-waitlist-tier.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

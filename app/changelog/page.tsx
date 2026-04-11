@@ -15,7 +15,7 @@ const ENTRIES = [
     version: "v0.39",
     date: "April 9, 2026",
     description:
-      "Insight Engine + Polish: Auto-generated Market Insights stories from live events (spread moves, whale activity, resolution alerts) — 10 templates, quality scoring, free/pro tiers, RSS feed, and methodology page. Annualized return capped at 999%+ with SHORT-TERM badge for ≤3-day windows; Capital Efficiency strip now filters out short-duration and low-volume positions. 4-tier pricing (Free $0, Pro $49, Trader $149 NEW, Quant API $299). Whale wallet labels with display-name resolution throughout the site.",
+      "Insight Engine + Polish: Auto-generated Market Insights stories from live events (spread moves, whale activity, resolution alerts) — 10 templates, quality scoring, free/pro tiers, RSS feed, and methodology page. Annualized return capped at 999%+ with SHORT-TERM badge for ≤3-day windows; Capital Efficiency strip now filters out short-duration and low-volume positions. 4-tier pricing at launch (Free $0, Pro $49, Trader $149, Quant API $299 — later updated to 5 tiers with Signal Desk $199 and Quant bumped to $399). Whale wallet labels with display-name resolution throughout the site.",
   },
   {
     version: "v0.38",

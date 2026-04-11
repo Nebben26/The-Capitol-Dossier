@@ -9,8 +9,11 @@ import {
   ExternalLink,
   RefreshCw,
   ChevronLeft,
+  Lock,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useUserTier } from "@/hooks/useUserTier";
+import { canAccess } from "@/lib/tiers";
 
 interface Subscriber {
   id: number;
@@ -29,6 +32,7 @@ interface Subscriber {
 }
 
 export default function TelegramSettingsPage() {
+  const { tier, loading: tierLoading } = useUserTier();
   const [subscriber, setSubscriber] = useState<Subscriber | null>(null);
   const [loading, setLoading] = useState(true);
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
@@ -113,7 +117,7 @@ export default function TelegramSettingsPage() {
     setLoading(false);
   };
 
-  if (loading) {
+  if (loading || tierLoading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 space-y-4">
         {[1, 2].map((i) => (
@@ -135,6 +139,79 @@ export default function TelegramSettingsPage() {
           >
             Sign in / Sign up
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Signal Desk tier gate
+  if (!canAccess(tier, "signal_desk")) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 space-y-6">
+        <div>
+          <Link
+            href="/settings"
+            className="inline-flex items-center gap-1 text-xs text-[#8d96a0] hover:text-[#57D7BA] transition-colors mb-4"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Back to Settings
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#57D7BA]/10 flex items-center justify-center">
+              <Send className="w-5 h-5 text-[#57D7BA]" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-[#f0f6fc] tracking-tight">Telegram Alerts</h1>
+              <p className="text-xs text-[#8d96a0]">Real-time push notifications for spreads and whale activity.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#d29922]/30 bg-gradient-to-b from-[#d29922]/5 to-[#161b27] p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#d29922]/15 flex items-center justify-center shrink-0">
+              <Lock className="w-4 h-4 text-[#d29922]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-bold text-[#d29922]">Signal Desk feature</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-[#d29922] bg-[#d29922]/10 border border-[#d29922]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+              </div>
+              <p className="text-xs text-[#8d96a0] leading-relaxed">
+                Real-time Telegram push alerts are a Signal Desk exclusive. The moment an arb spread opens
+                or a whale takes a large position, you get an instant Telegram message — no dashboard refreshing required.
+              </p>
+            </div>
+          </div>
+
+          <ul className="space-y-2 pl-11">
+            {[
+              "Arbitrage spreads above your threshold (3–30pt)",
+              "Whale wallets entering positions above $10K–$500K",
+              "Category-specific alert filters",
+              "Up to 50 alerts per day",
+              "Pause, resume, or adjust via bot commands",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2 text-xs text-[#8d96a0]">
+                <CheckCircle className="w-3.5 h-3.5 text-[#d29922] shrink-0 mt-0.5" />
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          <div className="pl-11">
+            <div className="text-2xl font-bold font-mono text-[#d29922] mb-0.5">
+              $199<span className="text-sm font-normal text-[#8d96a0]">/mo</span>
+            </div>
+            <p className="text-[10px] text-[#d29922] mb-3">First 25 spots: $149/mo locked in for life</p>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-[#d29922]/10 border border-[#d29922]/30 text-[#d29922] hover:bg-[#d29922]/20 text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+            >
+              <Send className="w-3.5 h-3.5" />
+              Upgrade to Signal Desk
+            </Link>
+          </div>
         </div>
       </div>
     );
