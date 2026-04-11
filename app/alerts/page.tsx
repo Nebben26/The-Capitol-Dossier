@@ -35,6 +35,8 @@ import { LastUpdated } from "@/components/layout/LastUpdated";
 import { Footer } from "@/components/layout/Footer";
 import { LeaderboardSkeleton } from "@/components/ui/skeleton-loaders";
 import { TrialBanner } from "@/components/ui/pro-gate";
+import { CustomAlertModal } from "@/components/alerts/custom-alert-modal";
+import { Plus } from "lucide-react";
 
 // ─── SIGNAL TYPE CONFIG ───────────────────────────────────────────────────────
 
@@ -285,6 +287,7 @@ export default function AlertsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterChip>("all");
   const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [alertModalOpen, setAlertModalOpen] = useState(false);
 
   // Page skeleton
   useEffect(() => {
@@ -340,6 +343,13 @@ export default function AlertsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            size="sm"
+            className="bg-[#57D7BA] text-[#0d1117] hover:bg-[#57D7BA]/80 gap-1.5 text-xs"
+            onClick={() => setAlertModalOpen(true)}
+          >
+            <Plus className="size-3.5" /> Create Alert
+          </Button>
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ef4444]/10 text-[#ef4444] text-[10px] font-bold animate-pulse">
             <span className="size-1.5 rounded-full bg-[#ef4444]" />
             LIVE
@@ -486,6 +496,11 @@ export default function AlertsPage() {
        *     Currently using recentlyResolved mock data from lib/mockData.ts
        *
        * ════════════════════════════════════════════════════════════════════ */}
+
+      <CustomAlertModal
+        open={alertModalOpen}
+        onClose={() => setAlertModalOpen(false)}
+      />
 
       <Footer />
     </div>

@@ -24,6 +24,8 @@ import {
   Sparkles,
   CalendarDays,
   Zap,
+  Mail,
+  Info,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -36,6 +38,7 @@ const navGroups = [
       { label: "Calendar", icon: CalendarDays, href: "/calendar" },
       { label: "Insights", icon: Newspaper, href: "/insights" },
       { label: "Stories", icon: Sparkles, href: "/stories" },
+      { label: "Morning Brief", icon: Mail, href: "/morning-brief" },
     ],
   },
   {
@@ -69,6 +72,7 @@ const navGroups = [
       { label: "Status", icon: Server, href: "/status" },
       { label: "Changelog", icon: FileText, href: "/changelog" },
       { label: "Blog", icon: BookOpen, href: "/blog" },
+      { label: "About", icon: Info, href: "/about" },
     ],
   },
 ];

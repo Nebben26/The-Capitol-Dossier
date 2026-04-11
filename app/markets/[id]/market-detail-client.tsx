@@ -77,6 +77,7 @@ import { analyzeResolutionDiff } from "@/lib/resolution-diff";
 import { getSpreadHistory, getMarketThesis, getMarketCandles, getWalletLabels, type MarketThesis, type Candle, type WalletLabel } from "@/lib/api";
 import { formatWallet } from "@/lib/format-wallet";
 import { CandlestickChartComponent } from "@/components/ui/candlestick-chart";
+import { WhaleTimeline } from "@/components/markets/whale-timeline";
 import { formatSignedPct, formatCents } from "@/lib/format";
 import { genPriceHistory } from "@/lib/mockData";
 import type { OrderbookLevel, Market } from "@/lib/mockData";
@@ -735,7 +736,20 @@ export default function MarketDetailPage() {
           </TabsContent>
 
           {/* ─── WHALE FLOWS TAB ───────────────────────────────────── */}
-          <TabsContent value="whales" className="pt-5">
+          <TabsContent value="whales" className="pt-5 space-y-4">
+            {/* Whale Entry/Exit Timeline */}
+            <Card className="bg-[#161b27] border-[#2a2f45]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Activity className="size-4 text-[#57D7BA]" />
+                  Whale Entry / Exit Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <WhaleTimeline positions={marketWhales} loading={dataLoading} />
+              </CardContent>
+            </Card>
+
             <Card className="bg-[#161b27] border-[#2a2f45]">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">

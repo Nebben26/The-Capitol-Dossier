@@ -58,6 +58,11 @@ import { analyzeResolutionDiff } from "@/lib/resolution-diff";
 import type { CausationType, CausationAnalysis } from "@/lib/causation";
 import type { Disagreement } from "@/lib/mockData";
 import { DataFreshness } from "@/components/ui/data-freshness";
+import { OpportunityScoreBadge } from "@/components/disagrees/opportunity-score-badge";
+import { ArbCalculatorModal } from "@/components/disagrees/arb-calculator-modal";
+import { scoreOpportunity } from "@/lib/opportunity-score";
+import { generateThesis, thesisSignalColor } from "@/lib/market-thesis";
+import { Sparkles } from "lucide-react";
 
 const catFilters = ["All", "Economics", "Elections", "Crypto", "Tech", "Geopolitics"];
 
@@ -111,13 +116,14 @@ function sidesFor(d: Disagreement): { polymarketSide: "YES" | "NO"; kalshiSide: 
 
 // ─── Grid card ────────────────────────────────────────────────────────────
 function DisagreeCard({
-  d, history, expanded, onToggleExpand, causationAnalysis,
+  d, history, expanded, onToggleExpand, causationAnalysis, onOpenCalc,
 }: {
   d: Disagreement;
   history: Array<{ t: number; spread: number }>;
   expanded: boolean;
   onToggleExpand: () => void;
   causationAnalysis: CausationAnalysis;
+  onOpenCalc?: () => void;
 }) {
   const { polymarketSide, kalshiSide } = sidesFor(d);
   const daysToRes = d.daysLeft > 0 ? d.daysLeft : null;
@@ -137,11 +143,7 @@ function DisagreeCard({
               <AlertTriangle className="size-2.5" /> ARBITRAGE
             </span>
             <span className="px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-semibold">{d.category}</span>
-            {(d.opportunityScore ?? 0) > 0 && (
-              <span className="px-1.5 py-0.5 rounded bg-[#57D7BA]/10 text-[#57D7BA] text-[8px] font-bold font-mono tabular-nums border border-[#57D7BA]/20">
-                Score: {d.opportunityScore}
-              </span>
-            )}
+            <OpportunityScoreBadge d={d} size="sm" />
             <span className="flex items-center gap-0.5 text-[8px] text-[#8892b0]">
               {d.daysLeft > 0 && <><Timer className="size-2.5" />{d.daysLeft}d</>}
             </span>
@@ -180,6 +182,23 @@ function DisagreeCard({
               : `Buy Polymarket YES at ${d.polyPrice}¢, sell Kalshi YES at ${d.kalshiPrice}¢ → ${d.spread}pt arb`
             }
           </div>
+          {/* Market thesis TL;DR */}
+          {(() => {
+            const thesis = generateThesis({
+              question: d.question,
+              price: d.polyPrice,
+              change: 0,
+              volNum: parseVol(d.polyVol),
+              daysLeft: d.daysLeft,
+              category: d.category,
+            });
+            return (
+              <div className="flex items-start gap-1.5 mb-1.5 px-2 py-1.5 rounded-lg bg-[#0d1117] border border-[#21262d]">
+                <Sparkles className="size-3 shrink-0 mt-0.5" style={{ color: thesisSignalColor(thesis.signal) }} />
+                <p className="text-[9px] text-[#8d96a0] leading-relaxed italic">{thesis.text}</p>
+              </div>
+            );
+          })()}
           {/* Causation tag */}
           <div className="mb-1.5">
             <CausationTag analysis={causationAnalysis} compact={true} />
@@ -204,6 +223,16 @@ function DisagreeCard({
             </div>
             <div className="flex items-center gap-1">
               <DisagreeShareButton d={d} />
+              {onOpenCalc && (
+                <button
+                  onClick={onOpenCalc}
+                  className="flex items-center gap-0.5 px-2 py-1 rounded-md text-[10px] font-semibold bg-[#388bfd]/10 text-[#388bfd] border border-[#388bfd]/20 hover:bg-[#388bfd]/20 transition-all"
+                  title="Open Arb Calculator"
+                >
+                  <BarChart3 className="size-3" />
+                  Calc
+                </button>
+              )}
               <button
                 onClick={onToggleExpand}
                 className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-all ${
@@ -264,6 +293,9 @@ function DisagreesContent() {
   const [viewMode, setViewMode]       = useState<ViewMode>("grid");
   const [historyMap, setHistoryMap]   = useState<Record<string, Array<{ t: number; spread: number }>>>({});
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+  const [eliteOnly, setEliteOnly]     = useState(false);
+  const [arbModalId, setArbModalId]   = useState<string | null>(null);
+  const [activeTab, setActiveTab]     = useState<"active" | "resolved">("active");
 
   // Dynamic tab title
   useEffect(() => {
@@ -341,6 +373,15 @@ function DisagreesContent() {
     let result = disagreements;
     if (category !== "All") result = result.filter((d) => d.category === category);
     if (searchQuery) result = result.filter((d) => d.question.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (eliteOnly) {
+      result = result.filter((d) =>
+        scoreOpportunity({
+          spread: d.spread, polyPrice: d.polyPrice, kalshiPrice: d.kalshiPrice,
+          polyVol: d.polyVol, kalshiVol: d.kalshiVol, daysLeft: d.daysLeft,
+          spreadTrend: d.spreadTrend, opportunityScore: d.opportunityScore,
+        }).verdict === "elite"
+      );
+    }
     // Causation filter
     if (causeFilter !== "all") {
       result = result.filter((d) => {
@@ -603,6 +644,14 @@ function DisagreesContent() {
           {/* Sort toggle */}
           <div className="flex items-center gap-1">
             <button
+              onClick={() => setEliteOnly((v) => !v)}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold transition-all border ${
+                eliteOnly ? "bg-[#f85149]/20 text-[#f85149] border-[#f85149]/40" : "bg-[#161b27] text-[#8892b0] border-[#21262d] hover:text-[#e2e8f0]"
+              }`}
+            >
+              <Zap className="size-3" /> Elite Only
+            </button>
+            <button
               onClick={() => handleSort("opportunity")}
               className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${sortBy === "opportunity" ? "bg-[#f59e0b] text-[#0f1119]" : "bg-[#161b27] text-[#8892b0] border border-[#21262d] hover:text-[#e2e8f0]"}`}
             >
@@ -624,6 +673,45 @@ function DisagreesContent() {
         </div>
       </div>
 
+      {/* Active / Resolved tabs */}
+      <div className="flex items-center gap-1 border-b border-[#21262d]">
+        {(["active", "resolved"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2.5 text-xs font-semibold transition-all capitalize border-b-2 -mb-px ${
+              activeTab === tab
+                ? "border-[#57D7BA] text-[#57D7BA]"
+                : "border-transparent text-[#8892b0] hover:text-[#f0f6fc]"
+            }`}
+          >
+            {tab === "active" ? "Active Arbs" : "Did This Arb Close?"}
+            {tab === "active" && <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-[#f59e0b]/15 text-[#f59e0b] text-[9px]">{disagreements.length}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Resolved tab content */}
+      {activeTab === "resolved" && (
+        <div className="space-y-4">
+          <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-6 text-center space-y-3">
+            <GitCompareArrows className="size-10 text-[#21262d] mx-auto" />
+            <h3 className="text-base font-semibold text-[#f0f6fc]">Resolved Arbitrage Archive</h3>
+            <p className="text-sm text-[#8d96a0] max-w-md mx-auto">
+              Track which spreads converged before resolution vs. which ones blew out.
+              Historical resolution data is collected every ingestion cycle and will appear here once enough spreads have resolved.
+            </p>
+            <div className="flex items-center justify-center gap-4 pt-2 text-[11px] text-[#484f58]">
+              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#3fb950]" />Converged — arb profitable</span>
+              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#f85149]" />Blew out — arb lost</span>
+              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#8d96a0]" />Unresolved</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "active" && (
+        <>
       {/* Summary stats */}
       {disagreements.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -669,6 +757,7 @@ function DisagreesContent() {
                   expanded={expandedId === d.id}
                   onToggleExpand={() => toggleExpand(d.id)}
                   causationAnalysis={causationMap.get(d.id)!}
+                  onOpenCalc={() => setArbModalId(d.id)}
                 />
               </div>
             ))
@@ -903,6 +992,16 @@ function DisagreesContent() {
           </CardContent>
         </Card>
       )}
+        </>
+      )}
+
+      {/* Arb Calculator Modal */}
+      {arbModalId && (() => {
+        const d = disagreements.find((x) => x.id === arbModalId);
+        return d ? (
+          <ArbCalculatorModal d={d} open={true} onClose={() => setArbModalId(null)} />
+        ) : null;
+      })()}
 
       <footer className="flex items-center justify-between py-4 border-t border-[#21262d] text-[10px] text-[#8892b0]">
         <span>© 2026 Quiver Markets. Not financial advice. Data from Polymarket &amp; Kalshi.</span>

@@ -56,6 +56,8 @@ import { formatPct, formatCents } from "@/lib/format";
 import { getMarketInsights, type MarketInsight } from "@/lib/api";
 import { analyzeCausation, getCausationLabel } from "@/lib/causation";
 import { DataFreshness } from "@/components/ui/data-freshness";
+import { generateThesis, thesisSignalColor } from "@/lib/market-thesis";
+import { Sparkles } from "lucide-react";
 
 type SortKey = "volume" | "change" | "spread" | "resolution" | "price" | "liquidity";
 type SortDir = "asc" | "desc";
@@ -140,6 +142,16 @@ function ScreenerCard({ m, spread, insight, causeType }: {
               </span>
             )
           )}
+          {/* Market Thesis TL;DR */}
+          {(() => {
+            const thesis = generateThesis({ question: m.question, price: m.price, change: m.change, volNum: m.volNum, daysLeft: m.daysLeft, category: m.category });
+            return (
+              <div className="flex items-start gap-1 mb-2 px-2 py-1 rounded-md bg-[#0d1117] border border-[#21262d]">
+                <Sparkles className="size-2.5 shrink-0 mt-0.5" style={{ color: thesisSignalColor(thesis.signal) }} />
+                <p className="text-[8px] text-[#8d96a0] leading-relaxed italic line-clamp-2">{thesis.text}</p>
+              </div>
+            );
+          })()}
           <div className="h-8 w-full mb-2">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={m.spark}>
