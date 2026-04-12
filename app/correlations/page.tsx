@@ -505,9 +505,7 @@ export default function CorrelationsPage() {
           <GitMerge className="size-8 text-[#484f58] mx-auto" />
           <div className="text-sm font-semibold text-[#f0f6fc]">Correlations Computing</div>
           <p className="text-xs text-[#8d96a0] max-w-sm mx-auto">
-            Correlations are computed nightly from price history data. Run{" "}
-            <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">npx tsx scripts/compute-correlations.ts</code>{" "}
-            manually after 24+ hours of price history to populate results.
+            Correlations are computed nightly from price history. Check back tomorrow.
           </p>
           <div className="text-[11px] text-[#484f58]">
             Try lowering the minimum correlation threshold, or check back after the next nightly run.
