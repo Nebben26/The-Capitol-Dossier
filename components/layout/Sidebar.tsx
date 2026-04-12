@@ -34,6 +34,7 @@ import {
   Calculator,
   TrendingUp,
   BarChart3,
+  FlaskConical,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -65,6 +66,7 @@ const navGroups = [
     items: [
       { label: "Indices", icon: BarChart3, href: "/indices", badge: "NEW" },
       { label: "Correlations", icon: GitMerge, href: "/correlations" },
+      { label: "Accuracy", icon: FlaskConical, href: "/accuracy" },
     ],
   },
   {

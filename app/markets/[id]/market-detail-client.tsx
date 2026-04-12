@@ -93,6 +93,7 @@ import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 import { useRecentMarkets } from "@/hooks/useRecentMarkets";
 import { PredictionModal } from "@/components/predictions/prediction-modal";
+import { CommunityPredictionWidget } from "@/components/community/community-prediction-widget";
 
 
 
@@ -1301,6 +1302,36 @@ export default function MarketDetailPage() {
         {/* Correlated Markets */}
         {loadedMarket && (
           <CorrelatedMarketsSection marketId={loadedMarket.id} />
+        )}
+
+        {/* Community Consensus */}
+        {loadedMarket && (
+          <CommunityPredictionWidget
+            marketId={loadedMarket.id}
+            marketQuestion={loadedMarket.question}
+            polyPrice={
+              loadedMarket.platform === "Polymarket"
+                ? loadedMarket.price
+                : marketDisagreement?.poly_price != null
+                ? Math.round(Number(marketDisagreement.poly_price))
+                : null
+            }
+            kalshiPrice={
+              loadedMarket.platform === "Kalshi"
+                ? loadedMarket.price
+                : marketDisagreement?.kalshi_price != null
+                ? Math.round(Number(marketDisagreement.kalshi_price))
+                : null
+            }
+            whaleConsensus={
+              marketWhales.length > 0
+                ? Math.round(
+                    marketWhales.reduce((s, w) => s + (w.avg_price ?? w.current_value ?? 50), 0) /
+                      marketWhales.length
+                  )
+                : null
+            }
+          />
         )}
 
       </div>

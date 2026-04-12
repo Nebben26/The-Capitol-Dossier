@@ -141,10 +141,12 @@ export function ProfileView({
   profile,
   predictions,
   followerCount,
+  communityPredictionCount = 0,
 }: {
   profile: Profile;
   predictions: Prediction[];
   followerCount: number;
+  communityPredictionCount?: number;
 }) {
   const [showClosedAll, setShowClosedAll] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -255,6 +257,14 @@ export function ProfileView({
             value: avgBrier != null ? avgBrier.toFixed(3) : "—",
             color: avgBrier != null && avgBrier < 0.2 ? "#3fb950" : avgBrier != null ? "#f85149" : "#8d96a0",
           },
+          ...(communityPredictionCount > 0
+            ? [{
+                icon: Users,
+                label: "Community",
+                value: communityPredictionCount,
+                color: "#f59e0b",
+              }]
+            : []),
         ].map((s) => (
           <div key={s.label} className="rounded-xl bg-[#161b27] border border-[#21262d] p-4">
             <div className="flex items-center gap-1.5 mb-2">

@@ -478,6 +478,59 @@ Sharpe (approx): annualized mean daily return / stddev daily return × √252
         </div>
       </Section>
 
+      {/* ─── Community Consensus Methodology ─── */}
+      <div id="community-consensus" />
+      <Section title="Community Consensus">
+        <Card>
+          <Label>Aggregation method</Label>
+          <FormulaBlock>{`For each market with ≥1 community prediction:
+
+consensus_prob = Σ(predicted_prob_i × confidence_i) / Σ(confidence_i)
+
+confidence weights: Low = 1, Medium = 2, High = 3
+
+Example: 3 users submit 60% (high), 70% (medium), 50% (low)
+  weighted sum = 60×3 + 70×2 + 50×1 = 180 + 140 + 50 = 370
+  total weight = 3 + 2 + 1 = 6
+  consensus    = 370 / 6 = 61.7%`}</FormulaBlock>
+          <Body>
+            The Community Consensus is a confidence-weighted mean of all predictions submitted on a market.
+            Users who express higher confidence in their estimate receive proportionally more weight.
+            This mirrors techniques from superforecasting research, where confidence calibration
+            improves aggregate accuracy. The raw (unweighted) mean is also stored for comparison.
+          </Body>
+        </Card>
+        <Card>
+          <Label>Source accuracy &amp; Brier scoring</Label>
+          <FormulaBlock>{`Brier score for a single prediction:
+  B = (predicted_probability - outcome)²
+  predicted_probability ∈ [0, 1]   (e.g. 65% → 0.65)
+  outcome ∈ {0, 1}                 (0 = NO, 1 = YES)
+
+Lower B is better. Range: 0 (perfect) to 1 (worst possible).
+
+Accuracy score (displayed in UI):
+  accuracy = round((1 - mean_B) × 100)   → 0–100 scale`}</FormulaBlock>
+          <Body>
+            When a market resolves, we record each source&apos;s last-known probability alongside the true outcome.
+            The Brier score measures probabilistic accuracy: a confident prediction that turns out wrong
+            is penalized more than a hedge near 50%. We compare Polymarket, Kalshi, Whale Consensus,
+            and Community predictions on the same resolved markets to determine which source is most accurate
+            over time. Sources with fewer than 10 resolved data points should be treated with caution.
+          </Body>
+        </Card>
+        <div className="rounded-xl bg-[#f85149]/5 border border-[#f85149]/20 p-5">
+          <Body>
+            <strong className="text-[#f0f6fc]">Limitations:</strong>{" "}
+            Community predictions are self-reported and subject to selection bias — users who predict
+            on Quiver Markets may be more informed or engaged than the general public. The consensus
+            is not a prediction market (no real money, no arbitrage mechanism), so it may be slower
+            to update than traded prices. Community sample sizes are small during early growth;
+            Brier scores should be treated as directional indicators, not precise benchmarks.
+          </Body>
+        </div>
+      </Section>
+
       {/* Footer link */}
       <div className="pt-4 border-t border-[#21262d] text-xs text-[#484f58]">
         Questions about a specific number?{" "}

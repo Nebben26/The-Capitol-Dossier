@@ -284,6 +284,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 31. `session27-consensus.sql`
+**What it does:** Creates `community_predictions` (one row per user per market, upserted), `market_consensus_cache` (pre-aggregated confidence-weighted consensus per market), and `source_accuracy_history` (Brier scores per resolved market per source).
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE OR REPLACE FUNCTION`, `DROP TRIGGER IF EXISTS`, `DROP POLICY IF EXISTS`)
+**Dependencies:** Supabase `auth.users`
+**Tables created:** `community_predictions`, `market_consensus_cache`, `source_accuracy_history`
+**RLS:** Community predictions publicly readable; users can insert/update/delete their own rows; accuracy history publicly readable
+
+---
+
 ## Quick Checklist
 
 | # | File | Applied? |
@@ -318,5 +327,6 @@ Mark each migration as ✅ once applied to production.
 | 28 | `backfill-resolved.sql` *(run last)* | ☐ |
 | 29 | `session25-price-history.sql` | ☐ |
 | 30 | `session26-indices.sql` | ☐ |
+| 31 | `session27-consensus.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

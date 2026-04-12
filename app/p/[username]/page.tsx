@@ -8,6 +8,11 @@ const supabaseAnon = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 async function getProfile(username: string) {
   const { data: profile } = await supabaseAnon
     .from("user_profiles")
@@ -30,7 +35,17 @@ async function getProfile(username: string) {
     .select("*", { count: "exact", head: true })
     .eq("followed_profile_id", profile.id);
 
-  return { profile, predictions: predictions ?? [], followerCount: followerCount ?? 0 };
+  const { count: communityPredictionCount } = await supabaseAdmin
+    .from("community_predictions")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", profile.user_id);
+
+  return {
+    profile,
+    predictions: predictions ?? [],
+    followerCount: followerCount ?? 0,
+    communityPredictionCount: communityPredictionCount ?? 0,
+  };
 }
 
 export async function generateMetadata({
@@ -82,6 +97,7 @@ export default async function PublicProfilePage({
       profile={result.profile}
       predictions={result.predictions}
       followerCount={result.followerCount}
+      communityPredictionCount={result.communityPredictionCount}
     />
   );
 }

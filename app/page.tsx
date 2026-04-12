@@ -608,6 +608,31 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* ─── COMMUNITY PULSE ─────────────────────────────────── */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#21262d]">
+          <div className="flex items-center gap-2">
+            <Users className="size-3.5 text-[#f59e0b]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]">Community Pulse</span>
+          </div>
+          <Link href="/accuracy" className="text-[10px] text-[#484f58] hover:text-[#f59e0b] transition-colors">
+            Source accuracy →
+          </Link>
+        </div>
+        <div className="p-4 space-y-2">
+          <p className="text-sm font-semibold text-[#f0f6fc]">The crowd vs. the market</p>
+          <p className="text-xs text-[#8d96a0] leading-relaxed">
+            Free users submit probability estimates on any market. We aggregate them into a community consensus — a 4th data point alongside Polymarket, Kalshi, and Whale prices. Track which source is most accurate over time.
+          </p>
+          <Link
+            href="/markets"
+            className="inline-flex items-center gap-1.5 mt-1 text-xs font-semibold text-[#f59e0b] hover:text-[#f59e0b]/80 transition-colors"
+          >
+            Submit your first prediction →
+          </Link>
+        </div>
+      </div>
+
       {/* ─── WAITLIST ────────────────────────────────────────── */}
       <Card className="bg-[#161b27] border-[#21262d]">
         <CardContent className="p-5">
