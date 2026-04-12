@@ -137,8 +137,8 @@ export function ExecutionSimulator({ disagreement: d }: { disagreement: SimDisag
   // Gross return %
   const grossReturn = cheapPrice > 0 ? (d.spread / cheapPrice) * 100 : 0;
 
-  // Position size calculator
-  const contracts = capital / (cheapPrice / 100);
+  // Position size calculator — guard against cheapPrice = 0 to prevent Infinity/NaN
+  const contracts = cheapPrice > 0 ? capital / (cheapPrice / 100) : 0;
   const cheapCost = contracts * (cheapPrice / 100);
   const expCost = contracts * ((100 - expPrice) / 100);          // buy NO on expensive side
   const totalCost = cheapCost + expCost;
@@ -428,17 +428,30 @@ export function ExecutionSimulator({ disagreement: d }: { disagreement: SimDisag
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[11px]">
-          {[
-            { label: "Contracts", value: contracts.toFixed(0), color: "#f0f6fc" },
-            { label: `Cost on ${cheapPlatform}`, value: fmtUsd(cheapCost), color: "#f0f6fc" },
-            { label: `Cost on ${expPlatform}`, value: fmtUsd(expCost), color: "#f0f6fc" },
-            { label: "Total invested", value: fmtUsd(totalCost), color: "#f0f6fc" },
-            { label: "Gross profit", value: fmtUsd(grossProfit), color: "#3fb950" },
-            { label: "Fees", value: `-${fmtUsd(feesTotal)}`, color: "#f85149" },
-            { label: "Net profit", value: fmtUsd(netProfit), color: netProfit >= 0 ? "#3fb950" : "#f85149" },
-            { label: "Net return %", value: `${netReturnPct.toFixed(2)}%`, color: netReturnPct >= 0 ? "#3fb950" : "#f85149" },
-            { label: "Break-even spread", value: `${(feesTotal / (contracts / 100)).toFixed(1)}pt`, color: "#8d96a0" },
-          ].map((s) => (
+          {(contracts === 0
+            ? [
+                { label: "Contracts", value: "—", color: "#484f58" },
+                { label: `Cost on ${cheapPlatform}`, value: "—", color: "#484f58" },
+                { label: `Cost on ${expPlatform}`, value: "—", color: "#484f58" },
+                { label: "Total invested", value: "—", color: "#484f58" },
+                { label: "Gross profit", value: "—", color: "#484f58" },
+                { label: "Fees", value: "—", color: "#484f58" },
+                { label: "Net profit", value: "—", color: "#484f58" },
+                { label: "Net return %", value: "—", color: "#484f58" },
+                { label: "Break-even spread", value: "—", color: "#484f58" },
+              ]
+            : [
+                { label: "Contracts", value: contracts.toFixed(0), color: "#f0f6fc" },
+                { label: `Cost on ${cheapPlatform}`, value: fmtUsd(cheapCost), color: "#f0f6fc" },
+                { label: `Cost on ${expPlatform}`, value: fmtUsd(expCost), color: "#f0f6fc" },
+                { label: "Total invested", value: fmtUsd(totalCost), color: "#f0f6fc" },
+                { label: "Gross profit", value: fmtUsd(grossProfit), color: "#3fb950" },
+                { label: "Fees", value: `-${fmtUsd(feesTotal)}`, color: "#f85149" },
+                { label: "Net profit", value: fmtUsd(netProfit), color: netProfit >= 0 ? "#3fb950" : "#f85149" },
+                { label: "Net return %", value: `${netReturnPct.toFixed(2)}%`, color: netReturnPct >= 0 ? "#3fb950" : "#f85149" },
+                { label: "Break-even spread", value: `${(feesTotal / (contracts / 100)).toFixed(1)}pt`, color: "#8d96a0" },
+              ]
+          ).map((s) => (
             <div key={s.label} className="rounded-lg bg-[#0d1117] border border-[#21262d] p-2.5">
               <div className="text-[#484f58] uppercase tracking-widest text-[9px] mb-1">{s.label}</div>
               <div className="font-bold font-mono text-sm" style={{ color: s.color }}>{s.value}</div>
