@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Calculator, AlertTriangle, ChevronRight, Zap, TrendingUp } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 interface ArbRow {
   id: string;
@@ -22,20 +21,17 @@ export default function SimulateLandingPage() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await supabase
-          .from("disagreements")
-          .select("id, question, spread, poly_price, kalshi_price, category, score")
-          .order("spread", { ascending: false })
-          .limit(10);
+        const { getDisagreements } = await import("@/lib/api");
+        const result = await getDisagreements();
         setArbs(
-          (data ?? []).map((d) => ({
+          result.data.slice(0, 10).map((d) => ({
             id: d.id,
             question: d.question,
-            spread: Number(d.spread),
-            poly_price: Number(d.poly_price),
-            kalshi_price: Number(d.kalshi_price),
+            spread: d.spread,
+            poly_price: d.polyPrice,
+            kalshi_price: d.kalshiPrice,
             category: d.category ?? "Other",
-            score: d.score ? Number(d.score) : undefined,
+            score: d.opportunityScore,
           }))
         );
       } catch {
