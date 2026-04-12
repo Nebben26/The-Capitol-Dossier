@@ -302,6 +302,16 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 33. `session29-briefs.sql`
+**What it does:** Creates `market_briefs` (daily auto-generated briefs per category — slug, category, title, markdown, HTML, JSON, word count) and `brief_subscriptions` (Pro+ custom branding per user per category).
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
+**Dependencies:** Supabase `auth.users`
+**Tables created:** `market_briefs`, `brief_subscriptions`
+**RLS:** Public read for briefs; users read/write their own subscriptions; service role full access
+**After running:** Run `npx tsx scripts/generate-briefs.ts` to generate first briefs from live data.
+
+---
+
 ## Quick Checklist
 
 | # | File | Applied? |
@@ -338,5 +348,6 @@ Mark each migration as ✅ once applied to production.
 | 30 | `session26-indices.sql` | ☐ |
 | 31 | `session27-consensus.sql` | ☐ |
 | 32 | `session28-api.sql` *(run after session28_api_keys.sql)* | ☐ |
+| 33 | `session29-briefs.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

@@ -91,6 +91,7 @@ const navGroups = [
   {
     label: "Developer",
     items: [
+      { label: "Market Briefs", icon: FileText, href: "/briefs", badge: "NEW" },
       { label: "API Docs", icon: Code, href: "/api" },
       { label: "API Keys", icon: Zap, href: "/settings/api-keys" },
     ],

@@ -48,6 +48,10 @@
     ".qm-cat-price{font-weight:700;font-family:ui-monospace,SFMono-Regular,monospace;color:" + COLORS.brand + ";flex-shrink:0;}",
     ".qm-loading{color:" + COLORS.textMuted + ";font-size:12px;text-align:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}",
     ".qm-error{color:" + COLORS.textMuted + ";font-size:11px;text-align:center;padding:12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}",
+    ".qm-brief-section{margin:0 0 10px;padding:10px 12px;background:" + COLORS.bg + ";border-radius:6px;border-left:3px solid " + COLORS.brand + ";}",
+    ".qm-brief-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:" + COLORS.brand + ";margin:0 0 6px;}",
+    ".qm-brief-mover{font-size:11px;color:#e2e8f0;line-height:1.5;margin:2px 0;}",
+    ".qm-brief-footer{font-size:9px;color:" + COLORS.textMuted + ";text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid " + COLORS.border + ";}",
   ].join("");
 
   function injectStyles() {
@@ -269,6 +273,57 @@
     );
   }
 
+  function renderBrief(el, data, theme) {
+    var catEmojis = { elections: "🗳️", crypto: "₿", economics: "📈", geopolitics: "🌍", sports: "🏆" };
+    var catColors = { elections: "#388bfd", crypto: "#f59e0b", economics: "#3fb950", geopolitics: "#a371f7", sports: "#f85149" };
+    var catLower = (data.category || "").toLowerCase();
+    var emoji = catEmojis[catLower] || "📊";
+    var accentColor = catColors[catLower] || COLORS.brand;
+    var dateStr = data.generatedAt ? new Date(data.generatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+
+    var indexHtml = "";
+    if (data.index && data.index.value != null) {
+      var v = Number(data.index.value);
+      var valColor = v <= 30 ? COLORS.negative : v <= 70 ? "#d29922" : COLORS.positive;
+      indexHtml = '<div class="qm-brief-section" style="border-left-color:' + valColor + '">' +
+        '<div class="qm-brief-section-title" style="color:' + valColor + '">📊 Market Pulse</div>' +
+        '<div class="qm-brief-mover">' + esc(data.index.name || "") + ': <strong style="color:' + valColor + '">' + v.toFixed(1) + '/100</strong></div>' +
+        '</div>';
+    }
+
+    var moverHtml = "";
+    if (data.topMover) {
+      var m = data.topMover;
+      var isUp = Number(m.change24h) >= 0;
+      var mColor = isUp ? COLORS.positive : COLORS.negative;
+      moverHtml = '<div class="qm-brief-section" style="border-left-color:' + mColor + '">' +
+        '<div class="qm-brief-section-title" style="color:' + mColor + '">📈 Top Mover</div>' +
+        '<div class="qm-brief-mover"><span style="color:' + mColor + ';font-weight:700">' + (isUp ? "▲" : "▼") + " " + Math.abs(Number(m.change24h)).toFixed(1) + "pp</span> &mdash; " + esc(m.question) + '</div>' +
+        '</div>';
+    }
+
+    var arbHtml = "";
+    if (data.topArb) {
+      var a = data.topArb;
+      arbHtml = '<div class="qm-brief-section" style="border-left-color:#f59e0b">' +
+        '<div class="qm-brief-section-title" style="color:#f59e0b">⚡ Arb Spread</div>' +
+        '<div class="qm-brief-mover"><span style="color:#f59e0b;font-weight:700">' + Number(a.spread).toFixed(1) + 'pp</span> &mdash; ' + esc(a.question) + '</div>' +
+        '</div>';
+    }
+
+    el.innerHTML = (
+      '<a href="' + esc(data.url || QUIVER_BASE + "/briefs/" + catLower) + '?utm_source=embed" target="_blank" rel="noopener" class="' + themeClass(theme) + '">' +
+        '<div class="qm-header">' +
+          '<div class="qm-question">' + emoji + ' ' + esc(data.category) + ' Market Brief</div>' +
+          (dateStr ? '<span style="font-size:9px;color:' + COLORS.textMuted + ';white-space:nowrap">' + esc(dateStr) + '</span>' : '') +
+        '</div>' +
+        '<div style="margin:0 0 8px;height:2px;border-radius:1px;background:' + accentColor + ';"></div>' +
+        indexHtml + moverHtml + arbHtml +
+        '<div class="qm-brief-footer">Powered by Quiver Markets &middot; ' + (data.sourceMarketCount || 0) + ' markets</div>' +
+      '</a>'
+    );
+  }
+
   function renderWidget(el) {
     var type = el.getAttribute("data-quiver-widget");
     var id = el.getAttribute("data-id");
@@ -284,6 +339,7 @@
     else if (type === "whale") url = QUIVER_BASE + "/api/embed/whale/" + encodeURIComponent(id);
     else if (type === "category") url = QUIVER_BASE + "/api/embed/category/" + encodeURIComponent(id);
     else if (type === "index") url = QUIVER_BASE + "/api/embed/index/" + encodeURIComponent(id);
+    else if (type === "brief") url = QUIVER_BASE + "/api/embed/brief/" + encodeURIComponent(id);
     else { renderError(el); return; }
 
     fetchData(url, function (err, data) {
@@ -293,6 +349,7 @@
       else if (type === "whale") renderWhale(el, data, theme);
       else if (type === "category") renderCategory(el, data, theme);
       else if (type === "index") renderIndex(el, data, theme);
+      else if (type === "brief") renderBrief(el, data, theme);
     });
   }
 

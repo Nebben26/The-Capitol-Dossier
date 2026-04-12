@@ -608,6 +608,27 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* ─── MARKET BRIEFS CALLOUT ───────────────────────────── */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
+        <div className="p-4 flex items-center gap-4">
+          <div className="w-9 h-9 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/20 flex items-center justify-center shrink-0">
+            <span className="text-base leading-none">📰</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-[#f0f6fc]">Daily Market Briefs — free RSS & JSON feed</p>
+            <p className="text-[10px] text-[#8d96a0] mt-0.5">
+              Elections · Crypto · Economics · Geopolitics · Sports · embeddable white-label content
+            </p>
+          </div>
+          <Link
+            href="/briefs"
+            className="shrink-0 text-xs font-semibold text-[#f59e0b] hover:text-[#f59e0b]/80 transition-colors whitespace-nowrap"
+          >
+            View briefs →
+          </Link>
+        </div>
+      </div>
+
       {/* ─── FREE API CALLOUT ────────────────────────────────── */}
       <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
         <div className="p-4 flex items-center gap-4">

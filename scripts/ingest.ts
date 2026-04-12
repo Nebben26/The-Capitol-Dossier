@@ -1014,6 +1014,15 @@ async function main() {
       runErrors.push({ stage: "compute_source_accuracy", error: err.message });
     }
 
+    // Generate daily market briefs (non-fatal)
+    try {
+      const { generateBriefs } = await import("./generate-briefs");
+      await generateBriefs();
+    } catch (err: any) {
+      console.error("  Brief generation failed (non-fatal):", err.message);
+      runErrors.push({ stage: "generate_briefs", error: err.message });
+    }
+
     console.log("\n✓ Ingestion complete!");
   } catch (err: any) {
     console.error("Fatal ingestion error:", err.message);

@@ -218,6 +218,30 @@ export default function SettingsPage() {
         </Link>
       </div>
 
+      {/* Market Briefs card */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#f59e0b]/10 flex items-center justify-center">
+            <span className="text-sm leading-none">📰</span>
+          </div>
+          <h2 className="text-sm font-semibold text-[#f0f6fc]">Market Briefs</h2>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#57D7BA] bg-[#57D7BA]/10 border border-[#57D7BA]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+        </div>
+
+        <p className="text-xs text-[#8d96a0] leading-relaxed">
+          Daily prediction market intelligence for Elections, Crypto, Economics, Geopolitics, and Sports.
+          Pull via RSS, JSON API, or embed as a widget. Pro users can add custom branding for white-label use.
+        </p>
+
+        <Link
+          href="/settings/briefs"
+          className="inline-flex items-center gap-2 bg-[#f59e0b]/10 border border-[#f59e0b]/30 text-[#f59e0b] hover:bg-[#f59e0b]/20 text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+        >
+          <span className="text-xs">📰</span>
+          Configure brief subscriptions
+        </Link>
+      </div>
+
       {/* API Keys card */}
       <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-5 space-y-4">
         <div className="flex items-center gap-2">
