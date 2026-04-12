@@ -182,7 +182,6 @@ export default function RootLayout({
                 description:
                   "Free tier with paid Pro and Trader plans available",
               },
-              // TODO: replace with real aggregate rating once user reviews exist
             }),
           }}
         />
