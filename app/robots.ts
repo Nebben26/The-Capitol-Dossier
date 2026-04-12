@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 
-// TODO: update to custom domain when purchased
-const SITE_URL = "https://quivermarkets.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://quivermarkets.com").replace(/\/$/, "");
 
 export default function robots(): MetadataRoute.Robots {
   return {
