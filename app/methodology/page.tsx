@@ -275,6 +275,72 @@ Latency:
         </Card>
       </Section>
 
+      {/* ─── Backtester Methodology ─── */}
+      <div id="backtester" />
+      <Section title="Backtester Methodology">
+        <Card>
+          <Label>Fee model</Label>
+          <FormulaBlock>{`fees_per_contract = $0.02 (Polymarket withdrawal) + $0.01 (Kalshi per-contract fee)
+                       = $0.03 per contract
+
+contracts          = capitalPerTrade / (cheapLegPrice / 100)
+totalCost          = contracts × cheapPrice/100 + contracts × (100 - expPrice)/100
+grossProfit        = contracts × spread / 100
+netProfit          = grossProfit - fees
+returnPct          = netProfit / totalCost × 100`}</FormulaBlock>
+          <Body>
+            The backtester simulates a market-neutral arbitrage on every signal in <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">signal_history</code>:
+            buy YES on the cheap leg (lower price) and buy NO on the expensive leg (higher price).
+            If both legs reach 100¢ at resolution, the gross profit equals the spread in cents per contract.
+            Fees are estimated from Polymarket&apos;s $0.02/contract withdrawal fee and Kalshi&apos;s $0.01/contract trading fee.
+          </Body>
+        </Card>
+        <Card>
+          <Label>P&amp;L accounting</Label>
+          <FormulaBlock>{`Resolved signals:
+  netProfit = arb_profit_pct × totalCost / 100   (if available from DB)
+            = grossProfit - fees                  (computed fallback)
+  status    = "won" if netProfit >= 0, "lost" if netProfit < 0
+
+Open signals:
+  netProfit = 0  (marked at cost — no unrealized P&L)
+  status    = "open"
+
+Deduplication:
+  One trade per disagreement_id (most recent snapshot wins)
+  Concurrency cap: max N open positions at once`}</FormulaBlock>
+          <Body>
+            Open (unresolved) positions are marked at $0 P&L — they do not contribute to the equity curve
+            or aggregate stats until resolved. This is conservative: a position could be worth more or less
+            if you exited early. The concurrency cap enforces a realistic position limit; signals that would
+            exceed the cap are skipped (not queued).
+          </Body>
+        </Card>
+        <Card>
+          <Label>Equity curve &amp; risk metrics</Label>
+          <FormulaBlock>{`Equity curve:   daily cumulative closed net P&L (resolved trades only)
+Max drawdown:   (peak - trough) / peak × 100, rolling over equity curve
+Sharpe (approx): annualized mean daily return / stddev daily return × √252
+  — Uses closed-trade daily P&L, not position-level returns
+  — Simplified: does not account for capital at risk over hold periods`}</FormulaBlock>
+          <Body>
+            The Sharpe ratio is an approximation. It uses daily closed P&L as a proxy for daily returns,
+            not a rigorous position-weighted return series. It should be treated as a directional indicator
+            rather than a precise risk-adjusted return figure. Values above 1.0 suggest favorable
+            risk-reward; values below 0 indicate consistent losses outpacing volatility.
+          </Body>
+        </Card>
+        <div className="rounded-xl bg-[#f85149]/5 border border-[#f85149]/20 p-5">
+          <Body>
+            <strong className="text-[#f0f6fc]">Limitations the backtester does not model:</strong>{" "}
+            slippage (especially on thin markets), partial fills, platform outages, withdrawal delays,
+            liquidity constraints on large positions, tax treatment of prediction market income,
+            or the possibility that both legs settle at the same value (both YES or both NO).
+            The simulation assumes perfect execution at the prices recorded at signal detection time.
+          </Body>
+        </div>
+      </Section>
+
       {/* Footer link */}
       <div className="pt-4 border-t border-[#21262d] text-xs text-[#484f58]">
         Questions about a specific number?{" "}

@@ -31,6 +31,7 @@ import {
   CheckCircle,
   Wallet,
   Calculator,
+  TrendingUp,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -53,6 +54,7 @@ const navGroups = [
     items: [
       { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
       { label: "Simulator", icon: Calculator, href: "/simulate" },
+      { label: "Backtester", icon: TrendingUp, href: "/backtest" },
       { label: "Flow", icon: DollarSign, href: "/flow" },
     ],
   },

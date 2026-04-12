@@ -482,6 +482,26 @@ export default function HomePage() {
         </Link>
       </div>
 
+      {/* ─── BACKTESTER CALLOUT ──────────────────────────────── */}
+      <div className="rounded-xl border border-[#3fb950]/30 bg-gradient-to-r from-[#3fb950]/8 to-[#161b27] p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#3fb950]/15 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-3.5 h-3.5 text-[#3fb950]" />
+          </div>
+          <span className="text-xs font-bold text-[#3fb950]">Arb Backtester</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#3fb950] bg-[#3fb950]/10 border border-[#3fb950]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+        </div>
+        <p className="text-[11px] text-[#8d96a0] leading-relaxed">
+          What would you have made following Quiver&apos;s arb signals? Simulated P&amp;L, win rate, equity curve, and per-signal breakdown across all historical data.
+        </p>
+        <Link
+          href="/backtest"
+          className="inline-flex items-center gap-1.5 text-[11px] text-[#3fb950] font-semibold hover:text-[#3fb950]/80 transition-colors"
+        >
+          Run a backtest →
+        </Link>
+      </div>
+
       {/* ─── EMBED CALLOUT ───────────────────────────────────── */}
       <div className="rounded-xl border border-[#388bfd]/30 bg-gradient-to-r from-[#388bfd]/8 to-[#161b27] p-4 space-y-2">
         <div className="flex items-center gap-2">
