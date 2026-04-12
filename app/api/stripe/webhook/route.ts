@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import * as Sentry from "@sentry/nextjs";
 import type Stripe from "stripe";
+
+// Service-role client — bypasses RLS for all webhook writes.
+// The anon client silently fails RLS on user_tiers and stripe_events.
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   if (!isStripeConfigured() || !stripe) {
