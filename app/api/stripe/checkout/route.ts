@@ -77,8 +77,20 @@ export async function POST(req: NextRequest) {
       customerId = customer.id;
     }
 
-    // Build checkout session
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Build checkout session.
+    // SECURITY: origin MUST come from a server-side env var, not the request
+    // headers. The Origin header is attacker-controlled and would allow an
+    // adversary to redirect the Stripe success URL to their own domain.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (!siteUrl) {
+      console.error("[stripe/checkout] NEXT_PUBLIC_SITE_URL is not set — cannot build redirect URLs");
+      return NextResponse.json(
+        { error: "Server misconfiguration: NEXT_PUBLIC_SITE_URL is not set." },
+        { status: 500 }
+      );
+    }
+    const origin = siteUrl.replace(/\/$/, ""); // strip trailing slash
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
