@@ -223,6 +223,52 @@
     );
   }
 
+  function renderIndex(el, data, theme) {
+    var val = Number(data.currentValue) || 0;
+    var chg = data.change24h != null ? Number(data.change24h) : null;
+    var valColor = val <= 30 ? "#f85149" : val <= 70 ? "#d29922" : "#3fb950";
+    var chgStr = chg != null ? ((chg >= 0 ? "+" : "") + chg.toFixed(1) + " 24h") : "";
+    var chgColor = chg != null ? (chg >= 0 ? COLORS.positive : COLORS.negative) : COLORS.textMuted;
+    var zoneLabel = val <= 20 ? "Extreme Low" : val <= 35 ? "Low" : val <= 65 ? "Neutral" : val <= 80 ? "High" : "Extreme High";
+
+    // Mini sparkline as inline SVG path
+    var sparkSvg = "";
+    if (data.sparkline && data.sparkline.length > 1) {
+      var pts = data.sparkline;
+      var mn = Math.min.apply(null, pts);
+      var mx = Math.max.apply(null, pts);
+      var range = mx - mn || 1;
+      var W = 80, H = 24;
+      var coords = pts.map(function(v, i) {
+        var x = (i / (pts.length - 1)) * W;
+        var y = H - ((v - mn) / range) * H;
+        return (i === 0 ? "M" : "L") + x.toFixed(1) + " " + y.toFixed(1);
+      }).join(" ");
+      sparkSvg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" style="display:block;margin:8px 0;">' +
+        '<path d="' + coords + '" fill="none" stroke="' + valColor + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '</svg>';
+    }
+
+    el.innerHTML = (
+      '<a href="' + esc(data.url) + '?utm_source=embed" target="_blank" rel="noopener" class="' + themeClass(theme) + '">' +
+        '<div class="qm-header">' +
+          '<div class="qm-question">' + esc(data.name) + '</div>' +
+          (data.category ? '<span class="qm-category">' + esc(data.category) + '</span>' : '') +
+        '</div>' +
+        '<div class="qm-price-row">' +
+          '<div class="qm-price" style="color:' + valColor + '">' + val.toFixed(1) + '<span style="font-size:14px;color:' + COLORS.textMuted + '">/100</span></div>' +
+          (chg != null ? '<div class="qm-change" style="color:' + chgColor + '">' + chgStr + '</div>' : '') +
+        '</div>' +
+        '<div style="font-size:11px;font-weight:700;color:' + valColor + ';text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">' + esc(zoneLabel) + '</div>' +
+        sparkSvg +
+        '<div class="qm-meta">' +
+          '<span class="qm-muted">Quiver Index &middot; prediction markets</span>' +
+          '<span class="qm-brand">&#9654; Quiver Markets</span>' +
+        '</div>' +
+      '</a>'
+    );
+  }
+
   function renderWidget(el) {
     var type = el.getAttribute("data-quiver-widget");
     var id = el.getAttribute("data-id");
@@ -237,6 +283,7 @@
     else if (type === "arb") url = QUIVER_BASE + "/api/embed/disagreement/" + encodeURIComponent(id);
     else if (type === "whale") url = QUIVER_BASE + "/api/embed/whale/" + encodeURIComponent(id);
     else if (type === "category") url = QUIVER_BASE + "/api/embed/category/" + encodeURIComponent(id);
+    else if (type === "index") url = QUIVER_BASE + "/api/embed/index/" + encodeURIComponent(id);
     else { renderError(el); return; }
 
     fetchData(url, function (err, data) {
@@ -245,6 +292,7 @@
       else if (type === "arb") renderArb(el, data, theme);
       else if (type === "whale") renderWhale(el, data, theme);
       else if (type === "category") renderCategory(el, data, theme);
+      else if (type === "index") renderIndex(el, data, theme);
     });
   }
 

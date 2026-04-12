@@ -196,6 +196,7 @@ export default function HomePage() {
   const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
   const [sysStats, setSysStats] = useState<{ marketsCount: number; signalsCount: number; disagreementsCount: number; whalesCount: number } | null>(null);
   const [pulse, setPulse] = useState<MarketPulse | null>(null);
+  const [indices, setIndices] = useState<Array<{ slug: string; name: string; category: string; current_value: number; change_24h: number | null }>>([]);
 
   const { recents } = useRecentMarkets();
   const { markets: allMarkets, biggestMovers: defaultMovers, breakingMarkets, whaleActivity, treemapData, source, refreshing, lastFetched, error, retry } = useHomepageData();
@@ -225,6 +226,10 @@ export default function HomePage() {
     getWaitlistCount().then(setWaitlistCount);
     getSystemStats().then((s) => setSysStats({ marketsCount: s.marketsCount, signalsCount: s.signalsCount, disagreementsCount: s.disagreementsCount, whalesCount: s.whalesCount }));
     computeMarketPulse().then(setPulse).catch(() => {/* leave null */});
+    // Load indices for homepage strip
+    fetch("/api/indices").then((r) => r.json()).then((j) => {
+      if (j.indices?.length) setIndices(j.indices);
+    }).catch(() => {/* silent */});
     // Data points ingested in last 24h
     supabase
       .from("price_history")
@@ -562,6 +567,46 @@ export default function HomePage() {
           Connect your wallet →
         </Link>
       </div>
+
+      {/* ─── QUIVER INDICES STRIP ────────────────────────────── */}
+      {indices.length > 0 && (
+        <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#21262d]">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="size-3.5 text-[#57D7BA]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#57D7BA]">Quiver Indices</span>
+            </div>
+            <Link href="/indices" className="text-[10px] text-[#484f58] hover:text-[#57D7BA] transition-colors">
+              View all →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 divide-x divide-y divide-[#21262d]">
+            {indices.map((idx) => {
+              const v = idx.current_value;
+              const color = v <= 30 ? "#f85149" : v <= 70 ? "#d29922" : "#3fb950";
+              const chg = idx.change_24h;
+              const shortName = idx.name.replace("Quiver ", "").replace(" Index", "");
+              return (
+                <Link key={idx.slug} href={`/indices/${idx.slug}`} className="p-3 hover:bg-[#1c2333] transition-colors group">
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-[#484f58] mb-1 truncate group-hover:text-[#57D7BA] transition-colors">
+                    {shortName}
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-black tabular-nums" style={{ color }}>
+                      {v.toFixed(1)}
+                    </span>
+                    {chg != null && (
+                      <span className={`text-[10px] font-bold tabular-nums ${chg >= 0 ? "text-[#3fb950]" : "text-[#f85149]"}`}>
+                        {chg >= 0 ? "▲" : "▼"}{Math.abs(chg).toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ─── WAITLIST ────────────────────────────────────────── */}
       <Card className="bg-[#161b27] border-[#21262d]">

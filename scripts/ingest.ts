@@ -996,6 +996,15 @@ async function main() {
       runErrors.push({ stage: "alert_evaluator", error: err.message });
     }
 
+    // Compute proprietary indices (non-fatal)
+    try {
+      const { computeIndices } = await import("./compute-indices");
+      await computeIndices();
+    } catch (err: any) {
+      console.error("  Index computation failed (non-fatal):", err.message);
+      runErrors.push({ stage: "compute_indices", error: err.message });
+    }
+
     console.log("\n✓ Ingestion complete!");
   } catch (err: any) {
     console.error("Fatal ingestion error:", err.message);

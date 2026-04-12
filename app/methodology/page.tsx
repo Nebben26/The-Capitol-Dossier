@@ -275,6 +275,81 @@ Latency:
         </Card>
       </Section>
 
+      {/* ─── Quiver Indices ─── */}
+      <div id="indices" />
+      <Section title="Quiver Indices Methodology">
+        <Card>
+          <Label>What indices are and are not</Label>
+          <Body>
+            Quiver Indices are <strong className="text-[#f0f6fc]">derived from prediction market prices</strong>, not
+            from economic data, expert forecasts, or ground-truth outcomes. They reflect the aggregate consensus of
+            all traders participating in each category of prediction markets — no more, no less. They are citeable
+            as <em className="text-[#f0f6fc]">"market-implied"</em> readings, not as objective measurements of the
+            underlying phenomena.
+          </Body>
+        </Card>
+        <Card>
+          <Label>Core formula — volume-weighted mean</Label>
+          <FormulaBlock>{`For most indices:
+  value = Σ(price_i × volume_i) / Σ(volume_i)
+
+Where:
+  price_i  = current YES probability of market i (0–100)
+  volume_i = lifetime USD volume of market i (weight)
+  i        = all non-resolved markets in the relevant category
+
+If total volume = 0 (no volume data): equal-weight mean is used.
+Result is clamped to [0, 100].`}</FormulaBlock>
+          <Body>
+            Volume-weighting means high-liquidity markets (where more real money has been committed)
+            count more than thin markets. A $10M election market contributes more to the Election Confidence
+            Index than a $5K market on the same topic.
+          </Body>
+        </Card>
+        <Card>
+          <Label>Index-specific formulas</Label>
+          <FormulaBlock>{`Election Confidence Index:
+  value = Σ(|price_i − 50| × 2 × volume_i) / Σ(volume_i)
+  — Measures "decisiveness": a market at 90¢ contributes 80pt of confidence
+    (it has a clear frontrunner); a 50/50 market contributes 0.
+  — Ranges 0 (all markets uncertain) to 100 (all markets fully decided).
+
+Crypto Sentiment Index:
+  value = volume-weighted mean of crypto market prices
+  — Direct sentiment: higher price = more bullish.
+  — 0 = all crypto markets near 0¢ (extreme bear), 100 = all near 100¢ (extreme bull).
+
+Geopolitical Risk Index:
+  value = volume-weighted mean of geopolitics market prices
+  — Higher = more market-implied probability of escalation events.
+  — Interpret: >70 = high risk priced in; <30 = markets calm.
+
+Economic Outlook Index:
+  value = 100 − (volume-weighted mean of economics market prices)
+  — Inverted: economics markets are often framed as recession/inflation risks.
+  — Higher index = more optimistic (lower recession/crisis probability priced in).`}</FormulaBlock>
+        </Card>
+        <Card>
+          <Label>Update frequency &amp; latency</Label>
+          <Body>
+            Indices are recomputed at the end of each ingest cycle, which runs approximately every 30 minutes.
+            The value displayed reflects the state of markets at the time of the most recent completed ingest.
+            Intraday price movements between ingest cycles are not reflected. The <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">updated_at</code>{" "}
+            timestamp on each index shows when it was last recomputed.
+          </Body>
+        </Card>
+        <div className="rounded-xl bg-[#f85149]/5 border border-[#f85149]/20 p-5">
+          <Body>
+            <strong className="text-[#f0f6fc]">Limitations:</strong>{" "}
+            Prediction market prices reflect trader consensus, not ground truth. Markets can be wrong,
+            thin, or manipulated. Category assignment of individual markets affects which index they feed.
+            The Economics index inversion assumes most economics markets are framed around negative outcomes
+            (recession, inflation) — this may not hold for all component markets. Indices should be cited
+            as <em className="text-[#f0f6fc]">"market-implied"</em> readings with this caveat noted.
+          </Body>
+        </div>
+      </Section>
+
       {/* ─── Correlation Engine ─── */}
       <div id="correlations" />
       <Section title="Correlation Engine Methodology">

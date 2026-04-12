@@ -256,6 +256,16 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 30. `session26-indices.sql`
+**What it does:** Creates `quiver_indices` (one row per index, stores current value, 24h change, component count, methodology) and `quiver_index_history` (time-series of index values for charts). Seeds the 4 initial index definitions: Election Confidence, Crypto Sentiment, Geopolitical Risk, Economic Outlook. Values start at default 50 until `compute-indices.ts` runs.
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS`, `ON CONFLICT (slug) DO NOTHING` for seed data)
+**Dependencies:** None
+**Tables created:** `quiver_indices`, `quiver_index_history`
+**RLS:** Public read; service role full access
+**After running:** Run `npx tsx scripts/compute-indices.ts` to seed initial values from live market data.
+
+---
+
 ### 29. `session25-price-history.sql`
 **What it does:** Creates `market_price_history` table — lightweight ingest-cycle price snapshots (~30 min frequency) used by the correlation engine. Also creates `market_correlations` table — nightly-computed returns-based Pearson correlations with denormalized question/category/price fields for fast UI rendering.
 **Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
@@ -307,5 +317,6 @@ Mark each migration as ✅ once applied to production.
 | 27 | `session23-signal-history.sql` | ☐ |
 | 28 | `backfill-resolved.sql` *(run last)* | ☐ |
 | 29 | `session25-price-history.sql` | ☐ |
+| 30 | `session26-indices.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

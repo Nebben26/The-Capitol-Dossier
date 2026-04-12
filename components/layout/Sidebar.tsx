@@ -33,6 +33,7 @@ import {
   Wallet,
   Calculator,
   TrendingUp,
+  BarChart3,
 } from "lucide-react";
 import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
 
@@ -62,7 +63,8 @@ const navGroups = [
   {
     label: "Intelligence",
     items: [
-      { label: "Correlations", icon: GitMerge, href: "/correlations", badge: "NEW" },
+      { label: "Indices", icon: BarChart3, href: "/indices", badge: "NEW" },
+      { label: "Correlations", icon: GitMerge, href: "/correlations" },
     ],
   },
   {
