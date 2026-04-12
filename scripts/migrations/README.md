@@ -284,6 +284,15 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 32. `session28-api.sql`
+**What it does:** Adds `user_id` FK to `api_keys` table, updates default rate limits to published free-tier values (30/min, 1,000/day), and adds proper RLS policies so users can self-serve key management via the UI.
+**Idempotent:** Yes (`ADD COLUMN IF NOT EXISTS`, `DROP POLICY IF EXISTS`, `CREATE POLICY`)
+**Dependencies:** `session28_api_keys.sql` must be applied first
+**Tables modified:** `api_keys`, `api_request_logs` (RLS policies only)
+**Run after:** `session28_api_keys.sql`
+
+---
+
 ### 31. `session27-consensus.sql`
 **What it does:** Creates `community_predictions` (one row per user per market, upserted), `market_consensus_cache` (pre-aggregated confidence-weighted consensus per market), and `source_accuracy_history` (Brier scores per resolved market per source).
 **Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `CREATE OR REPLACE FUNCTION`, `DROP TRIGGER IF EXISTS`, `DROP POLICY IF EXISTS`)
@@ -328,5 +337,6 @@ Mark each migration as ✅ once applied to production.
 | 29 | `session25-price-history.sql` | ☐ |
 | 30 | `session26-indices.sql` | ☐ |
 | 31 | `session27-consensus.sql` | ☐ |
+| 32 | `session28-api.sql` *(run after session28_api_keys.sql)* | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

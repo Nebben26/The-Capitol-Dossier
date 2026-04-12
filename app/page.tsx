@@ -608,6 +608,27 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* ─── FREE API CALLOUT ────────────────────────────────── */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
+        <div className="p-4 flex items-center gap-4">
+          <div className="w-9 h-9 rounded-xl bg-[#57D7BA]/10 border border-[#57D7BA]/20 flex items-center justify-center shrink-0">
+            <Code className="size-4 text-[#57D7BA]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-[#f0f6fc]">Free public API — no credit card required</p>
+            <p className="text-[10px] text-[#8d96a0] mt-0.5">
+              1,000 req/day · All endpoints · Markets, whales, arb spreads, indices &amp; correlations
+            </p>
+          </div>
+          <Link
+            href="/api"
+            className="shrink-0 text-xs font-semibold text-[#57D7BA] hover:text-[#57D7BA]/80 transition-colors whitespace-nowrap"
+          >
+            View docs →
+          </Link>
+        </div>
+      </div>
+
       {/* ─── COMMUNITY PULSE ─────────────────────────────────── */}
       <div className="rounded-xl bg-[#161b27] border border-[#21262d] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#21262d]">

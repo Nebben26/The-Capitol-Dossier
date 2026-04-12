@@ -89,9 +89,15 @@ const navGroups = [
     ],
   },
   {
+    label: "Developer",
+    items: [
+      { label: "API Docs", icon: Code, href: "/api" },
+      { label: "API Keys", icon: Zap, href: "/settings/api-keys" },
+    ],
+  },
+  {
     label: "Platform",
     items: [
-      { label: "API", icon: Code, href: "/api-docs" },
       { label: "Pricing", icon: CreditCard, href: "/pricing" },
       { label: "Status", icon: Server, href: "/status" },
       { label: "Changelog", icon: FileText, href: "/changelog" },

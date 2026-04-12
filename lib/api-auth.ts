@@ -4,8 +4,23 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import type { NextRequest } from "next/server";
+
+// ─── KEY GENERATION ───────────────────────────────────────────────────────────
+
+/**
+ * Generate a new API key.
+ * Format: qvr_live_<32 hex chars>
+ * Returns { key, prefix, hash } — store the hash, show the key once.
+ */
+export function generateApiKey(): { key: string; prefix: string; hash: string } {
+  const secret = randomBytes(32).toString("hex");
+  const key = `qvr_live_${secret}`;
+  const prefix = `qvr_live_${secret.slice(0, 8)}`;
+  const hash = createHash("sha256").update(key).digest("hex");
+  return { key, prefix, hash };
+}
 
 // Service-role client — server-side only, never exposed to browser
 function getServiceSupabase() {

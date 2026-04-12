@@ -532,6 +532,66 @@ Accuracy score (displayed in UI):
       </Section>
 
       {/* Footer link */}
+      {/* ─── API Methodology ─── */}
+      <div id="api" />
+      <Section title="Public API v1">
+        <Card>
+          <Label>Rate limiting approach</Label>
+          <FormulaBlock>{`Tiers and default limits:
+  Free tier:    30 req/min · 1,000 req/day
+  Pro tier:     60 req/min · 5,000 req/day
+  Premium tier: 300 req/min · 50,000 req/day
+
+Per-minute limit enforcement:
+  In-memory sliding window per API key (60-second window).
+  Not shared across serverless instances — best effort, not exact.
+
+Per-day limit enforcement:
+  Tracked in api_keys.requests_today (incremented async on each request).
+  Resets at midnight UTC (checked via last_used_at date comparison).
+  requests_today is reset lazily on the next request after day rollover.`}</FormulaBlock>
+          <Body>
+            Rate limits are enforced server-side per API key. The per-minute limit uses an in-memory
+            sliding window within each serverless function instance. Because multiple instances may run
+            concurrently, per-minute enforcement is best-effort — a burst could exceed the per-minute
+            cap slightly across cold starts. The per-day limit is tracked in the database and is reliable.
+            If your use case requires stricter rate-limit guarantees, contact us for an enterprise arrangement.
+          </Body>
+        </Card>
+        <Card>
+          <Label>Data freshness guarantees</Label>
+          <FormulaBlock>{`Ingest cycle: every ~30 minutes (cron-triggered)
+Data sources: Polymarket Gamma API + Kalshi REST API
+
+Freshness by endpoint:
+  /markets           → data age: 0–30 min (last ingest)
+  /disagreements     → data age: 0–30 min
+  /whales            → data age: 0–30 min (Polymarket Data API)
+  /indices           → data age: 0–30 min (computed during ingest)
+  /correlations      → data age: 0–24h (nightly compute job)
+  /signals           → data age: 0–30 min
+  /spread-history    → point-in-time snapshots at each ingest cycle`}</FormulaBlock>
+          <Body>
+            All data flows through a single ingest pipeline that runs approximately every 30 minutes.
+            API responses reflect the state of the database at query time — there is no additional caching
+            layer on the v1 endpoints beyond what the database provides.
+            The <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">generated_at</code> field in
+            every response envelope reflects when the API query was executed, not when the underlying data was last updated.
+            Use <code className="text-[#f0f6fc] bg-[#0d1117] px-1 rounded">updated_at</code> fields on individual records for data freshness.
+          </Body>
+        </Card>
+        <div className="rounded-xl bg-[#f85149]/5 border border-[#f85149]/20 p-5">
+          <Body>
+            <strong className="text-[#f0f6fc]">SLA:</strong>{" "}
+            The free and pro tiers are best-effort — no uptime or latency SLA is guaranteed.
+            We target 99.5% monthly uptime but do not offer SLA credits.
+            The API inherits Supabase&apos;s hosting infrastructure reliability.
+            For production workloads requiring SLA guarantees, contact{" "}
+            <a href="mailto:hello@quivermarkets.com" className="text-[#57D7BA] hover:underline">hello@quivermarkets.com</a>.
+          </Body>
+        </div>
+      </Section>
+
       <div className="pt-4 border-t border-[#21262d] text-xs text-[#484f58]">
         Questions about a specific number?{" "}
         <a href="mailto:hello@quivermarkets.com" className="text-[#57D7BA] hover:underline">

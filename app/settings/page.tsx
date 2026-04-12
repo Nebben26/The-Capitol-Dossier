@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useUserTier } from "@/hooks/useUserTier";
 import { TIER_LABELS, TIER_COLORS } from "@/lib/tiers";
 import { TierBadge } from "@/components/layout/tier-badge";
-import { CreditCard, User, LogOut, ExternalLink, Settings, Send, Wallet, Target } from "lucide-react";
+import { CreditCard, User, LogOut, ExternalLink, Settings, Send, Wallet, Target, Code } from "lucide-react";
 import { trackEvent, resetAnalytics, AnalyticsEvents } from "@/lib/analytics";
 import { useRouter } from "next/navigation";
 import { TestModeBanner } from "@/components/ui/test-mode-banner";
@@ -215,6 +215,29 @@ export default function SettingsPage() {
         >
           <Wallet className="w-3.5 h-3.5" />
           Connect your Polymarket wallet
+        </Link>
+      </div>
+
+      {/* API Keys card */}
+      <div className="rounded-xl bg-[#161b27] border border-[#21262d] p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#57D7BA]/10 flex items-center justify-center">
+            <Code className="w-4 h-4 text-[#57D7BA]" />
+          </div>
+          <h2 className="text-sm font-semibold text-[#f0f6fc]">API Keys</h2>
+        </div>
+
+        <p className="text-xs text-[#8d96a0] leading-relaxed">
+          Access all prediction market data programmatically via the Quiver Markets REST API.
+          Free tier includes 1,000 requests/day with all endpoints — no credit card required.
+        </p>
+
+        <Link
+          href="/settings/api-keys"
+          className="inline-flex items-center gap-2 bg-[#57D7BA]/10 border border-[#57D7BA]/30 text-[#57D7BA] hover:bg-[#57D7BA]/20 text-xs font-semibold px-4 py-2 rounded-lg transition-all"
+        >
+          <Code className="w-3.5 h-3.5" />
+          Manage API keys
         </Link>
       </div>
 
