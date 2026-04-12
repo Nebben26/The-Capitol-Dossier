@@ -759,6 +759,28 @@ async function ingestDisagreements(markets: any[]) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("  Signal history write failed (non-fatal):", msg);
   }
+
+  // ── Snapshot price history for all markets (feeds correlation engine) ──
+  console.log("\n=== Snapshotting price history ===");
+  try {
+    const priceSnapshots = markets
+      .filter((m: any) => m.price != null)
+      .map((m: any) => ({
+        market_id: m.id,
+        price: Number(m.price),
+        volume: m.volume != null ? Number(m.volume) : null,
+      }));
+
+    for (let i = 0; i < priceSnapshots.length; i += 200) {
+      const batch = priceSnapshots.slice(i, i + 200);
+      const { error } = await supabase.from("market_price_history").insert(batch);
+      if (error) console.warn("  price history batch error:", error.message);
+    }
+    console.log(`  Wrote ${priceSnapshots.length} price snapshots`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("  Price history write failed (non-fatal):", msg);
+  }
 }
 
 // ─── 11. INGEST WHALE POSITIONS ──────────────────────────────────────

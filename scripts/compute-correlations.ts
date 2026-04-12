@@ -230,21 +230,66 @@ async function main() {
   }
 
   console.log("\n=== Writing to Supabase ===");
-  const { error: delErr } = await supabase.from("correlations").delete().gte("id", 0);
-  if (delErr) { console.error("Failed to clear:", delErr.message); process.exit(1); }
-  console.log("Cleared existing correlations");
 
-  const BATCH = 500;
-  let inserted = 0;
-  for (let i = 0; i < results.length; i += BATCH) {
-    const chunk = results.slice(i, i + BATCH);
-    const { error } = await supabase
-      .from("correlations")
-      .upsert(chunk, { onConflict: "market_a_id,market_b_id" });
-    if (error) console.error(`  Upsert error (batch ${i}):`, error.message);
-    else inserted += chunk.length;
+  // Write to legacy `correlations` table (keeps backward compatibility)
+  const { error: delErr } = await supabase.from("correlations").delete().gte("id", 0);
+  if (delErr) { console.error("Failed to clear correlations:", delErr.message); }
+  else {
+    const BATCH = 500;
+    let inserted = 0;
+    for (let i = 0; i < results.length; i += BATCH) {
+      const chunk = results.slice(i, i + BATCH);
+      const { error } = await supabase
+        .from("correlations")
+        .upsert(chunk, { onConflict: "market_a_id,market_b_id" });
+      if (error) console.error(`  Upsert error (batch ${i}):`, error.message);
+      else inserted += chunk.length;
+    }
+    console.log(`Upserted ${inserted}/${results.length} into correlations`);
   }
-  console.log(`Upserted ${inserted}/${results.length}`);
+
+  // Write to market_correlations (richer schema with question/category/price denormalized)
+  // This is what the /api/correlations routes and /correlations UI read from.
+  const enriched = results.map((r) => {
+    const a = qMap.get(r.market_a_id) as { q: string; c: string } | undefined;
+    const b = qMap.get(r.market_b_id) as { q: string; c: string } | undefined;
+    const mA = withData.find((m: any) => m.id === r.market_a_id);
+    const mB = withData.find((m: any) => m.id === r.market_b_id);
+    return {
+      market_a_id: r.market_a_id,
+      market_b_id: r.market_b_id,
+      correlation: r.correlation,
+      sample_count: r.sample_size,
+      category_a: a?.c ?? null,
+      category_b: b?.c ?? null,
+      question_a: a?.q ?? null,
+      question_b: b?.q ?? null,
+      price_a: mA ? Number(mA.price ?? 0) : null,
+      price_b: mB ? Number(mB.price ?? 0) : null,
+    };
+  });
+
+  // Clear and re-populate market_correlations
+  const { error: mcDelErr } = await supabase.from("market_correlations").delete().gte("id", 0);
+  if (mcDelErr) {
+    if (mcDelErr.message.includes("does not exist")) {
+      console.warn("  market_correlations table not found — run session25-price-history.sql first");
+    } else {
+      console.error("  Failed to clear market_correlations:", mcDelErr.message);
+    }
+  } else {
+    let mcInserted = 0;
+    for (let i = 0; i < enriched.length; i += 500) {
+      const chunk = enriched.slice(i, i + 500);
+      const { error } = await supabase
+        .from("market_correlations")
+        .upsert(chunk, { onConflict: "market_a_id,market_b_id" });
+      if (error) console.error(`  market_correlations upsert error (batch ${i}):`, error.message);
+      else mcInserted += chunk.length;
+    }
+    console.log(`Upserted ${mcInserted}/${enriched.length} into market_correlations`);
+  }
+
   console.log("\nCorrelations computed");
 }
 

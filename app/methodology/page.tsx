@@ -275,6 +275,68 @@ Latency:
         </Card>
       </Section>
 
+      {/* ─── Correlation Engine ─── */}
+      <div id="correlations" />
+      <Section title="Correlation Engine Methodology">
+        <Card>
+          <Label>Algorithm</Label>
+          <FormulaBlock>{`Method: Returns-based Pearson correlation (not raw price correlation)
+
+Step 1: Compute returns (price differences) between adjacent snapshots:
+  dx[i] = price[i] - price[i-1]
+
+Step 2: Align two markets' return series by timestamp (forward-fill)
+
+Step 3: Pearson correlation on aligned return series:
+  r = Σ((dx - mean_dx)(dy - mean_dy)) / sqrt(Σ(dx - mean_dx)² × Σ(dy - mean_dy)²)
+
+Filters applied:
+  - At least 30 aligned data points per pair
+  - Standard deviation of returns ≥ 0.02 (removes flat/near-flat markets)
+  - Bonferroni-adjusted significance threshold (p < 0.05, two-tailed)
+  - Category compatibility filter (cross-category pairs must be plausibly related)
+
+Output: |r| threshold is typically 0.65–0.80+ after Bonferroni correction`}</FormulaBlock>
+          <Body>
+            Correlations are computed on <strong className="text-[#f0f6fc]">price returns</strong> (changes between
+            adjacent snapshots), not raw price levels. This removes spurious correlations caused by two markets
+            that happen to both trend upward or downward over time (co-drift), which would produce a high raw
+            correlation even if the markets are completely unrelated.
+          </Body>
+        </Card>
+        <Card>
+          <Label>Significance test</Label>
+          <FormulaBlock>{`H₀: correlation = 0 (no relationship)
+Test: Two-tailed t-test using Fisher z-transformation
+Correction: Bonferroni adjustment for number of pairs tested
+Threshold: p < 0.05 after correction
+
+Why Bonferroni: Testing thousands of pairs simultaneously creates a high
+false-positive rate. Bonferroni correction ensures the expected number of
+false positives across all pairs remains below 1 per run.`}</FormulaBlock>
+          <Body>
+            Without multiple-testing correction, testing 50,000 pairs at p &lt; 0.05 would produce ~2,500
+            false positives by chance alone. Bonferroni correction makes this rigorous at the cost of
+            lower sensitivity — some real correlations may be missed. We accept this tradeoff to keep the
+            results meaningful rather than noisy.
+          </Body>
+        </Card>
+        <div className="rounded-xl bg-[#f85149]/5 border border-[#f85149]/20 p-5 space-y-2">
+          <Body>
+            <strong className="text-[#f0f6fc]">Correlation does not imply causation.</strong>{" "}
+            Two prediction markets may be correlated because they both respond to the same underlying real-world
+            variable (e.g., both depend on the outcome of an election), not because one causes the other.
+            A correlated pair is a signal to investigate, not a signal to trade blindly.
+          </Body>
+          <Body>
+            <strong className="text-[#f0f6fc]">Data limitations:</strong> Correlations are computed from
+            ingest-cycle price snapshots (~30 min frequency), not tick-level data. Short-lived price movements
+            between snapshots are invisible. Markets with fewer than 30 aligned snapshots in the computation
+            window are excluded entirely. Correlations are recomputed nightly; intraday changes are not reflected.
+          </Body>
+        </div>
+      </Section>
+
       {/* ─── Backtester Methodology ─── */}
       <div id="backtester" />
       <Section title="Backtester Methodology">

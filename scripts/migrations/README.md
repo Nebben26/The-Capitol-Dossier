@@ -256,6 +256,16 @@ Mark each migration as ✅ once applied to production.
 
 ---
 
+### 29. `session25-price-history.sql`
+**What it does:** Creates `market_price_history` table — lightweight ingest-cycle price snapshots (~30 min frequency) used by the correlation engine. Also creates `market_correlations` table — nightly-computed returns-based Pearson correlations with denormalized question/category/price fields for fast UI rendering.
+**Idempotent:** Yes (`CREATE TABLE IF NOT EXISTS`, `DROP POLICY IF EXISTS`)
+**Dependencies:** None
+**Tables created:** `market_price_history`, `market_correlations`
+**RLS:** Public read; service role full access
+**After running:** Execute `npx tsx scripts/ingest.ts` to start populating price history, then after 24+ hours run `npx tsx scripts/compute-correlations.ts` to populate correlations.
+
+---
+
 ### 24. `backfill-resolved.sql`
 **What it does:** Data cleanup — marks markets as resolved when `resolves_at` or `end_date` is in the past; zeros out impossible `change_24h` values (artifacts of old % formula).
 **Idempotent:** Yes (UPDATE with WHERE clause, safe to re-run)
@@ -296,5 +306,6 @@ Mark each migration as ✅ once applied to production.
 | 26 | `session22-embed-analytics.sql` | ☐ |
 | 27 | `session23-signal-history.sql` | ☐ |
 | 28 | `backfill-resolved.sql` *(run last)* | ☐ |
+| 29 | `session25-price-history.sql` | ☐ |
 
 > **Note:** `session14_news.sql` is listed as #6 but was built in session 14 — it still goes after the core tables (sessions 4–9).

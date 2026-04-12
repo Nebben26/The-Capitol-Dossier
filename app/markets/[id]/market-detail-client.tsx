@@ -63,6 +63,7 @@ import {
   BookOpen,
   CandlestickChart,
   LineChart as LineChartIcon,
+  GitMerge,
 } from "lucide-react";
 import { useMarketDetail, useMarkets } from "@/hooks/useData";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
@@ -94,6 +95,76 @@ import { useRecentMarkets } from "@/hooks/useRecentMarkets";
 import { PredictionModal } from "@/components/predictions/prediction-modal";
 
 
+
+// ─── CORRELATED MARKETS ───────────────────────────────────────────────
+function CorrelatedMarketsSection({ marketId }: { marketId: string }) {
+  const [corrs, setCorrs] = useState<Array<{
+    otherId: string;
+    otherQuestion: string | null;
+    correlation: number;
+    otherCategory: string | null;
+  }>>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!marketId) return;
+    fetch(`/api/correlations/${encodeURIComponent(marketId)}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const top3 = (json.correlations ?? []).slice(0, 3);
+        setCorrs(top3);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, [marketId]);
+
+  if (!loaded || corrs.length === 0) return null;
+
+  return (
+    <div className="mt-6 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <GitMerge className="size-4 text-[#a371f7]" />
+          <span className="text-sm font-bold text-[#f0f6fc]">Correlated Markets</span>
+        </div>
+        <Link
+          href={`/correlations/${encodeURIComponent(marketId)}`}
+          className="text-[11px] text-[#484f58] hover:text-[#a371f7] transition-colors"
+        >
+          View all →
+        </Link>
+      </div>
+      <div className="space-y-2">
+        {corrs.map((c) => {
+          const color = c.correlation >= 0.75 ? "#3fb950" : c.correlation >= 0 ? "#57D7BA" : c.correlation <= -0.75 ? "#f85149" : "#d29922";
+          return (
+            <Link
+              key={c.otherId}
+              href={`/markets/${c.otherId}`}
+              className="flex items-center gap-3 rounded-xl bg-[#161b27] border border-[#21262d] hover:border-[#a371f7]/20 p-3 transition-colors group"
+            >
+              <div
+                className="shrink-0 w-12 text-center rounded-lg px-1 py-1.5 border text-xs font-bold font-mono tabular-nums"
+                style={{ color, borderColor: `${color}30`, backgroundColor: `${color}10` }}
+              >
+                {c.correlation >= 0 ? "+" : ""}{c.correlation.toFixed(2)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-[#f0f6fc] line-clamp-1 group-hover:text-[#a371f7] transition-colors">
+                  {c.otherQuestion ?? c.otherId}
+                </p>
+                {c.otherCategory && (
+                  <span className="text-[9px] text-[#484f58]">{c.otherCategory}</span>
+                )}
+              </div>
+              <ExternalLink className="size-3.5 text-[#484f58] shrink-0" />
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 // ─── DEPTH CHART ──────────────────────────────────────────────────────
 function DepthChart({ bids, asks }: { bids: OrderbookLevel[]; asks: OrderbookLevel[] }) {
@@ -1225,6 +1296,11 @@ export default function MarketDetailPage() {
           <div className="mt-6">
             <RelatedMarkets markets={getRelatedMarkets(loadedMarket, allMarkets, 4)} />
           </div>
+        )}
+
+        {/* Correlated Markets */}
+        {loadedMarket && (
+          <CorrelatedMarketsSection marketId={loadedMarket.id} />
         )}
 
       </div>

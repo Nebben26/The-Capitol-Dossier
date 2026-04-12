@@ -11,6 +11,7 @@ import {
   Target,
   X,
   GitCompareArrows,
+  GitMerge,
   ArrowLeftRight,
   Crosshair,
   Star,
@@ -56,6 +57,12 @@ const navGroups = [
       { label: "Simulator", icon: Calculator, href: "/simulate" },
       { label: "Backtester", icon: TrendingUp, href: "/backtest" },
       { label: "Flow", icon: DollarSign, href: "/flow" },
+    ],
+  },
+  {
+    label: "Intelligence",
+    items: [
+      { label: "Correlations", icon: GitMerge, href: "/correlations", badge: "NEW" },
     ],
   },
   {

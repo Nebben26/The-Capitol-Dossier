@@ -43,6 +43,7 @@ import {
   ExternalLink,
   AlertTriangle,
   GitCompareArrows,
+  GitMerge,
   Clock,
   Database,
   Users,
@@ -479,6 +480,26 @@ export default function HomePage() {
           className="inline-flex items-center gap-1.5 text-[11px] text-[#d29922] font-semibold hover:text-[#d29922]/80 transition-colors"
         >
           Learn about Signal Desk →
+        </Link>
+      </div>
+
+      {/* ─── CORRELATION ENGINE CALLOUT ──────────────────────── */}
+      <div className="rounded-xl border border-[#a371f7]/30 bg-gradient-to-r from-[#a371f7]/8 to-[#161b27] p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-[#a371f7]/15 flex items-center justify-center shrink-0">
+            <GitMerge className="w-3.5 h-3.5 text-[#a371f7]" />
+          </div>
+          <span className="text-xs font-bold text-[#a371f7]">Correlation Engine</span>
+          <span className="text-[8px] font-bold uppercase tracking-widest text-[#a371f7] bg-[#a371f7]/10 border border-[#a371f7]/20 px-1.5 py-0.5 rounded-full">NEW</span>
+        </div>
+        <p className="text-[11px] text-[#8d96a0] leading-relaxed">
+          Find hidden relationships between markets. Discover pairs trades, lead-lag patterns, and cross-category signals nobody else is tracking.
+        </p>
+        <Link
+          href="/correlations"
+          className="inline-flex items-center gap-1.5 text-[11px] text-[#a371f7] font-semibold hover:text-[#a371f7]/80 transition-colors"
+        >
+          Explore correlations →
         </Link>
       </div>
 
