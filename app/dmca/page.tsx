@@ -1,8 +1,6 @@
 // LEGAL DISCLAIMER: This content was generated as a starting template.
 // Ben should have it reviewed by a qualified attorney before launching to the public,
 // especially the data processing, payment, and dispute resolution clauses.
-//
-// TODO: Update the mailing address with your real business address before launch.
 
 import { LegalPageLayout } from "@/components/legal/legal-page-layout";
 import type { Metadata } from "next";
@@ -49,9 +47,8 @@ export default function DmcaPolicyPage() {
         <div><strong>Email:</strong> <a href="mailto:dmca@quivermarkets.com">dmca@quivermarkets.com</a></div>
         <div><strong>Mailing Address:</strong></div>
         <div className="pl-4 text-[#484f58]">
-          {/* TODO: Replace with real business address before launch */}
           Quiver Markets<br />
-          [Business Address — Update Before Launch]<br />
+          [Address to be provided before public launch]<br />
           United States
         </div>
       </div>
