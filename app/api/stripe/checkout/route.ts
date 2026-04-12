@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured, STRIPE_PRICE_IDS } from "@/lib/stripe";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import * as Sentry from "@sentry/nextjs";
+
+// Service-role client for reading existing customer data server-side.
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   if (!isStripeConfigured() || !stripe) {
@@ -9,6 +15,17 @@ export async function POST(req: NextRequest) {
       { error: "Stripe not configured. Add STRIPE_SECRET_KEY to your environment variables." },
       { status: 503 }
     );
+  }
+
+  // ── Auth: verify the caller owns the userId they passed in ──────────────
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.replace("Bearer ", "").trim();
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+  if (authError || !authUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -24,6 +41,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields: tier, cycle, userId, userEmail" }, { status: 400 });
     }
 
+    // Prevent a user from creating a checkout for a different user's account.
+    if (userId !== authUser.id) {
+      return NextResponse.json({ error: "Forbidden: userId does not match authenticated user" }, { status: 403 });
+    }
+
     const priceKey = `${tier}_${cycle}` as keyof typeof STRIPE_PRICE_IDS;
     const priceId = STRIPE_PRICE_IDS[priceKey];
 
@@ -36,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // Check if customer already exists in user_tiers
     let customerId: string | undefined;
-    const { data: existingTier } = await supabase
+    const { data: existingTier } = await supabaseAdmin
       .from("user_tiers")
       .select("stripe_customer_id")
       .eq("user_id", userId)
