@@ -365,46 +365,63 @@ function DisagreesContent() {
     getSpreadHistory(ids).then(setHistoryMap).catch(() => {/* non-blocking */});
   }, [disagreements]);
 
-  // Fetch resolved disagreements when that tab is opened
+  // Fetch resolved disagreements when that tab is opened.
+  // NOTE: the `disagreements` table is wiped and rebuilt each ingest run —
+  // resolved markets are never present in it. We query `disagreement_snapshots`
+  // instead, which persists historical spread observations, then join to `markets`
+  // to filter for resolved pairs. The "final spread" is the last snapshot we
+  // captured for each pair — not necessarily the exact spread at resolution.
   useEffect(() => {
     if (activeTab !== "resolved") return;
     if (resolvedDisagreements.length > 0) return; // already loaded
     setResolvedLoading(true);
     (async () => {
       try {
-        // Step 1: get IDs of resolved markets
+        // Step 1: get resolved market IDs (cap at 100 to keep the IN clause short)
         const { data: resolvedMarkets } = await supabase
           .from("markets")
           .select("id")
           .eq("resolved", true)
-          .limit(200);
+          .limit(100);
 
         if (!resolvedMarkets || resolvedMarkets.length === 0) {
           setResolvedLoading(false);
           return;
         }
 
-        const resolvedIds = resolvedMarkets.map((m) => m.id);
+        const resolvedIds = resolvedMarkets.map((m: { id: string }) => m.id);
 
-        // Step 2: get disagreements that matched any of those market IDs
+        // Step 2: pull the most recent snapshots for any pair that involved a
+        // resolved market. disagreement_snapshots is an append-only table so
+        // resolved pairs are still present here even after ingest clears `disagreements`.
         const { data: rows } = await supabase
-          .from("disagreements")
-          .select("id, question, spread, updated_at, poly_market_id, kalshi_market_id")
+          .from("disagreement_snapshots")
+          .select("poly_market_id, kalshi_market_id, question, spread, captured_at")
           .or(`poly_market_id.in.(${resolvedIds.join(",")}),kalshi_market_id.in.(${resolvedIds.join(",")})`)
-          .order("updated_at", { ascending: false })
-          .limit(50);
+          .order("captured_at", { ascending: false })
+          .limit(500);
 
-        if (rows) {
-          setResolvedDisagreements(
-            rows.map((r) => ({
-              id: r.id,
-              question: r.question,
-              spread: Number(r.spread) || 0,
-              resolved_at: r.updated_at,
-              converged: (Number(r.spread) || 0) < 2,
-            }))
-          );
+        if (!rows || rows.length === 0) {
+          setResolvedLoading(false);
+          return;
         }
+
+        // Step 3: deduplicate — keep only the most-recent snapshot per pair
+        const seen = new Map<string, typeof rows[0]>();
+        for (const r of rows) {
+          const key = `${r.poly_market_id}|${r.kalshi_market_id}`;
+          if (!seen.has(key)) seen.set(key, r);
+        }
+
+        setResolvedDisagreements(
+          Array.from(seen.values()).map((r) => ({
+            id: `${r.poly_market_id}|${r.kalshi_market_id}`,
+            question: r.question,
+            spread: Number(r.spread) || 0,
+            resolved_at: r.captured_at,
+            converged: (Number(r.spread) || 0) < 2,
+          }))
+        );
       } catch {
         // non-fatal — show empty state
       } finally {
@@ -942,7 +959,7 @@ function DisagreesContent() {
                     <p className="text-xs font-medium text-[#e2e8f0] line-clamp-2 leading-snug">{d.question}</p>
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Final spread</div>
+                        <div className="text-[10px] text-[#8892b0] uppercase tracking-wider">Last tracked spread</div>
                         <div className={`text-sm font-bold font-mono tabular-nums ${d.converged ? "text-[#3fb950]" : "text-[#f85149]"}`}>
                           {d.spread.toFixed(1)}pt
                         </div>
@@ -953,7 +970,7 @@ function DisagreesContent() {
                     </div>
                     {d.resolved_at && (
                       <div className="text-[10px] text-[#484f58]">
-                        Resolved {new Date(d.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        Last observed {new Date(d.resolved_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </div>
                     )}
                   </div>
