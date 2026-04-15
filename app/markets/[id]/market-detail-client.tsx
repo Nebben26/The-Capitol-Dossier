@@ -92,80 +92,10 @@ import { EmbedButton } from "@/components/ui/embed-button";
 import { TradeButton } from "@/components/ui/trade-button";
 import { ChartSkeleton } from "@/components/ui/skeleton-loaders";
 import { useRecentMarkets } from "@/hooks/useRecentMarkets";
-import { PredictionModal } from "@/components/predictions/prediction-modal";
-import { CommunityPredictionWidget } from "@/components/community/community-prediction-widget";
 
 
 
-// ─── CORRELATED MARKETS ───────────────────────────────────────────────
-function CorrelatedMarketsSection({ marketId }: { marketId: string }) {
-  const [corrs, setCorrs] = useState<Array<{
-    otherId: string;
-    otherQuestion: string | null;
-    correlation: number;
-    otherCategory: string | null;
-  }>>([]);
-  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    if (!marketId) return;
-    fetch(`/api/correlations/${encodeURIComponent(marketId)}`)
-      .then((r) => r.json())
-      .then((json) => {
-        const top3 = (json.correlations ?? []).slice(0, 3);
-        setCorrs(top3);
-      })
-      .catch(() => {})
-      .finally(() => setLoaded(true));
-  }, [marketId]);
-
-  if (!loaded || corrs.length === 0) return null;
-
-  return (
-    <div className="mt-6 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <GitMerge className="size-4 text-[#a371f7]" />
-          <span className="text-sm font-bold text-[#f0f6fc]">Correlated Markets</span>
-        </div>
-        <Link
-          href={`/correlations/${encodeURIComponent(marketId)}`}
-          className="text-[11px] text-[#484f58] hover:text-[#a371f7] transition-colors"
-        >
-          View all →
-        </Link>
-      </div>
-      <div className="space-y-2">
-        {corrs.map((c) => {
-          const color = c.correlation >= 0.75 ? "#3fb950" : c.correlation >= 0 ? "#57D7BA" : c.correlation <= -0.75 ? "#f85149" : "#d29922";
-          return (
-            <Link
-              key={c.otherId}
-              href={`/markets/${c.otherId}`}
-              className="flex items-center gap-3 rounded-xl bg-[#161b27] border border-[#21262d] hover:border-[#a371f7]/20 p-3 transition-colors group"
-            >
-              <div
-                className="shrink-0 w-12 text-center rounded-lg px-1 py-1.5 border text-xs font-bold font-mono tabular-nums"
-                style={{ color, borderColor: `${color}30`, backgroundColor: `${color}10` }}
-              >
-                {c.correlation >= 0 ? "+" : ""}{c.correlation.toFixed(2)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-[#f0f6fc] line-clamp-1 group-hover:text-[#a371f7] transition-colors">
-                  {c.otherQuestion ?? c.otherId}
-                </p>
-                {c.otherCategory && (
-                  <span className="text-[9px] text-[#484f58]">{c.otherCategory}</span>
-                )}
-              </div>
-              <ExternalLink className="size-3.5 text-[#484f58] shrink-0" />
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 // ─── DEPTH CHART ──────────────────────────────────────────────────────
 function DepthChart({ bids, asks }: { bids: OrderbookLevel[]; asks: OrderbookLevel[] }) {
@@ -218,7 +148,6 @@ export default function MarketDetailPage() {
   }, [loadedMarket?.id]);
   const [timeRange, setTimeRange] = useState<"1D" | "7D" | "30D" | "90D" | "ALL">("30D");
   const [chartMode, setChartMode] = useState<"area" | "candle">("area");
-  const [showPredictionModal, setShowPredictionModal] = useState(false);
 
   // If market not found after data loads, show not-found state
   useEffect(() => {
@@ -456,13 +385,6 @@ export default function MarketDetailPage() {
                 <ShareCardButton title={market.question} price={market.price} change={market.change} />
                 <WatchlistButton type="market" itemId={market.id} name={market.question} />
                 <EmbedButton type="market" id={market.id} label="Embed" />
-                <button
-                  onClick={() => setShowPredictionModal(true)}
-                  className="inline-flex items-center gap-1.5 bg-[#0d1117] border border-[#21262d] text-[#8d96a0] hover:text-[#57D7BA] hover:border-[#57D7BA]/30 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  Predict
-                </button>
               </div>
             </CardContent>
           </Card>
@@ -1299,51 +1221,9 @@ export default function MarketDetailPage() {
           </div>
         )}
 
-        {/* Correlated Markets */}
-        {loadedMarket && (
-          <CorrelatedMarketsSection marketId={loadedMarket.id} />
-        )}
-
-        {/* Community Consensus */}
-        {loadedMarket && (
-          <CommunityPredictionWidget
-            marketId={loadedMarket.id}
-            marketQuestion={loadedMarket.question}
-            polyPrice={
-              loadedMarket.platform === "Polymarket"
-                ? loadedMarket.price
-                : marketDisagreement?.poly_price != null
-                ? Math.round(Number(marketDisagreement.poly_price))
-                : null
-            }
-            kalshiPrice={
-              loadedMarket.platform === "Kalshi"
-                ? loadedMarket.price
-                : marketDisagreement?.kalshi_price != null
-                ? Math.round(Number(marketDisagreement.kalshi_price))
-                : null
-            }
-            whaleConsensus={
-              marketWhales.length > 0
-                ? Math.round(
-                    marketWhales.reduce((s, w) => s + (w.avg_price ?? w.current_value ?? 50), 0) /
-                      marketWhales.length
-                  )
-                : null
-            }
-          />
-        )}
 
       </div>
 
-      {showPredictionModal && (
-        <PredictionModal
-          marketId={market.id}
-          marketQuestion={market.question}
-          currentPrice={market.price}
-          onClose={() => setShowPredictionModal(false)}
-        />
-      )}
     </>
   );
 }

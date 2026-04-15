@@ -1005,15 +1005,6 @@ async function main() {
       runErrors.push({ stage: "compute_indices", error: err.message });
     }
 
-    // Compute source accuracy on resolved markets (non-fatal)
-    try {
-      const { computeSourceAccuracy } = await import("./compute-source-accuracy");
-      await computeSourceAccuracy();
-    } catch (err: any) {
-      console.error("  Source accuracy computation failed (non-fatal):", err.message);
-      runErrors.push({ stage: "compute_source_accuracy", error: err.message });
-    }
-
     // Generate daily market briefs (non-fatal)
     try {
       const { generateBriefs } = await import("./generate-briefs");

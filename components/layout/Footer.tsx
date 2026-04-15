@@ -9,20 +9,18 @@ export function Footer() {
             <div className="text-[10px] font-bold uppercase tracking-widest text-[#484f58] mb-3">Product</div>
             <ul className="space-y-2 text-xs">
               <li><Link href="/" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Home</Link></li>
-              <li><Link href="/disagrees" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Arbitrage</Link></li>
-              <li><Link href="/whales" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Whale Tracker</Link></li>
-              <li><Link href="/screener" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Market Screener</Link></li>
-              <li><Link href="/morning-brief" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Morning Brief</Link></li>
+              <li><Link href="/disagrees" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Disagrees</Link></li>
+              <li><Link href="/whales" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Whales</Link></li>
+              <li><Link href="/indices" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Indices</Link></li>
             </ul>
           </div>
           <div>
             <div className="text-[10px] font-bold uppercase tracking-widest text-[#484f58] mb-3">Company</div>
             <ul className="space-y-2 text-xs">
               <li><Link href="/about" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">About</Link></li>
-              <li><Link href="/pricing" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Pricing</Link></li>
               <li><Link href="/methodology" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Methodology</Link></li>
-              <li><Link href="/about-data" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">About Our Data</Link></li>
               <li><Link href="/blog" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">Blog</Link></li>
+              <li><a href="https://thecapitoldossier.com" target="_blank" rel="noopener noreferrer" className="text-[#8d96a0] hover:text-[#57D7BA] transition-colors">The Capitol Dossier ↗</a></li>
             </ul>
           </div>
           <div>

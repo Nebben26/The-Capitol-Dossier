@@ -2,111 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Activity,
-  Users,
-  Trophy,
-  Bell,
-  Home,
-  Target,
-  X,
-  GitCompareArrows,
-  GitMerge,
-  ArrowLeftRight,
-  Crosshair,
-  Star,
-  Newspaper,
-  DollarSign,
-  Copy,
-  Code,
-  CreditCard,
-  Server,
-  FileText,
-  BookOpen,
-  Sparkles,
-  CalendarDays,
-  Zap,
-  Mail,
-  Info,
-  Settings,
-  CheckCircle,
-  Wallet,
-  Calculator,
-  TrendingUp,
-  BarChart3,
-  FlaskConical,
-} from "lucide-react";
-import { SidebarUpgradeCard } from "@/components/ui/pro-gate";
+import { Activity, Users, BarChart3, GitMerge, X, ExternalLink, LogIn } from "lucide-react";
+import { useAuth } from "@/components/layout/AuthContext";
 
-const navGroups = [
-  {
-    label: "Discover",
-    items: [
-      { label: "Home", icon: Home, href: "/" },
-      { label: "Screener", icon: Target, href: "/screener" },
-      { label: "Resolved", icon: CheckCircle, href: "/resolved" },
-      { label: "Calendar", icon: CalendarDays, href: "/calendar" },
-      { label: "Compare", icon: ArrowLeftRight, href: "/compare" },
-      { label: "Insights", icon: Newspaper, href: "/insights" },
-      { label: "Stories", icon: Sparkles, href: "/stories" },
-      { label: "Morning Brief", icon: Mail, href: "/morning-brief" },
-    ],
-  },
-  {
-    label: "Arbitrage",
-    items: [
-      { label: "Disagrees", icon: GitCompareArrows, href: "/disagrees" },
-      { label: "Simulator", icon: Calculator, href: "/simulate" },
-      { label: "Backtester", icon: TrendingUp, href: "/backtest" },
-      { label: "Flow", icon: DollarSign, href: "/flow" },
-    ],
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { label: "Indices", icon: BarChart3, href: "/indices", badge: "NEW" },
-      { label: "Correlations", icon: GitMerge, href: "/correlations" },
-      { label: "Accuracy", icon: FlaskConical, href: "/accuracy" },
-    ],
-  },
-  {
-    label: "Whales",
-    items: [
-      { label: "Whales", icon: Users, href: "/whales" },
-      { label: "Smart Money", icon: Copy, href: "/copy" },
-      { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
-    ],
-  },
-  {
-    label: "My Account",
-    items: [
-      { label: "My Quiver", icon: Wallet, href: "/my", badge: "NEW" },
-      { label: "My Profile", icon: Target, href: "/profile/claim" },
-      { label: "Watchlist", icon: Star, href: "/watchlist" },
-      { label: "Calibration", icon: Crosshair, href: "/calibration" },
-      { label: "Alerts", icon: Bell, href: "/alerts" },
-      { label: "Settings", icon: Settings, href: "/settings" },
-    ],
-  },
-  {
-    label: "Developer",
-    items: [
-      { label: "Market Briefs", icon: FileText, href: "/briefs", badge: "NEW" },
-      { label: "API Docs", icon: Code, href: "/api" },
-      { label: "API Keys", icon: Zap, href: "/settings/api-keys" },
-    ],
-  },
-  {
-    label: "Platform",
-    items: [
-      { label: "Pricing", icon: CreditCard, href: "/pricing" },
-      { label: "Status", icon: Server, href: "/status" },
-      { label: "Changelog", icon: FileText, href: "/changelog" },
-      { label: "Blog", icon: BookOpen, href: "/blog" },
-      { label: "Methodology", icon: BookOpen, href: "/methodology" },
-      { label: "About", icon: Info, href: "/about" },
-    ],
-  },
+const NAV = [
+  { label: "Disagrees", icon: GitMerge, href: "/disagrees" },
+  { label: "Whales", icon: Users, href: "/whales" },
+  { label: "Indices", icon: BarChart3, href: "/indices" },
 ];
 
 export function Sidebar({
@@ -117,11 +19,9 @@ export function Sidebar({
   onClose: () => void;
 }) {
   const pathname = usePathname();
+  const { user, setShowLogin } = useAuth();
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
-  };
+  const isActive = (href: string) => pathname.startsWith(href);
 
   return (
     <>
@@ -132,7 +32,7 @@ export function Sidebar({
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 h-14 border-b border-[#21262d]">
-          <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0">
+          <Link href="/" className="flex items-center gap-2.5 flex-1 min-w-0" onClick={onClose}>
             <div className="w-8 h-8 rounded-lg bg-[#57D7BA] flex items-center justify-center shrink-0 shadow-glow-brand">
               <Activity className="size-4 text-[#0d1117]" />
             </div>
@@ -149,47 +49,60 @@ export function Sidebar({
           </button>
         </div>
 
-        {/* Nav groups */}
-        <nav className="flex-1 py-2 overflow-y-auto scrollbar-thin">
-          {navGroups.map((group, gi) => (
-            <div key={group.label}>
-              <div className={`px-3 mb-1 ${gi === 0 ? "mt-2" : "mt-5"}`}>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#484f58]">
-                  {group.label}
-                </span>
-              </div>
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={onClose}
-                      className={`flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150 ${
-                        active
-                          ? "bg-gradient-to-r from-[#57D7BA]/15 to-transparent border-l-2 border-[#57D7BA] text-[#57D7BA] font-semibold rounded-r-lg pl-[10px] pr-3"
-                          : "text-[#8d96a0] hover:bg-[#1c2333] hover:text-[#f0f6fc] rounded-lg mx-1 px-3"
-                      }`}
-                    >
-                      <item.icon className="size-4 shrink-0" />
-                      {item.label}
-                      {"badge" in item && item.badge && (
-                        <span className="ml-auto text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-[#57D7BA]/15 text-[#57D7BA] border border-[#57D7BA]/20">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        {/* Main nav */}
+        <nav className="flex-1 py-4 px-2 space-y-0.5">
+          {NAV.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={onClose}
+                className={`flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150 ${
+                  active
+                    ? "bg-gradient-to-r from-[#57D7BA]/15 to-transparent border-l-2 border-[#57D7BA] text-[#57D7BA] font-semibold rounded-r-lg pl-[10px] pr-3"
+                    : "text-[#8d96a0] hover:bg-[#1c2333] hover:text-[#f0f6fc] rounded-lg px-3"
+                }`}
+              >
+                <item.icon className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Upgrade card */}
-        <div className="px-3 pb-4">
-          <SidebarUpgradeCard />
+        {/* Footer section */}
+        <div className="px-3 pb-5 space-y-1">
+          <div className="border-t border-[#21262d] mb-3" />
+
+          <a
+            href="https://thecapitoldossier.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[#8d96a0] hover:text-[#f0f6fc] transition-colors"
+          >
+            <ExternalLink className="size-3.5 shrink-0" />
+            <span className="text-xs">The Capitol Dossier</span>
+          </a>
+
+          {user ? (
+            <Link
+              href="/settings"
+              onClick={onClose}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[#8d96a0] hover:text-[#f0f6fc] transition-colors"
+            >
+              <LogIn className="size-3.5 shrink-0" />
+              <span className="text-xs">Account</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => { setShowLogin(true); onClose(); }}
+              className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-[#8d96a0] hover:text-[#f0f6fc] transition-colors"
+            >
+              <LogIn className="size-3.5 shrink-0" />
+              <span className="text-xs">Sign in</span>
+            </button>
+          )}
         </div>
       </aside>
 

@@ -240,7 +240,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
             )}
             {hasResults && (
               <div className="px-3 py-2 border-t border-[#21262d] text-center">
-                <Link href="/screener" onClick={() => { setOpen(false); setQuery(""); }} className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">Browse all markets →</Link>
+                <Link href="/markets" onClick={() => { setOpen(false); setQuery(""); }} className="text-[10px] text-[#8892b0] hover:text-[#57D7BA] transition-colors">Browse all markets →</Link>
               </div>
             )}
           </div>
@@ -254,11 +254,6 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           <span className="w-1.5 h-1.5 rounded-full bg-[#3fb950] animate-pulse shrink-0" />
           LIVE
         </div>
-
-        {/* My Calibration */}
-        <Link href="/calibration" className="hidden xl:inline text-[11px] text-[#8d96a0] hover:text-[#f0f6fc] transition-colors">
-          My Calibration
-        </Link>
 
         {/* Disagrees count */}
         <Link href="/disagrees" className="hidden md:inline-flex items-center gap-1 bg-[#161b27] border border-[#21262d] text-[#f0f6fc] text-[11px] font-semibold px-2 py-1 rounded-md hover:border-[#57D7BA]/40 transition-colors">
